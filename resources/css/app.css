@@ -1,0 +1,493 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* The source toggles a `.dark` class on <html> via JS; make `dark:` utilities follow the class. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Alpine: hide elements until Alpine initializes. */
+[x-cloak] { display: none !important; }
+
+@theme {
+  /* Medical Color Palette */
+  --color-medical-blue: #1e5f9f;
+  --color-medical-blue-light: #3d7fc4;
+  --color-medical-blue-dark: #0d3d6e;
+  --color-soft-pink: #f8e8ee;
+  --color-soft-pink-dark: #e8c8d8;
+  --color-light-gold: #d4af37;
+  --color-light-gold-light: #e8c864;
+  --color-medical-white: #fafbfc;
+  --color-medical-gray: #6b7280;
+  --color-medical-success: #10b981;
+  --color-medical-warning: #f59e0b;
+  --color-medical-error: #ef4444;
+
+  /* Font Families */
+  --font-family-cairo: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+  --font-family-poppins: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
+  --font-cairo: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+  --font-poppins: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 208 67% 37%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 340 30% 94%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 43 74% 52%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 208 67% 37%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 208 67% 50%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 340 20% 20%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 43 74% 45%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 208 67% 50%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* RTL Support */
+  [dir="rtl"] {
+    font-family: var(--font-family-cairo);
+  }
+
+  [dir="ltr"] {
+    font-family: var(--font-family-poppins);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.7);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(30, 95, 159, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(30, 95, 159, 0.5);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gradient backgrounds */
+.gradient-medical {
+  background: linear-gradient(135deg, var(--color-medical-blue) 0%, var(--color-medical-blue-light) 100%);
+}
+
+.gradient-soft {
+  background: linear-gradient(135deg, var(--color-soft-pink) 0%, #fff 100%);
+}
+
+.gradient-gold {
+  background: linear-gradient(135deg, var(--color-light-gold) 0%, var(--color-light-gold-light) 100%);
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .glass {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: var(--color-medical-blue);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-medical-blue-dark);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background-color: var(--color-soft-pink);
+  color: var(--color-medical-blue);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-soft-pink-dark);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-gold {
+  background-color: var(--color-light-gold);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-gold:hover {
+  background-color: var(--color-light-gold-light);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Section styling */
+.section-padding {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+
+.container-custom {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-custom {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-custom {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Heading styles */
+.heading-primary {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-medical-blue);
+}
+
+@media (min-width: 768px) {
+  .heading-primary {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .heading-primary {
+    font-size: 3rem;
+  }
+}
+
+.dark .heading-primary {
+  color: white;
+}
+
+.heading-secondary {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+@media (min-width: 768px) {
+  .heading-secondary {
+    font-size: 1.875rem;
+  }
+}
+
+.dark .heading-secondary {
+  color: white;
+}
+
+/* Medical icon container */
+.icon-container {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-soft-pink) 0%, #fff 100%);
+}
+
+.dark .icon-container {
+  background: linear-gradient(135deg, rgba(248, 232, 238, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+}
+
+/* Stats counter */
+.stats-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-medical-blue);
+  background: linear-gradient(135deg, var(--color-medical-blue) 0%, var(--color-light-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (min-width: 768px) {
+  .stats-number {
+    font-size: 3rem;
+  }
+}
+
+/* Form styles */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-medical-blue);
+  border-color: transparent;
+}
+
+.dark .form-input {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: white;
+}
+
+/* WhatsApp button */
+.whatsapp-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  z-index: 50;
+  background-color: #22c55e;
+  color: white;
+  padding: 1rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s;
+}
+
+[dir="rtl"] .whatsapp-btn {
+  left: 1.5rem;
+}
+
+[dir="ltr"] .whatsapp-btn {
+  right: 1.5rem;
+}
+
+.whatsapp-btn:hover {
+  transform: scale(1.1);
+  background-color: #16a34a;
+}
+
+/* Loading spinner */
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 4px solid var(--color-medical-blue);
+  border-top-color: transparent;
+  border-radius: 9999px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Badge styles */
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.badge-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-info {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.dark .badge-success {
+  background-color: rgba(22, 101, 52, 0.3);
+  color: #86efac;
+}
+
+.dark .badge-warning {
+  background-color: rgba(146, 64, 14, 0.3);
+  color: #fcd34d;
+}
+
+.dark .badge-error {
+  background-color: rgba(153, 27, 27, 0.3);
+  color: #fca5a5;
+}
+
+.dark .badge-info {
+  background-color: rgba(30, 64, 175, 0.3);
+  color: #93c5fd;
+}
