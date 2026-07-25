@@ -1,13 +1,13 @@
 @extends('layouts.public')
 
-@section('title', 'المدونة الطبية | د. محمد عوض')
+@section('title', __('blogTitle') . ' | ' . __('heroTitle'))
 
 @section('content')
     {{-- Hero --}}
     <section class="pt-32 pb-16 gradient-medical">
         <div class="container-custom text-center text-white">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">المدونة الطبية</h1>
-            <p class="text-xl text-white/80 max-w-2xl mx-auto">مقالات طبية موثوقة ونصائح صحية من د. محمد عوض</p>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ __('blogTitle') }}</h1>
+            <p class="text-xl text-white/80 max-w-2xl mx-auto">{{ __('blogHeroSubtitle') }}</p>
         </div>
     </section>
 
@@ -54,11 +54,11 @@
                                 </div>
                                 <div class="flex items-center gap-2 text-sm text-gray-500">
                                     @svg('lucide-calendar', 'w-3.5 h-3.5')
-                                    {{ \Carbon\Carbon::parse($article['date'])->locale('ar_EG')->isoFormat('D/M/YYYY') }}
+                                    {{ \Carbon\Carbon::parse($article['date'])->locale(app()->getLocale() === 'en' ? 'en' : 'ar_EG')->isoFormat('D/M/YYYY') }}
                                 </div>
                             </div>
                             <a href="/blog/{{ $article['id'] }}" class="mt-4 flex items-center gap-2 text-medical-blue font-medium hover:underline">
-                                اقرأ المزيد
+                                {{ __('readMore') }}
                                 @svg('lucide-arrow-left', 'w-4 h-4')
                             </a>
                         </div>
@@ -69,11 +69,11 @@
             {{-- Pagination --}}
             <div class="flex justify-center mt-12">
                 <div class="flex gap-2">
-                    <button class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">السابق</button>
+                    <button class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">{{ __('prevPage') }}</button>
                     <button class="px-4 py-2 bg-medical-blue text-white rounded-lg">1</button>
                     <button class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">2</button>
                     <button class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">3</button>
-                    <button class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">التالي</button>
+                    <button class="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">{{ __('nextPage') }}</button>
                 </div>
             </div>
         </div>
@@ -82,15 +82,15 @@
     {{-- Newsletter --}}
     <section class="py-16 bg-gray-50 dark:bg-gray-900">
         <div class="container-custom text-center">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">اشتركي في نشرتنا البريدية</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">{{ __('newsletterTitle') }}</h2>
             <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-xl mx-auto">
-                احصلي على أحدث المقالات الطبية والنصائح الصحية مباشرة في بريدك الإلكتروني
+                {{ __('newsletterDesc') }}
             </p>
             <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="return false">
-                <input type="email" placeholder="بريدك الإلكتروني"
+                <input type="email" placeholder="{{ __('emailPlaceholder') }}"
                        class="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-medical-blue">
                 <button type="submit" class="px-6 py-3 bg-medical-blue text-white rounded-lg font-semibold hover:bg-medical-blue-dark transition-colors">
-                    اشتراك
+                    {{ __('subscribeBtn') }}
                 </button>
             </form>
         </div>

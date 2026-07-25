@@ -1,13 +1,13 @@
-@props(['testimonials' => [], 'stats' => []])
-<section class="section-padding bg-gradient-to-br from-soft-pink to-white dark:from-gray-800 dark:to-gray-900" dir="rtl"
+@props(['testimonials' => []])
+<section class="section-padding bg-gradient-to-br from-soft-pink to-white dark:from-gray-800 dark:to-gray-900"
          x-data="{ i: 0, items: @js($testimonials), next() { this.i = (this.i + 1) % this.items.length }, prev() { this.i = (this.i - 1 + this.items.length) % this.items.length } }">
     <div class="container-custom">
         {{-- Section Header --}}
         <div class="text-center max-w-3xl mx-auto mb-16">
-            <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">آراء المريضات</span>
-            <h2 class="heading-primary mb-6">قصص نجاح ملهمة</h2>
+            <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">{{ __('testimonials') }}</span>
+            <h2 class="heading-primary mb-6">{{ __('successStoriesTitle') }}</h2>
             <p class="text-gray-600 dark:text-gray-400 text-lg">
-                آلاف السيدات حققن حلمهن بالأمومة وتغلبن على التحديات الصحية بفضل الله ثم بفضل خبرتنا ورعايتنا المتميزة.
+                {{ __('successStoriesSubtitle') }}
             </p>
         </div>
 
@@ -60,16 +60,6 @@
                             class="w-3 h-3 rounded-full transition-all"></button>
                 @endforeach
             </div>
-        </div>
-
-        {{-- Stats --}}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
-            @foreach ($stats as $stat)
-                <div class="text-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
-                    <div class="text-3xl md:text-4xl font-bold text-medical-blue dark:text-light-gold mb-2">{{ $stat['value'] }}</div>
-                    <div class="text-gray-600 dark:text-gray-400">{{ $stat['label'] }}</div>
-                </div>
-            @endforeach
         </div>
     </div>
 </section>

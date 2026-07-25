@@ -1,12 +1,12 @@
 @props(['services' => []])
-<section class="section-padding bg-gray-50 dark:bg-gray-900" dir="rtl">
+<section class="section-padding bg-gray-50 dark:bg-gray-900">
     <div class="container-custom">
         {{-- Section Header --}}
         <div class="text-center max-w-3xl mx-auto mb-16">
-            <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">خدماتنا الطبية</span>
-            <h2 class="heading-primary mb-6">نقدم أفضل الخدمات الطبية المتخصصة</h2>
+            <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">{{ __('servicesEyebrow') }}</span>
+            <h2 class="heading-primary mb-6">{{ __('servicesHeading') }}</h2>
             <p class="text-gray-600 dark:text-gray-400 text-lg">
-                نقدم مجموعة شاملة من الخدمات الطبية المتخصصة في مجالات النساء والتوليد وعلاج العقم وجراحات المناظير بأحدث التقنيات العالمية.
+                {{ __('servicesHomeSubtitle') }}
             </p>
         </div>
 
@@ -38,7 +38,7 @@
 
                             <x-ui.button href="{{ $service['href'] }}" variant="ghost"
                                          class="w-full group-hover:bg-medical-blue group-hover:text-white transition-all">
-                                اعرف المزيد
+                                {{ __('learnMore') }}
                                 <x-slot:rightIcon>@svg('lucide-arrow-left', 'w-[18px] h-[18px]')</x-slot:rightIcon>
                             </x-ui.button>
                         </div>
@@ -50,7 +50,7 @@
         {{-- CTA --}}
         <div class="text-center mt-12">
             <x-ui.button href="/services" variant="primary" size="lg">
-                عرض جميع الخدمات
+                {{ __('viewAllServices') }}
                 <x-slot:rightIcon>@svg('lucide-arrow-left', 'w-5 h-5')</x-slot:rightIcon>
             </x-ui.button>
         </div>

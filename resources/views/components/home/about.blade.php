@@ -1,5 +1,5 @@
 @props(['achievements' => [], 'highlights' => []])
-<section class="section-padding" dir="rtl">
+<section class="section-padding">
     <div class="container-custom">
         <div class="grid lg:grid-cols-2 gap-16 items-center">
             {{-- Image Section --}}
@@ -8,8 +8,8 @@
                     <img src="/images/dr-mohamed-awad.jpg" alt="د. محمد عوض" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-medical-blue/80 via-transparent to-transparent flex items-end p-8">
                         <div class="text-white">
-                            <h3 class="text-2xl font-bold mb-1">د. محمد عوض</h3>
-                            <p class="text-white/90 text-sm">استشاري النساء والتوليد والحقن المجهري</p>
+                            <h3 class="text-2xl font-bold mb-1">{{ __('heroTitle') }}</h3>
+                            <p class="text-white/90 text-sm">{{ __('doctorTitleShort') }}</p>
                         </div>
                     </div>
                 </div>
@@ -17,7 +17,7 @@
                 {{-- Experience Badge --}}
                 <div class="absolute -bottom-6 -left-6 bg-light-gold text-white rounded-2xl p-6 shadow-xl">
                     <div class="text-4xl font-bold">20+</div>
-                    <div class="text-sm">سنة خبرة</div>
+                    <div class="text-sm">{{ __('yearsExperienceBadge') }}</div>
                 </div>
 
                 {{-- Decorative Elements --}}
@@ -27,13 +27,13 @@
 
             {{-- Content Section --}}
             <div>
-                <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">عن الدكتور</span>
-                <h2 class="heading-primary mb-6">د. محمد عوض</h2>
+                <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">{{ __('aboutEyebrow') }}</span>
+                <h2 class="heading-primary mb-6">{{ __('heroTitle') }}</h2>
                 <p class="text-xl text-medical-blue dark:text-light-gold font-medium mb-4">
-                    استشاري النساء والتوليد والحقن المجهري وجراحات المناظير
+                    {{ __('heroSubtitle') }}
                 </p>
                 <p class="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                    يتمتع الدكتور محمد عوض بخبرة تزيد عن 20 عاماً في مجال النساء والتوليد وعلاج العقم. حاصل على درجة الدكتوراه من جامعة القاهرة وزمالة الكلية الملكية البريطانية، ويعتمد في علاجاته على أحدث التقنيات العالمية والبروتوكولات العلاجية المتطورة.
+                    {{ __('aboutBioHome') }}
                 </p>
 
                 {{-- Achievements Grid --}}
@@ -62,7 +62,7 @@
                 </div>
 
                 <x-ui.button href="/about" variant="primary" size="lg">
-                    تعرف على المزيد
+                    {{ __('learnMore') }}
                     <x-slot:rightIcon>@svg('lucide-arrow-left', 'w-5 h-5')</x-slot:rightIcon>
                 </x-ui.button>
             </div>

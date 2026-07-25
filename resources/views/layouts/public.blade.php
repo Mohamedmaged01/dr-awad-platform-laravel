@@ -1,11 +1,15 @@
+@php
+    $locale = app()->getLocale();
+    $dir = $locale === 'ar' ? 'rtl' : 'ltr';
+    $bodyFont = $locale === 'ar' ? 'font-cairo' : 'font-poppins';
+@endphp
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="scroll-smooth">
+<html lang="{{ $locale }}" dir="{{ $dir }}" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'د. محمد عوض | استشاري النساء والتوليد والحقن المجهري')</title>
-    <meta name="description" content="@yield('description', 'منصة متكاملة لعيادة الدكتور محمد عوض المتخصصة في النساء والتوليد، الحقن المجهري وأطفال الأنابيب، وجراحات المناظير. احجزي موعدك الآن.')">
-    <meta name="keywords" content="دكتور نساء وتوليد، حقن مجهري، أطفال أنابيب، جراحات مناظير، علاج العقم، متابعة الحمل، القاهرة">
+    <title>@yield('title', __('metaTitle'))</title>
+    <meta name="description" content="@yield('description', __('metaDescription'))">
 
     {{-- Set the theme class before paint to avoid a flash (mirrors Header.tsx useEffect). --}}
     <script>
@@ -23,14 +27,15 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-cairo antialiased">
-    <main class="min-h-screen @yield('main-class')" dir="rtl">
+<body class="{{ $bodyFont }} antialiased">
+    <main class="min-h-screen @yield('main-class')" dir="{{ $dir }}">
         <x-layout.header />
 
         @yield('content')
 
         <x-layout.footer />
         <x-whatsapp-button />
+        <x-scroll-to-top />
     </main>
 </body>
 </html>

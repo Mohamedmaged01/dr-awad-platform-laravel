@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'احجز موعدك | د. محمد عوض')
+@section('title', __('bookingPageTitle') . ' | ' . __('heroTitle'))
 
 @section('content')
 {{-- Mirrors booking/page.tsx: 3-step wizard, 2s simulated submit, success screen. --}}
@@ -28,23 +28,23 @@
                     <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
                         @svg('lucide-check-circle', 'w-14 h-14 text-green-500')
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">تم استلام طلب الحجز بنجاح!</h2>
+                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">{{ __('bookingReceivedTitle') }}</h2>
                     <p class="text-gray-600 dark:text-gray-400 text-lg mb-6">
-                        شكراً لك، سيتواصل معك فريقنا خلال ساعات العمل لتأكيد موعدك.
+                        {{ __('bookingReceivedDescLong') }}
                     </p>
                     <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mb-8 text-start">
-                        <h3 class="font-bold text-gray-800 dark:text-white mb-4">تفاصيل الحجز:</h3>
+                        <h3 class="font-bold text-gray-800 dark:text-white mb-4">{{ __('bookingDetails') }}</h3>
                         <div class="space-y-2 text-gray-600 dark:text-gray-400">
-                            <p><strong>الفرع:</strong> <span x-text="selectedBranch?.label"></span></p>
-                            <p><strong>الخدمة:</strong> <span x-text="selectedService?.label"></span></p>
-                            <p><strong>التاريخ:</strong> <span x-text="form.date"></span></p>
-                            <p><strong>الوقت:</strong> <span x-text="form.time"></span></p>
-                            <p><strong>الاسم:</strong> <span x-text="form.name"></span></p>
+                            <p><strong>{{ __('branch') }}:</strong> <span x-text="selectedBranch?.label"></span></p>
+                            <p><strong>{{ __('serviceLabel') }}:</strong> <span x-text="selectedService?.label"></span></p>
+                            <p><strong>{{ __('date') }}:</strong> <span x-text="form.date"></span></p>
+                            <p><strong>{{ __('time') }}:</strong> <span x-text="form.time"></span></p>
+                            <p><strong>{{ __('nameLabel') }}:</strong> <span x-text="form.name"></span></p>
                         </div>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <x-ui.button variant="primary" x-on:click="reset()">حجز موعد آخر</x-ui.button>
-                        <x-ui.button href="/" variant="outline">العودة للرئيسية</x-ui.button>
+                        <x-ui.button variant="primary" x-on:click="reset()">{{ __('bookAnother') }}</x-ui.button>
+                        <x-ui.button href="/" variant="outline">{{ __('backToHome') }}</x-ui.button>
                     </div>
                 </x-ui.card-content>
             </x-ui.card>
@@ -56,8 +56,8 @@
         {{-- Hero --}}
         <section class="pt-32 pb-8 gradient-medical">
             <div class="container-custom text-center text-white">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">احجز موعدك</h1>
-                <p class="text-xl text-white/80">احجزي موعدك بسهولة في خطوات بسيطة</p>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ __('bookingPageTitle') }}</h1>
+                <p class="text-xl text-white/80">{{ __('bookingPageSubtitle') }}</p>
             </div>
         </section>
 
@@ -65,7 +65,7 @@
         <section class="py-8 bg-white dark:bg-gray-800 shadow-sm sticky top-20 z-30">
             <div class="container-custom">
                 <div class="flex justify-center items-center gap-4">
-                    @foreach ([1 => 'الخدمة والموعد', 2 => 'البيانات', 3 => 'التأكيد'] as $s => $label)
+                    @foreach ([1 => __('stepServiceTime'), 2 => __('stepInfo'), 3 => __('stepConfirm')] as $s => $label)
                         <div class="flex items-center gap-2" :class="step >= {{ $s }} ? 'text-medical-blue' : 'text-gray-400'">
                             <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold"
                                  :class="step >= {{ $s }} ? 'bg-medical-blue text-white' : 'bg-gray-200 text-gray-500'">
@@ -90,21 +90,21 @@
                         <form @submit.prevent="submit()">
                             {{-- Step 1: Service & Time --}}
                             <div x-show="step === 1" class="space-y-6">
-                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">اختاري الخدمة والموعد</h2>
+                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('step1Heading') }}</h2>
 
-                                <x-ui.select label="الفرع" name="branch" x-model="form.branch"
+                                <x-ui.select :label="__('branch')" name="branch" x-model="form.branch"
                                              :options="collect($branches)->map(fn ($b) => ['value' => $b['value'], 'label' => $b['label']])->all()"
-                                             placeholder="اختاري الفرع" required />
+                                             :placeholder="__('selectBranchPlaceholder')" required />
 
-                                <x-ui.select label="نوع الخدمة" name="service" x-model="form.service"
-                                             :options="collect($services)->map(fn ($s) => ['value' => $s['value'], 'label' => $s['label'] . ' - ' . $s['price'] . ' جنيه'])->all()"
-                                             placeholder="اختاري الخدمة" required />
+                                <x-ui.select :label="__('serviceType')" name="service" x-model="form.service"
+                                             :options="collect($services)->map(fn ($s) => ['value' => $s['value'], 'label' => $s['label'] . ' - ' . $s['price'] . ' ' . __('egp')])->all()"
+                                             :placeholder="__('selectServicePlaceholder')" required />
 
-                                <x-ui.input label="التاريخ" name="date" type="date" x-model="form.date"
+                                <x-ui.input :label="__('date')" name="date" type="date" x-model="form.date"
                                             min="{{ now()->toDateString() }}" required />
 
                                 <div x-show="form.date" x-cloak>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">اختاري الوقت المناسب</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ __('chooseTime') }}</label>
                                     <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
                                         @foreach ($timeSlots as $slot)
                                             <button type="button" @click="form.time = '{{ $slot }}'"
@@ -121,7 +121,7 @@
                                 <div class="flex justify-end pt-6">
                                     <x-ui.button type="button" variant="primary" size="lg" x-on:click="step = 2"
                                                  ::disabled="!form.branch || !form.service || !form.date || !form.time">
-                                        التالي
+                                        {{ __('next') }}
                                         <x-slot:rightIcon>@svg('lucide-arrow-left', 'w-[18px] h-[18px]')</x-slot:rightIcon>
                                     </x-ui.button>
                                 </div>
@@ -129,31 +129,31 @@
 
                             {{-- Step 2: Personal Info --}}
                             <div x-show="step === 2" x-cloak class="space-y-6">
-                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">بياناتك الشخصية</h2>
+                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('step2Heading') }}</h2>
 
-                                <x-ui.input label="الاسم الكامل" name="name" x-model="form.name" placeholder="أدخلي اسمك الكامل" required>
+                                <x-ui.input :label="__('fullName')" name="name" x-model="form.name" :placeholder="__('enterFullName')" required>
                                     <x-slot:leftIcon>@svg('lucide-user', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                                 </x-ui.input>
 
-                                <x-ui.input label="رقم الهاتف" name="phone" type="tel" x-model="form.phone" placeholder="01xxxxxxxxx" required>
+                                <x-ui.input :label="__('phone')" name="phone" type="tel" x-model="form.phone" placeholder="01xxxxxxxxx" required>
                                     <x-slot:leftIcon>@svg('lucide-phone', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                                 </x-ui.input>
 
-                                <x-ui.input label="البريد الإلكتروني (اختياري)" name="email" type="email" x-model="form.email" placeholder="example@email.com">
+                                <x-ui.input :label="__('emailOptional')" name="email" type="email" x-model="form.email" placeholder="example@email.com">
                                     <x-slot:leftIcon>@svg('lucide-mail', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                                 </x-ui.input>
 
-                                <x-ui.textarea label="ملاحظات إضافية (اختياري)" name="notes" x-model="form.notes" rows="3"
-                                               placeholder="أي ملاحظات أو استفسارات تودين إضافتها..." />
+                                <x-ui.textarea :label="__('notesOptional')" name="notes" x-model="form.notes" rows="3"
+                                               :placeholder="__('notesPlaceholderLong')" />
 
                                 <div class="flex justify-between pt-6">
                                     <x-ui.button type="button" variant="outline" size="lg" x-on:click="step = 1">
                                         <x-slot:leftIcon>@svg('lucide-arrow-right', 'w-[18px] h-[18px]')</x-slot:leftIcon>
-                                        السابق
+                                        {{ __('prev') }}
                                     </x-ui.button>
                                     <x-ui.button type="button" variant="primary" size="lg" x-on:click="step = 3"
                                                  ::disabled="!form.name || !form.phone">
-                                        مراجعة الحجز
+                                        {{ __('reviewBooking') }}
                                         <x-slot:rightIcon>@svg('lucide-arrow-left', 'w-[18px] h-[18px]')</x-slot:rightIcon>
                                     </x-ui.button>
                                 </div>
@@ -161,7 +161,7 @@
 
                             {{-- Step 3: Confirmation --}}
                             <div x-show="step === 3" x-cloak class="space-y-6">
-                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">تأكيد الحجز</h2>
+                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('confirmBooking') }}</h2>
 
                                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 space-y-4">
                                     <div class="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
@@ -176,7 +176,7 @@
                                         @svg('lucide-calendar', 'w-5 h-5 text-medical-blue')
                                         <div>
                                             <p class="font-medium text-gray-800 dark:text-white" x-text="form.date"></p>
-                                            <p class="text-sm text-gray-500">التاريخ المحدد</p>
+                                            <p class="text-sm text-gray-500">{{ __('selectedDate') }}</p>
                                         </div>
                                     </div>
 
@@ -184,7 +184,7 @@
                                         @svg('lucide-clock', 'w-5 h-5 text-medical-blue')
                                         <div>
                                             <p class="font-medium text-gray-800 dark:text-white" x-text="form.time"></p>
-                                            <p class="text-sm text-gray-500">الوقت المحدد</p>
+                                            <p class="text-sm text-gray-500">{{ __('selectedTime') }}</p>
                                         </div>
                                     </div>
 
@@ -199,22 +199,22 @@
                                     <div class="flex items-center justify-between pt-2">
                                         <div>
                                             <p class="font-medium text-gray-800 dark:text-white" x-text="selectedService?.label"></p>
-                                            <p class="text-sm text-gray-500">الخدمة المطلوبة</p>
+                                            <p class="text-sm text-gray-500">{{ __('requestedService') }}</p>
                                         </div>
                                         <div class="text-2xl font-bold text-medical-blue">
-                                            <span x-text="selectedService?.price"></span> جنيه
+                                            <span x-text="selectedService?.price"></span> {{ __('egp') }}
                                         </div>
                                     </div>
                                 </div>
 
                                 <p class="text-sm text-gray-500 text-center">
-                                    بالضغط على &quot;تأكيد الحجز&quot; سيتم إرسال طلبك وسيتواصل معك فريقنا للتأكيد
+                                    {{ __('confirmNote') }}
                                 </p>
 
                                 <div class="flex justify-between pt-6">
                                     <x-ui.button type="button" variant="outline" size="lg" x-on:click="step = 2">
                                         <x-slot:leftIcon>@svg('lucide-arrow-right', 'w-[18px] h-[18px]')</x-slot:leftIcon>
-                                        السابق
+                                        {{ __('prev') }}
                                     </x-ui.button>
 
                                     <button type="submit" :disabled="submitting"
@@ -226,7 +226,7 @@
                                             </svg>
                                         </span>
                                         <span x-show="!submitting" class="flex-shrink-0">@svg('lucide-check-circle', 'w-[18px] h-[18px]')</span>
-                                        تأكيد الحجز
+                                        {{ __('confirmBooking') }}
                                     </button>
                                 </div>
                             </div>

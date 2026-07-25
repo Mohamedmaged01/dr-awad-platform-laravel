@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $pageTitle . ' | لوحة التحكم')
+@section('title', $pageTitle . ' | ' . __('dashboard'))
 
 @section('content')
     <div class="flex items-center justify-center min-h-[60vh]">
@@ -10,8 +10,8 @@
                     @svg('lucide-hammer', 'w-10 h-10 text-medical-blue')
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">{{ $pageTitle }}</h2>
-                <p class="text-gray-600 dark:text-gray-400 mb-8">هذا القسم قيد التطوير.</p>
-                <x-ui.button href="/admin" variant="primary">العودة للوحة التحكم</x-ui.button>
+                <p class="text-gray-600 dark:text-gray-400 mb-8">{{ __('comingSoonText') }}</p>
+                <x-ui.button href="/admin" variant="primary">{{ __('backToDashboard') }}</x-ui.button>
             </x-ui.card-content>
         </x-ui.card>
     </div>

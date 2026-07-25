@@ -1,14 +1,14 @@
 @extends('layouts.public')
 
-@section('title', 'خدماتنا الطبية | د. محمد عوض')
+@section('title', __('servicesEyebrow') . ' | ' . __('heroTitle'))
 
 @section('content')
     {{-- Hero Section --}}
     <section class="pt-32 pb-16 gradient-medical">
         <div class="container-custom text-center text-white">
-            <h1 class="text-4xl md:text-5xl font-bold mb-6">خدماتنا الطبية</h1>
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">{{ __('servicesEyebrow') }}</h1>
             <p class="text-xl text-white/80 max-w-3xl mx-auto">
-                نقدم مجموعة شاملة من الخدمات الطبية المتخصصة في مجالات النساء والتوليد وعلاج العقم وجراحات المناظير
+                {{ __('servicesPageSubtitle') }}
             </p>
         </div>
     </section>
@@ -34,7 +34,7 @@
                                 @endforeach
                             </ul>
                             <a href="/booking" class="inline-flex items-center gap-2 bg-medical-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-medical-blue-dark transition-colors">
-                                احجزي موعد الآن
+                                {{ __('bookNowShort') }}
                                 @svg('lucide-arrow-left', 'w-[18px] h-[18px]')
                             </a>
                         </div>
@@ -58,16 +58,16 @@
     <section class="py-16 bg-gray-50 dark:bg-gray-900">
         <div class="container-custom text-center">
             @svg('lucide-heart', 'w-12 h-12 mx-auto text-pink-500 mb-6')
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">هل لديكِ استفسار؟</h2>
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">{{ __('servicesCtaHeading') }}</h2>
             <p class="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
-                فريقنا الطبي جاهز للرد على جميع استفساراتك ومساعدتك في اختيار العلاج المناسب
+                {{ __('servicesCtaDesc') }}
             </p>
             <div class="flex flex-wrap justify-center gap-4">
                 <a href="/booking" class="bg-medical-blue text-white px-8 py-4 rounded-lg font-semibold hover:bg-medical-blue-dark transition-colors">
-                    احجزي موعد
+                    {{ __('bookAppointmentBtn') }}
                 </a>
                 <a href="https://wa.me/{{ config('clinic.contact.whatsapp') }}" class="bg-green-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-600 transition-colors">
-                    تواصلي عبر واتساب
+                    {{ __('contactViaWhatsAppBtn') }}
                 </a>
             </div>
         </div>

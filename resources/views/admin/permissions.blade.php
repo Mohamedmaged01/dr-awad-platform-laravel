@@ -10,8 +10,8 @@
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">جدول صلاحيات الوصول</h1>
-                <p class="text-gray-500">نظرة عامة على الميزات المتاحة لكل دور وظيفي</p>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">{{ __('permMatrixTitle') }}</h1>
+                <p class="text-gray-500">{{ __('permMatrixSubtitle') }}</p>
             </div>
         </div>
 
@@ -19,7 +19,7 @@
             <x-ui.card-header class="bg-gray-50 dark:bg-gray-800/50">
                 <div class="flex items-center gap-2">
                     @svg('lucide-shield', 'w-6 h-6 text-medical-blue')
-                    <h2 class="text-lg font-bold">مصفوفة الصلاحيات</h2>
+                    <h2 class="text-lg font-bold">{{ __('permMatrix') }}</h2>
                 </div>
             </x-ui.card-header>
             <x-ui.card-content class="p-0">
@@ -27,9 +27,9 @@
                     <table class="w-full text-right border-collapse">
                         <thead>
                             <tr class="bg-gray-100 dark:bg-gray-700">
-                                <th class="p-4 border-b border-gray-200 dark:border-gray-600 font-bold">الميزة / الصفحة</th>
+                                <th class="p-4 border-b border-gray-200 dark:border-gray-600 font-bold">{{ __('permFeatureCol') }}</th>
                                 @foreach ($roles as $role)
-                                    <th class="p-4 border-b border-gray-200 dark:border-gray-600 text-center font-bold">{{ $roleLabels[$role] }}</th>
+                                    <th class="p-4 border-b border-gray-200 dark:border-gray-600 text-center font-bold">{{ __($roleLabels[$role]) }}</th>
                                 @endforeach
                             </tr>
                         </thead>
@@ -39,7 +39,7 @@
                                     <td class="p-4 border-b border-gray-200 dark:border-gray-700">
                                         <div class="flex items-center gap-3">
                                             @svg('lucide-' . $item['icon'], 'w-[18px] h-[18px] text-gray-400')
-                                            <span class="font-medium">{{ $item['name'] }}</span>
+                                            <span class="font-medium">{{ __($item['name']) }}</span>
                                         </div>
                                     </td>
                                     @foreach ($roles as $role)
@@ -69,18 +69,18 @@
                 @php $roleItems = collect($menu)->filter(fn ($item) => in_array($role, $item['roles']))->values(); @endphp
                 <x-ui.card class="border-t-4 border-t-medical-blue">
                     <x-ui.card-header>
-                        <h3 class="font-bold text-lg">{{ $roleLabels[$role] }}</h3>
+                        <h3 class="font-bold text-lg">{{ __($roleLabels[$role]) }}</h3>
                     </x-ui.card-header>
                     <x-ui.card-content>
                         <ul class="space-y-2">
                             @foreach ($roleItems->take(5) as $item)
                                 <li class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                     @svg('lucide-check', 'w-3.5 h-3.5 text-green-500')
-                                    {{ $item['name'] }}
+                                    {{ __($item['name']) }}
                                 </li>
                             @endforeach
                             @if ($roleItems->count() > 5)
-                                <li class="text-xs text-medical-blue font-medium">+ ميزات أخرى</li>
+                                <li class="text-xs text-medical-blue font-medium">{{ __('moreFeatures') }}</li>
                             @endif
                         </ul>
                     </x-ui.card-content>

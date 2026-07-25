@@ -1,14 +1,14 @@
 @extends('layouts.public')
 
-@section('title', 'تواصل معنا | د. محمد عوض')
+@section('title', __('contactTitle') . ' | ' . __('heroTitle'))
 
 @section('content')
     {{-- Hero --}}
     <section class="pt-32 pb-16 gradient-medical">
         <div class="container-custom text-center text-white">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">تواصل معنا</h1>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ __('contactTitle') }}</h1>
             <p class="text-xl text-white/80 max-w-2xl mx-auto">
-                نحن هنا للإجابة على استفساراتك ومساعدتك. تواصلي معنا عبر أي من الطرق التالية
+                {{ __('contactSubtitle') }}
             </p>
         </div>
     </section>
@@ -25,23 +25,23 @@
                             <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
                                 @svg('lucide-check-circle', 'w-12 h-12 text-green-500')
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">تم إرسال رسالتك بنجاح!</h3>
+                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">{{ __('messageSent') }}</h3>
                             <p class="text-gray-600 dark:text-gray-400 mb-6">
-                                شكراً لتواصلك معنا. سيقوم فريقنا بالرد عليك في أقرب وقت ممكن.
+                                {{ __('contactSuccessDesc') }}
                             </p>
-                            <x-ui.button variant="primary" x-on:click="success = false">إرسال رسالة أخرى</x-ui.button>
+                            <x-ui.button variant="primary" x-on:click="success = false">{{ __('sendAnother') }}</x-ui.button>
                         </div>
 
                         <div x-show="!success">
-                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">أرسلي لنا رسالة</h2>
+                            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('sendUsMessage') }}</h2>
                             <form class="space-y-5" @submit.prevent="submit()">
-                                <x-ui.input label="الاسم الكامل" name="name" placeholder="أدخلي اسمك الكامل" required />
+                                <x-ui.input :label="__('fullName')" name="name" :placeholder="__('enterFullName')" required />
                                 <div class="grid md:grid-cols-2 gap-5">
-                                    <x-ui.input label="رقم الهاتف" name="phone" type="tel" placeholder="01xxxxxxxxx" required />
-                                    <x-ui.input label="البريد الإلكتروني" name="email" type="email" placeholder="example@email.com" />
+                                    <x-ui.input :label="__('phone')" name="phone" type="tel" placeholder="01xxxxxxxxx" required />
+                                    <x-ui.input :label="__('email')" name="email" type="email" placeholder="example@email.com" />
                                 </div>
-                                <x-ui.input label="الموضوع" name="subject" placeholder="موضوع الرسالة" required />
-                                <x-ui.textarea label="الرسالة" name="message" rows="5" placeholder="اكتبي رسالتك هنا..." required />
+                                <x-ui.input :label="__('subject')" name="subject" :placeholder="__('subjectPlaceholder')" required />
+                                <x-ui.textarea :label="__('yourMessage')" name="message" rows="5" :placeholder="__('messagePlaceholder')" required />
 
                                 <button type="submit" :disabled="submitting"
                                         class="inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed px-7 py-3.5 text-lg gap-2.5 bg-medical-blue text-white hover:bg-medical-blue-dark focus:ring-medical-blue shadow-md hover:shadow-lg w-full">
@@ -52,7 +52,7 @@
                                         </svg>
                                     </span>
                                     <span x-show="!submitting" class="flex-shrink-0">@svg('lucide-send', 'w-[18px] h-[18px]')</span>
-                                    إرسال الرسالة
+                                    {{ __('sendMessageBtn') }}
                                 </button>
                             </form>
                         </div>
@@ -61,7 +61,7 @@
 
                 {{-- Quick Contact --}}
                 <div class="space-y-6">
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">طرق التواصل السريع</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('quickContact') }}</h2>
 
                     <div class="grid gap-4">
                         <a href="tel:{{ config('clinic.contact.phone_tel') }}"
@@ -70,7 +70,7 @@
                                 @svg('lucide-phone', 'w-6 h-6 text-medical-blue')
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-800 dark:text-white">اتصل بنا</p>
+                                <p class="font-semibold text-gray-800 dark:text-white">{{ __('callNow') }}</p>
                                 <p class="text-medical-blue">{{ config('clinic.contact.phone_display') }}</p>
                             </div>
                         </a>
@@ -81,7 +81,7 @@
                                 @svg('lucide-message-circle', 'w-6 h-6 text-green-600')
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-800 dark:text-white">واتساب</p>
+                                <p class="font-semibold text-gray-800 dark:text-white">{{ __('whatsapp') }}</p>
                                 <p class="text-green-600">{{ config('clinic.contact.phone_display') }}</p>
                             </div>
                         </a>
@@ -92,7 +92,7 @@
                                 @svg('lucide-mail', 'w-6 h-6 text-light-gold')
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-800 dark:text-white">البريد الإلكتروني</p>
+                                <p class="font-semibold text-gray-800 dark:text-white">{{ __('email') }}</p>
                                 <p class="text-light-gold">{{ config('clinic.contact.email') }}</p>
                             </div>
                         </a>
@@ -101,11 +101,11 @@
                     <div class="p-5 bg-gray-50 dark:bg-gray-800 rounded-xl">
                         <div class="flex items-center gap-3 mb-3">
                             @svg('lucide-clock', 'w-5 h-5 text-medical-blue')
-                            <h3 class="font-semibold text-gray-800 dark:text-white">ساعات العمل</h3>
+                            <h3 class="font-semibold text-gray-800 dark:text-white">{{ __('workingHoursLabel') }}</h3>
                         </div>
                         <div class="space-y-2 text-gray-600 dark:text-gray-400">
-                            <p>السبت - الخميس: 9 صباحاً - 9 مساءً</p>
-                            <p>الجمعة: مغلق</p>
+                            <p>{{ __('hoursDailyLong') }}</p>
+                            <p>{{ __('forBookingInquiries') }} {{ config('clinic.contact.phone_display') }}</p>
                         </div>
                     </div>
                 </div>
@@ -116,8 +116,8 @@
     {{-- Branches --}}
     <section class="py-16 bg-gray-50 dark:bg-gray-900">
         <div class="container-custom">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center mb-12">فروعنا</h2>
-            <div class="grid md:grid-cols-3 gap-8">
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-white text-center mb-12">{{ __('ourBranches') }}</h2>
+            <div class="grid md:grid-cols-2 gap-8">
                 @foreach ($branches as $branch)
                     <x-ui.card class="overflow-hidden">
                         <x-ui.card-content class="p-6">
@@ -143,11 +143,11 @@
                             <div class="mt-6 flex gap-3">
                                 <a href="{{ $branch['mapUrl'] }}" target="_blank" rel="noopener noreferrer"
                                    class="flex-1 text-center py-2 bg-medical-blue text-white rounded-lg hover:bg-medical-blue-dark transition-colors">
-                                    الخريطة
+                                    {{ __('mapBtn') }}
                                 </a>
                                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $branch['whatsapp']) }}" target="_blank" rel="noopener noreferrer"
                                    class="flex-1 text-center py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                                    واتساب
+                                    {{ __('whatsapp') }}
                                 </a>
                             </div>
                         </x-ui.card-content>

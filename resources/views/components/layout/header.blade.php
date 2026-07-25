@@ -2,11 +2,12 @@
     $current = '/' . ltrim(request()->path(), '/');
     $nav = config('clinic.navigation');
     $contact = config('clinic.contact');
+    $locale = app()->getLocale();
 @endphp
 <header x-data="{ scrolled: false, menuOpen: false }"
         @scroll.window="scrolled = window.scrollY > 50"
         :class="scrolled ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg' : 'bg-transparent'"
-        class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" dir="rtl">
+        class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
 
     {{-- Top Bar --}}
     <div class="hidden md:block bg-medical-blue text-white py-2">
@@ -18,7 +19,7 @@
                 </a>
             </div>
             <div class="flex items-center gap-4">
-                <span>{{ $contact['hours_short'] }}</span>
+                <span>{{ __('hoursDaily') }}</span>
             </div>
         </div>
     </div>
@@ -32,8 +33,8 @@
                     <img src="/images/dr-mohamed-awad.jpg" alt="Dr. Mohamed Awad" class="w-full h-full object-cover">
                 </div>
                 <div :class="scrolled ? 'text-gray-800 dark:text-white' : 'text-white'">
-                    <h1 class="font-bold text-lg leading-tight">د. محمد عوض</h1>
-                    <p class="text-xs opacity-80">استشاري النساء والتوليد</p>
+                    <h1 class="font-bold text-lg leading-tight">{{ __('heroTitle') }}</h1>
+                    <p class="text-xs opacity-80">{{ __('doctorTitleShort') }}</p>
                 </div>
             </a>
 
@@ -48,7 +49,7 @@
                            class="font-medium transition-colors relative py-2"
                            :class="scrolled ? 'text-gray-700 dark:text-gray-200 hover:text-medical-blue dark:hover:text-light-gold' : 'text-white/90 hover:text-white'"
                        @endif>
-                        {{ $item['name'] }}
+                        {{ __($item['name']) }}
                         @if ($active)
                             <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-light-gold rounded-full"></span>
                         @endif
@@ -58,6 +59,27 @@
 
             {{-- Action Buttons --}}
             <div class="hidden lg:flex items-center gap-3">
+                {{-- Language switcher (AR / EN) --}}
+                <div class="flex items-center p-1 rounded-full border transition-all duration-300"
+                     :class="scrolled ? 'bg-gray-100/50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700' : 'bg-white/10 border-white/20 backdrop-blur-sm'">
+                    <a href="/locale/ar"
+                       @class([
+                           'px-3 py-1 rounded-full text-[11px] font-bold transition-all duration-300',
+                           'bg-white text-medical-blue shadow-sm dark:bg-medical-blue dark:text-white' => $locale === 'ar',
+                       ])
+                       @if ($locale !== 'ar') :class="scrolled ? 'text-gray-500 hover:text-medical-blue' : 'text-white/70 hover:text-white'" @endif>
+                        ع
+                    </a>
+                    <a href="/locale/en"
+                       @class([
+                           'px-3 py-1 rounded-full text-[11px] font-bold transition-all duration-300',
+                           'bg-white text-medical-blue shadow-sm dark:bg-medical-blue dark:text-white' => $locale === 'en',
+                       ])
+                       @if ($locale !== 'en') :class="scrolled ? 'text-gray-500 hover:text-medical-blue' : 'text-white/70 hover:text-white'" @endif>
+                        EN
+                    </a>
+                </div>
+
                 <button @click="$store.theme.toggle()"
                         class="p-2 rounded-lg transition-colors"
                         :class="scrolled ? 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' : 'text-white/80 hover:text-white hover:bg-white/10'"
@@ -70,13 +92,19 @@
                    class="inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1.5 text-sm gap-1.5 border-2"
                    :class="scrolled ? 'border-medical-blue text-medical-blue hover:bg-medical-blue hover:text-white focus:ring-medical-blue' : 'border-white/50 text-white hover:bg-white hover:text-medical-blue focus:ring-medical-blue'">
                     @svg('lucide-user', 'w-[18px] h-[18px]')
-                    بوابة المريضات
+                    {{ __('patientPortal') }}
                 </a>
 
                 <x-ui.button href="/booking" variant="gold" size="sm">
                     <x-slot:leftIcon>@svg('lucide-calendar', 'w-[18px] h-[18px]')</x-slot:leftIcon>
-                    احجز موعد
+                    {{ __('booking') }}
                 </x-ui.button>
+
+                <a href="/admin/login" title="{{ __('adminLogin') }}"
+                   class="p-2 rounded-lg transition-colors border-2"
+                   :class="scrolled ? 'border-gray-100 dark:border-gray-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-medical-blue' : 'border-white/20 text-white/70 hover:bg-white/10 hover:text-white'">
+                    @svg('lucide-lock', 'w-[18px] h-[18px]')
+                </a>
             </div>
 
             {{-- Mobile Menu Button --}}
@@ -102,24 +130,49 @@
                            'bg-medical-blue text-white' => $active,
                            'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800' => ! $active,
                        ])>
-                        {{ $item['name'] }}
+                        {{ __($item['name']) }}
                     </a>
                 @endforeach
                 <hr class="my-2 border-gray-200 dark:border-gray-700">
                 <a href="/patient-portal" @click="menuOpen = false"
                    class="px-4 py-3 rounded-lg font-medium text-medical-blue dark:text-light-gold">
-                    بوابة المريضات
+                    {{ __('patientPortal') }}
                 </a>
                 <a href="/booking" @click="menuOpen = false">
                     <x-ui.button variant="gold" class="w-full mt-2">
                         <x-slot:leftIcon>@svg('lucide-calendar', 'w-[18px] h-[18px]')</x-slot:leftIcon>
-                        احجز موعد
+                        {{ __('booking') }}
                     </x-ui.button>
                 </a>
+                <a href="/admin/login" @click="menuOpen = false"
+                   class="w-full flex items-center justify-center gap-2 mt-2 px-4 py-3 rounded-lg border-2 border-gray-100 dark:border-gray-700 text-gray-500 dark:text-gray-300 font-medium">
+                    @svg('lucide-lock', 'w-[18px] h-[18px]')
+                    {{ __('adminLogin') }}
+                </a>
+                {{-- Language switcher (AR / EN) --}}
+                <div class="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-xl mt-4">
+                    <a href="/locale/ar"
+                       @class([
+                           'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all',
+                           'bg-white dark:bg-gray-700 text-medical-blue shadow-sm' => $locale === 'ar',
+                           'text-gray-500' => $locale !== 'ar',
+                       ])>
+                        @svg('lucide-languages', 'w-4 h-4') العربية
+                    </a>
+                    <a href="/locale/en"
+                       @class([
+                           'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all',
+                           'bg-white dark:bg-gray-700 text-medical-blue shadow-sm' => $locale === 'en',
+                           'text-gray-500' => $locale !== 'en',
+                       ])>
+                        @svg('lucide-languages', 'w-4 h-4') English
+                    </a>
+                </div>
+
                 <div class="flex items-center justify-between mt-4 px-4">
                     <button @click="$store.theme.toggle()" class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                        <span x-show="!$store.theme.dark" class="flex items-center gap-2">@svg('lucide-moon', 'w-5 h-5') <span>الوضع الليلي</span></span>
-                        <span x-show="$store.theme.dark" x-cloak class="flex items-center gap-2">@svg('lucide-sun', 'w-5 h-5') <span>الوضع النهاري</span></span>
+                        <span x-show="!$store.theme.dark" class="flex items-center gap-2">@svg('lucide-moon', 'w-5 h-5') <span>{{ __('darkMode') }}</span></span>
+                        <span x-show="$store.theme.dark" x-cloak class="flex items-center gap-2">@svg('lucide-sun', 'w-5 h-5') <span>{{ __('lightMode') }}</span></span>
                     </button>
                 </div>
             </nav>

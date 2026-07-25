@@ -4,7 +4,7 @@
     $services = config('clinic.footer_services');
     $currentYear = date('Y');
 @endphp
-<footer class="bg-gray-900 text-white" dir="rtl">
+<footer class="bg-gray-900 text-white">
     {{-- Main Footer --}}
     <div class="container-custom py-16">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -15,12 +15,12 @@
                         م.ع
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg">د. محمد عوض</h3>
-                        <p class="text-sm text-gray-400">استشاري النساء والتوليد</p>
+                        <h3 class="font-bold text-lg">{{ __('heroTitle') }}</h3>
+                        <p class="text-sm text-gray-400">{{ __('doctorTitleShort') }}</p>
                     </div>
                 </div>
                 <p class="text-gray-400 mb-6 leading-relaxed">
-                    نقدم أعلى معايير الرعاية الطبية للمرأة في مجالات النساء والتوليد، علاج العقم، والحقن المجهري، وجراحات المناظير المتقدمة.
+                    {{ __('heroDescription') }}
                 </p>
                 <div class="flex gap-4">
                     <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-medical-blue transition-colors" aria-label="Facebook">
@@ -40,31 +40,31 @@
 
             {{-- Quick Links --}}
             <div>
-                <h4 class="font-bold text-lg mb-6 text-light-gold">روابط سريعة</h4>
+                <h4 class="font-bold text-lg mb-6 text-light-gold">{{ __('quickLinks') }}</h4>
                 <ul class="space-y-3">
                     @foreach ($quickLinks as $link)
-                        <li><a href="{{ $link['href'] }}" class="text-gray-400 hover:text-white transition-colors">{{ $link['name'] }}</a></li>
+                        <li><a href="{{ $link['href'] }}" class="text-gray-400 hover:text-white transition-colors">{{ __($link['name']) }}</a></li>
                     @endforeach
                 </ul>
             </div>
 
             {{-- Services --}}
             <div>
-                <h4 class="font-bold text-lg mb-6 text-light-gold">خدماتنا</h4>
+                <h4 class="font-bold text-lg mb-6 text-light-gold">{{ __('ourServices') }}</h4>
                 <ul class="space-y-3">
                     @foreach ($services as $service)
-                        <li><a href="{{ $service['href'] }}" class="text-gray-400 hover:text-white transition-colors">{{ $service['name'] }}</a></li>
+                        <li><a href="{{ $service['href'] }}" class="text-gray-400 hover:text-white transition-colors">{{ __($service['name']) }}</a></li>
                     @endforeach
                 </ul>
             </div>
 
             {{-- Contact Info --}}
             <div>
-                <h4 class="font-bold text-lg mb-6 text-light-gold">معلومات التواصل</h4>
+                <h4 class="font-bold text-lg mb-6 text-light-gold">{{ __('contactInfo') }}</h4>
                 <ul class="space-y-4">
                     <li class="flex items-start gap-3">
                         @svg('lucide-map-pin', 'w-5 h-5 text-light-gold flex-shrink-0 mt-1')
-                        <span class="text-gray-400">{{ $contact['address'] }}</span>
+                        <span class="text-gray-400 whitespace-pre-line">{{ __('footerAddress') }}</span>
                     </li>
                     <li class="flex items-center gap-3">
                         @svg('lucide-phone', 'w-5 h-5 text-light-gold flex-shrink-0')
@@ -72,7 +72,7 @@
                     </li>
                     <li class="flex items-center gap-3">
                         @svg('lucide-message-circle', 'w-5 h-5 text-light-gold flex-shrink-0')
-                        <a href="https://wa.me/{{ $contact['whatsapp'] }}" class="text-gray-400 hover:text-white transition-colors">واتساب</a>
+                        <a href="https://wa.me/{{ $contact['whatsapp'] }}" class="text-gray-400 hover:text-white transition-colors">{{ __('whatsapp') }}</a>
                     </li>
                     <li class="flex items-center gap-3">
                         @svg('lucide-mail', 'w-5 h-5 text-light-gold flex-shrink-0')
@@ -81,8 +81,8 @@
                     <li class="flex items-start gap-3">
                         @svg('lucide-clock', 'w-5 h-5 text-light-gold flex-shrink-0 mt-1')
                         <div class="text-gray-400">
-                            <p>السبت - الخميس</p>
-                            <p>9 صباحاً - 9 مساءً</p>
+                            <p>{{ __('footerHoursDays') }}</p>
+                            <p>{{ __('footerHoursTime') }}</p>
                         </div>
                     </li>
                 </ul>
@@ -94,10 +94,10 @@
     <div class="border-t border-gray-800">
         <div class="container-custom py-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-gray-400 text-sm">© {{ $currentYear }} د. محمد عوض. جميع الحقوق محفوظة.</p>
+                <p class="text-gray-400 text-sm">© {{ $currentYear }} {{ __('heroTitle') }}. {{ __('allRightsReserved') }} - {{ __('developedBy') }} <a href="https://www.scadaatech.com" target="_blank" rel="noopener noreferrer" class="text-light-gold hover:text-white transition-colors underline decoration-dotted">{{ __('scadaCompany') }}</a></p>
                 <div class="flex gap-6 text-sm text-gray-400">
-                    <a href="/privacy" class="hover:text-white transition-colors">سياسة الخصوصية</a>
-                    <a href="/terms" class="hover:text-white transition-colors">الشروط والأحكام</a>
+                    <a href="/privacy" class="hover:text-white transition-colors">{{ __('privacyPolicy') }}</a>
+                    <a href="/terms" class="hover:text-white transition-colors">{{ __('termsConditions') }}</a>
                 </div>
             </div>
         </div>

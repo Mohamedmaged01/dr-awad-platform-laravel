@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'فيديوهات طبية | د. محمد عوض')
+@section('title', __('videosHeroTitle') . ' | ' . __('heroTitle'))
 
 @section('content')
     {{-- Hero Section --}}
@@ -9,9 +9,9 @@
             <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6">
                 @svg('lucide-play', 'w-10 h-10 text-white')
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">فيديوهات طبية</h1>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ __('videosHeroTitle') }}</h1>
             <p class="text-xl text-white/80 max-w-2xl mx-auto">
-                مجموعة من الفيديوهات التعليمية والتوعوية من د. محمد عوض حول أهم المواضيع الطبية في مجال النساء والتوليد والحقن المجهري
+                {{ __('videosHeroSubtitle') }}
             </p>
         </div>
     </section>
@@ -65,16 +65,16 @@
                                 <div class="flex items-center gap-4 text-sm text-gray-500">
                                     <span class="flex items-center gap-1">
                                         @svg('lucide-eye', 'w-3.5 h-3.5')
-                                        {{ $video['views'] }} مشاهدة
+                                        {{ $video['views'] }} {{ __('viewsLabel') }}
                                     </span>
                                     <span class="flex items-center gap-1">
                                         @svg('lucide-calendar', 'w-3.5 h-3.5')
-                                        {{ \Carbon\Carbon::parse($video['date'])->locale('ar_EG')->isoFormat('D/M/YYYY') }}
+                                        {{ \Carbon\Carbon::parse($video['date'])->locale(app()->getLocale() === 'en' ? 'en' : 'ar_EG')->isoFormat('D/M/YYYY') }}
                                     </span>
                                 </div>
                                 <a href="https://www.youtube.com/watch?v={{ $video['id'] }}" target="_blank" rel="noopener noreferrer"
                                    class="text-medical-blue font-medium hover:underline flex items-center gap-1">
-                                    مشاهدة على يوتيوب
+                                    {{ __('watchOnYoutube') }}
                                     @svg('lucide-play', 'w-3.5 h-3.5')
                                 </a>
                             </div>
@@ -94,16 +94,16 @@
                         <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                     </svg>
                 </div>
-                <h2 class="text-3xl font-bold mb-4">اشترك في قناتنا على يوتيوب</h2>
+                <h2 class="text-3xl font-bold mb-4">{{ __('subscribeChannelTitle') }}</h2>
                 <p class="text-white/80 text-lg mb-8">
-                    تابعونا للحصول على أحدث الفيديوهات التعليمية والنصائح الطبية المفيدة
+                    {{ __('subscribeChannelDesc') }}
                 </p>
                 <a href="{{ config('clinic.contact.youtube') }}" target="_blank" rel="noopener noreferrer"
                    class="inline-flex items-center gap-3 bg-white text-red-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors">
                     <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                     </svg>
-                    اشترك الآن
+                    {{ __('subscribeNow') }}
                 </a>
             </div>
         </div>
@@ -113,18 +113,18 @@
     <section class="py-16 bg-gray-50 dark:bg-gray-900">
         <div class="container-custom">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">هل لديكِ سؤال؟</h2>
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">{{ __('servicesCtaHeading') }}</h2>
                 <p class="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-                    إذا كان لديكِ أي استفسار طبي، لا تترددي في التواصل معنا أو حجز موعد للاستشارة
+                    {{ __('videosQuestionDesc') }}
                 </p>
             </div>
             <div class="flex flex-wrap justify-center gap-4">
                 <a href="/booking" class="bg-medical-blue text-white px-8 py-4 rounded-lg font-semibold hover:bg-medical-blue-dark transition-colors">
-                    احجزي موعد استشارة
+                    {{ __('bookConsultation') }}
                 </a>
                 <a href="https://wa.me/{{ config('clinic.contact.whatsapp') }}" target="_blank" rel="noopener noreferrer"
                    class="bg-green-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-600 transition-colors">
-                    تواصلي عبر واتساب
+                    {{ __('contactViaWhatsAppBtn') }}
                 </a>
             </div>
         </div>

@@ -1,12 +1,12 @@
 @props(['faqs' => []])
 {{-- Mirrors FAQSection.tsx: first item open by default, click toggles. --}}
-<section class="section-padding" dir="rtl" x-data="{ open: 0 }">
+<section class="section-padding" x-data="{ open: 0 }">
     <div class="container-custom">
         {{-- Section Header --}}
         <div class="text-center max-w-3xl mx-auto mb-16">
-            <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">الأسئلة الشائعة</span>
-            <h2 class="heading-primary mb-6">أسئلة متكررة</h2>
-            <p class="text-gray-600 dark:text-gray-400 text-lg">إجابات على أكثر الأسئلة شيوعاً حول خدماتنا وعلاجاتنا</p>
+            <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">{{ __('faqEyebrow') }}</span>
+            <h2 class="heading-primary mb-6">{{ __('faqTitle') }}</h2>
+            <p class="text-gray-600 dark:text-gray-400 text-lg">{{ __('faqSubtitle') }}</p>
         </div>
 
         {{-- FAQ Accordion --}}
@@ -42,10 +42,10 @@
 
         {{-- CTA --}}
         <div class="text-center mt-12">
-            <p class="text-gray-600 dark:text-gray-400 mb-4">لم تجدي إجابة سؤالك؟</p>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">{{ __('faqCtaText') }}</p>
             <a href="https://wa.me/{{ config('clinic.contact.whatsapp') }}"
                class="inline-flex items-center gap-2 text-medical-blue dark:text-light-gold font-semibold hover:underline">
-                تواصلي معنا عبر الواتساب
+                {{ __('contactViaWhatsApp') }}
             </a>
         </div>
     </div>

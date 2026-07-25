@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', $service['title'] . ' | د. محمد عوض')
+@section('title', $service['title'] . ' | ' . __('heroTitle'))
 
 @section('content')
     <section class="pt-32 pb-16 gradient-medical">
@@ -17,7 +17,7 @@
         <div class="container-custom">
             <div class="grid lg:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">ما نقدمه</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('whatWeOffer') }}</h2>
                     <ul class="space-y-3 mb-8">
                         @foreach ($service['features'] as $feature)
                             <li class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
@@ -27,7 +27,7 @@
                         @endforeach
                     </ul>
                     <x-ui.button href="/booking" variant="primary" size="lg">
-                        احجزي موعد الآن
+                        {{ __('bookNowShort') }}
                         <x-slot:rightIcon>@svg('lucide-arrow-left', 'w-5 h-5')</x-slot:rightIcon>
                     </x-ui.button>
                 </div>

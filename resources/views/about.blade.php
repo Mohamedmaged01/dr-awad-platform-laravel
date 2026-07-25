@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'عن الدكتور محمد عوض | استشاري النساء والتوليد')
+@section('title', __('aboutTitle') . ' | ' . __('heroTitle'))
 
 @section('content')
     {{-- Hero Section --}}
@@ -8,19 +8,11 @@
         <div class="container-custom">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="text-white">
-                    <h1 class="text-4xl md:text-5xl font-bold mb-6">د. محمد عوض</h1>
-                    <p class="text-xl text-light-gold mb-4">استشاري النساء والتوليد والحقن المجهري وجراحات المناظير</p>
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">{{ __('heroTitle') }}</h1>
+                    <p class="text-xl text-light-gold mb-4">{{ __('heroSubtitle') }}</p>
                     <p class="text-white/80 text-lg leading-relaxed mb-8">
-                        خبرة تزيد عن 20 عاماً في مجال النساء والتوليد وعلاج العقم. حاصل على درجة الدكتوراه من جامعة القاهرة وزمالة الكلية الملكية البريطانية.
+                        {{ __('aboutHeroDesc') }}
                     </p>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        @foreach ($achievements as $item)
-                            <div class="text-center p-4 bg-white/10 rounded-xl backdrop-blur-sm">
-                                <div class="text-2xl md:text-3xl font-bold text-light-gold">{{ $item['value'] }}</div>
-                                <div class="text-sm text-white/70">{{ $item['label'] }}</div>
-                            </div>
-                        @endforeach
-                    </div>
                 </div>
                 <div class="hidden lg:block">
                     <div class="relative">
@@ -32,7 +24,7 @@
                                 @svg('lucide-star', 'w-5 h-5 fill-white')
                                 <span class="font-bold">4.9</span>
                             </div>
-                            <p class="text-sm">تقييم المرضى</p>
+                            <p class="text-sm">{{ __('patientRating') }}</p>
                         </div>
                     </div>
                 </div>
@@ -49,7 +41,7 @@
                         <div class="w-12 h-12 rounded-xl bg-medical-blue/10 flex items-center justify-center">
                             @svg('lucide-graduation-cap', 'w-6 h-6 text-medical-blue')
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">المؤهلات العلمية</h2>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ __('qualifications') }}</h2>
                     </div>
                     <ul class="space-y-3">
                         @foreach ($qualifications as $item)
@@ -66,7 +58,7 @@
                         <div class="w-12 h-12 rounded-xl bg-light-gold/10 flex items-center justify-center">
                             @svg('lucide-building', 'w-6 h-6 text-light-gold')
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">الخبرات المهنية</h2>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ __('experience') }}</h2>
                     </div>
                     <ul class="space-y-3">
                         @foreach ($experience as $item)
@@ -88,8 +80,8 @@
                 <div class="w-16 h-16 rounded-full bg-medical-blue/10 flex items-center justify-center mx-auto mb-4">
                     @svg('lucide-globe', 'w-8 h-8 text-medical-blue')
                 </div>
-                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">العضويات الدولية والمحلية</h2>
-                <p class="text-gray-600 dark:text-gray-400">عضوية فعالة في أهم الجمعيات الطبية العالمية والمحلية</p>
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">{{ __('membershipsTitle') }}</h2>
+                <p class="text-gray-600 dark:text-gray-400">{{ __('membershipsSubtitle') }}</p>
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($memberships as $item)
@@ -108,7 +100,7 @@
     <section class="py-16">
         <div class="container-custom">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">لماذا تختارين د. محمد عوض؟</h2>
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">{{ __('whyChooseUs') }}</h2>
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($whyChooseUs as $item)
@@ -127,13 +119,13 @@
     {{-- CTA --}}
     <section class="py-16 gradient-medical">
         <div class="container-custom text-center text-white">
-            <h2 class="text-3xl font-bold mb-4">احجزي موعدك الآن</h2>
+            <h2 class="text-3xl font-bold mb-4">{{ __('ctaHeading') }}</h2>
             <p class="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-                نحن هنا لمساعدتك في رحلتك نحو الأمومة أو للعناية بصحتك النسائية
+                {{ __('ctaDesc') }}
             </p>
             <a href="/booking" class="inline-flex items-center gap-2 bg-light-gold text-white px-8 py-4 rounded-lg font-semibold hover:bg-light-gold-light transition-colors text-lg">
                 @svg('lucide-calendar', 'w-5 h-5')
-                احجزي موعد
+                {{ __('bookAppointmentBtn') }}
             </a>
         </div>
     </section>

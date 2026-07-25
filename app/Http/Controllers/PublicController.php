@@ -9,12 +9,10 @@ class PublicController extends Controller
     public function home()
     {
         return view('home', [
-            'heroStats' => ClinicData::heroStats(),
             'homeServices' => ClinicData::homeServices(),
             'aboutAchievements' => ClinicData::aboutAchievements(),
             'aboutHighlights' => ClinicData::aboutHighlights(),
             'testimonials' => ClinicData::testimonials(),
-            'testimonialStats' => ClinicData::testimonialStats(),
             'bookingBranches' => ClinicData::bookingSectionBranches(),
             'bookingServices' => ClinicData::bookingSectionServices(),
             'faqs' => ClinicData::faqs(),
@@ -27,7 +25,6 @@ class PublicController extends Controller
             'qualifications' => ClinicData::qualifications(),
             'experience' => ClinicData::experience(),
             'memberships' => ClinicData::memberships(),
-            'achievements' => ClinicData::achievements(),
             'whyChooseUs' => ClinicData::whyChooseUs(),
         ]);
     }
