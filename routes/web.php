@@ -81,10 +81,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Admin CRUD write endpoints.
         require __DIR__.'/admin.php';
-
-        // Quick-action "/new" links from the dashboard still resolve to a stub page.
-        foreach (['patients/new', 'appointments/new', 'ivf/new', 'reports/new'] as $stub) {
-            Route::get("/{$stub}", [AdminController::class, 'comingSoon']);
-        }
     });
 });

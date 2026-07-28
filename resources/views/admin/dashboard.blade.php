@@ -16,10 +16,12 @@
                         <div class="w-12 h-12 rounded-xl {{ $stat['color'] }} flex items-center justify-center">
                             @svg('lucide-' . $stat['icon'], 'w-6 h-6 text-white')
                         </div>
-                        <div class="flex items-center gap-1 text-sm {{ $stat['trend'] === 'up' ? 'text-green-500' : 'text-red-500' }}">
-                            @svg('lucide-' . ($stat['trend'] === 'up' ? 'trending-up' : 'trending-down'), 'w-4 h-4')
-                            {{ $stat['change'] }}
-                        </div>
+                        @if (! empty($stat['change']))
+                            <div class="flex items-center gap-1 text-sm {{ ($stat['trend'] ?? 'up') === 'up' ? 'text-green-500' : 'text-red-500' }}">
+                                @svg('lucide-' . (($stat['trend'] ?? 'up') === 'up' ? 'trending-up' : 'trending-down'), 'w-4 h-4')
+                                {{ $stat['change'] }}
+                            </div>
+                        @endif
                     </div>
                     <h3 class="text-gray-500 dark:text-gray-400 text-sm mb-1">{{ $stat['title'] }}</h3>
                     <p class="text-2xl font-bold text-gray-800 dark:text-white">
