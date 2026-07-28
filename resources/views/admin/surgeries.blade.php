@@ -2,10 +2,23 @@
 
 @php
     $statusColors = ['scheduled' => 'blue', 'completed' => 'green', 'pending' => 'yellow', 'cancelled' => 'red'];
+    $typeOptions = [
+        ['value' => 'laparoscopy', 'label' => __('laparoscopy')],
+        ['value' => 'hysteroscopy', 'label' => __('hysteroscopy')],
+        ['value' => 'cesarean', 'label' => __('cesarean')],
+        ['value' => 'natural_delivery', 'label' => __('natural_delivery')],
+        ['value' => 'other', 'label' => __('other')],
+    ];
+    $statusOptions = [
+        ['value' => 'scheduled', 'label' => __('scheduled')],
+        ['value' => 'pending', 'label' => __('pending')],
+        ['value' => 'completed', 'label' => __('completed')],
+        ['value' => 'cancelled', 'label' => __('cancelled')],
+    ];
 @endphp
 
 @section('content')
-<div x-data="{ addOpen: false, viewOpen: false, current: {} }">
+<div x-data="{ addOpen: false, editOpen: false, viewOpen: false, current: {} }">
     <x-admin.page-header :title="__('surgeries')">
         <x-slot:actions>
             <x-ui.button variant="primary" size="sm" x-on:click="addOpen = true">
@@ -21,22 +34,6 @@
             <x-admin.stat-tile :label="$s['label']" :value="$s['value']" :icon="$s['icon']" :color="$s['color']" />
         @endforeach
     </div>
-
-    {{-- Filter --}}
-    <x-ui.card class="mb-6">
-        <x-ui.card-content class="p-4 flex flex-wrap gap-4">
-            <div class="flex-1 min-w-[200px]">
-                <x-ui.input name="search" :placeholder="__('search_placeholder')">
-                    <x-slot:leftIcon>@svg('lucide-search', 'w-[18px] h-[18px]')</x-slot:leftIcon>
-                </x-ui.input>
-            </div>
-            <x-ui.select name="status" :placeholder="__('status')" class="w-44" :options="[
-                ['value' => 'scheduled', 'label' => __('scheduled')],
-                ['value' => 'completed', 'label' => __('completed')],
-                ['value' => 'pending', 'label' => __('pending')],
-            ]" />
-        </x-ui.card-content>
-    </x-ui.card>
 
     {{-- Table --}}
     <x-ui.card>
@@ -55,7 +52,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        @foreach ($surgeries as $s)
+                        @forelse ($surgeries as $s)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
@@ -82,12 +79,17 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-1">
                                         <button class="p-1.5 text-gray-400 hover:text-medical-blue" x-on:click="current = {{ Js::from($s) }}; viewOpen = true">@svg('lucide-eye', 'w-[18px] h-[18px]')</button>
-                                        <button class="p-1.5 text-gray-400 hover:text-medical-blue">@svg('lucide-pencil', 'w-[18px] h-[18px]')</button>
-                                        <button class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                                        <button class="p-1.5 text-gray-400 hover:text-medical-blue" x-on:click="current = {{ Js::from($s) }}; editOpen = true">@svg('lucide-pencil', 'w-[18px] h-[18px]')</button>
+                                        <form method="POST" action="{{ route('admin.surgeries.destroy', $s['id']) }}" onsubmit="return confirm('{{ __('confirmDelete') }}')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr><td colspan="7" class="px-6 py-10 text-center text-gray-400">{{ __('noRecords') }}</td></tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -96,18 +98,42 @@
 
     {{-- Add modal --}}
     <x-admin.modal :title="__('add_new')" var="addOpen" max-width="max-w-2xl">
-        <form class="grid md:grid-cols-2 gap-4" @submit.prevent="addOpen = false">
-            <x-ui.input :label="__('patient_name')" name="patient" />
-            <x-ui.input :label="__('surgery_name')" name="operation" />
-            <x-ui.input :label="__('date')" name="date" type="date" />
-            <x-ui.input :label="__('time')" name="time" type="time" />
-            <x-ui.input :label="__('cost')" name="cost" type="number" />
-            <x-ui.input :label="__('doctor')" name="doctor" value="د. محمد عوض" />
+        <form method="POST" action="{{ route('admin.surgeries.store') }}" class="grid md:grid-cols-2 gap-4">
+            @csrf
+            <div class="md:col-span-2">
+                <x-ui.select :label="__('patient_name')" name="patient_id" :options="$patientOptions" :placeholder="__('selectPatient')" required />
+            </div>
+            <x-ui.input :label="__('surgery_name')" name="surgery_name" required />
+            <x-ui.select :label="__('surgery_type')" name="surgery_type" :options="$typeOptions" required />
+            <x-ui.input :label="__('date')" name="date" type="date" required />
+            <x-ui.input :label="__('time')" name="time" type="time" value="09:00" />
+            <x-ui.input :label="__('cost')" name="total_cost" type="number" min="0" />
+            <x-ui.select :label="__('status')" name="status" :options="$statusOptions" />
+            <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <x-ui.button type="button" variant="outline" size="sm" x-on:click="addOpen = false">{{ __('cancel') }}</x-ui.button>
+                <x-ui.button type="submit" variant="primary" size="sm">{{ __('save') }}</x-ui.button>
+            </div>
         </form>
-        <x-slot:footer>
-            <x-ui.button variant="outline" size="sm" x-on:click="addOpen = false">{{ __('cancel') }}</x-ui.button>
-            <x-ui.button variant="primary" size="sm" x-on:click="addOpen = false">{{ __('save') }}</x-ui.button>
-        </x-slot:footer>
+    </x-admin.modal>
+
+    {{-- Edit modal --}}
+    <x-admin.modal :title="__('edit_details')" var="editOpen" max-width="max-w-2xl">
+        <form :action="'{{ url('/admin/surgeries') }}/' + current.id" method="POST" class="grid md:grid-cols-2 gap-4">
+            @csrf @method('PUT')
+            <div class="md:col-span-2">
+                <x-ui.select :label="__('patient_name')" name="patient_id" :options="$patientOptions" x-model="current.patient_id" required />
+            </div>
+            <x-ui.input :label="__('surgery_name')" name="surgery_name" x-model="current.operation" required />
+            <x-ui.select :label="__('surgery_type')" name="surgery_type" :options="$typeOptions" x-model="current.surgery_type" required />
+            <x-ui.input :label="__('date')" name="date" type="date" x-model="current.date" required />
+            <x-ui.input :label="__('time')" name="time" type="time" x-model="current.time" />
+            <x-ui.input :label="__('cost')" name="total_cost" type="number" min="0" x-model="current.cost" />
+            <x-ui.select :label="__('status')" name="status" :options="$statusOptions" x-model="current.status" />
+            <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <x-ui.button type="button" variant="outline" size="sm" x-on:click="editOpen = false">{{ __('cancel') }}</x-ui.button>
+                <x-ui.button type="submit" variant="primary" size="sm">{{ __('save_changes') }}</x-ui.button>
+            </div>
+        </form>
     </x-admin.modal>
 
     {{-- View modal --}}
@@ -116,7 +142,7 @@
             <p><span class="text-gray-500">{{ __('patient_name') }}:</span> <span class="font-medium" x-text="current.patient"></span></p>
             <p><span class="text-gray-500">{{ __('surgery_name') }}:</span> <span class="font-medium" x-text="current.operation"></span></p>
             <p><span class="text-gray-500">{{ __('date') }}:</span> <span class="font-medium" x-text="current.date + ' - ' + current.time"></span></p>
-            <p><span class="text-gray-500">{{ __('cost') }}:</span> <span class="font-medium text-medical-blue" x-text="current.cost"></span></p>
+            <p><span class="text-gray-500">{{ __('cost') }}:</span> <span class="font-medium text-medical-blue" x-text="current.cost"></span> {{ __('egp') }}</p>
         </div>
     </x-admin.modal>
 </div>

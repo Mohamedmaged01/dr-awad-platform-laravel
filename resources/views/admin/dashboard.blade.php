@@ -98,10 +98,10 @@
         {{-- Quick Actions --}}
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @foreach ([
-                ['label' => 'إضافة مريضة', 'href' => '/admin/patients/new', 'icon' => 'users'],
-                ['label' => 'حجز جديد', 'href' => '/admin/appointments/new', 'icon' => 'calendar'],
-                ['label' => 'بدء دورة علاج', 'href' => '/admin/ivf/new', 'icon' => 'baby'],
-                ['label' => 'إضافة تقرير', 'href' => '/admin/reports/new', 'icon' => 'activity'],
+                ['label' => 'إضافة مريضة', 'href' => '/admin/patients', 'icon' => 'users'],
+                ['label' => 'حجز جديد', 'href' => '/admin/appointments', 'icon' => 'calendar'],
+                ['label' => 'بدء دورة علاج', 'href' => '/admin/ivf', 'icon' => 'baby'],
+                ['label' => 'التقارير', 'href' => '/admin/reports', 'icon' => 'activity'],
             ] as $action)
                 <a href="{{ $action['href'] }}"
                    class="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow group">

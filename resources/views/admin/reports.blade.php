@@ -28,7 +28,7 @@
     {{-- KPIs --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         @foreach ($kpis as $k)
-            <x-admin.stat-tile :label="$k['label']" :value="$k['value']" :icon="$k['icon']" :color="$k['color']" :trend="$k['change']" :trend-up="$k['up']" />
+            <x-admin.stat-tile :label="$k['label']" :value="$k['value']" :icon="$k['icon']" :color="$k['color']" />
         @endforeach
     </div>
 

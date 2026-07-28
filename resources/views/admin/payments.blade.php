@@ -1,6 +1,18 @@
 @extends('layouts.admin')
 
-@php $statusColors = ['paid' => 'green', 'pending' => 'yellow', 'cancelled' => 'red']; @endphp
+@php
+    $statusColors = ['paid' => 'green', 'pending' => 'yellow', 'refunded' => 'blue', 'failed' => 'red'];
+    $methodOptions = [
+        ['value' => 'نقدي', 'label' => 'نقدي'],
+        ['value' => 'فيزا', 'label' => 'فيزا'],
+        ['value' => 'فودافون كاش', 'label' => 'فودافون كاش'],
+        ['value' => 'انستاباي', 'label' => 'انستاباي'],
+    ];
+    $invoiceStatusOptions = [
+        ['value' => 'pending', 'label' => __('pending')],
+        ['value' => 'paid', 'label' => __('paid')],
+    ];
+@endphp
 
 @section('content')
 <div x-data="{ createOpen: false, viewOpen: false, current: {} }">
@@ -35,25 +47,35 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        @foreach ($invoices as $inv)
+                        @forelse ($invoices as $inv)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                <td class="px-6 py-4 font-mono text-sm text-gray-800 dark:text-gray-200">{{ $inv['id'] }}</td>
+                                <td class="px-6 py-4 font-mono text-sm text-gray-800 dark:text-gray-200">{{ $inv['number'] }}</td>
                                 <td class="px-6 py-4 text-gray-800 dark:text-gray-200">{{ $inv['patient'] }}</td>
                                 <td class="px-6 py-4 text-gray-600 dark:text-gray-400">{{ $inv['service'] }}</td>
                                 <td class="px-6 py-4 font-medium text-medical-blue">{{ number_format($inv['amount']) }} {{ __('egp') }}</td>
                                 <td class="px-6 py-4">
-                                    <x-admin.badge :color="$statusColors[$inv['status']] ?? 'gray'">{{ $inv['status'] === 'paid' ? __('completed') : __('pending') }}</x-admin.badge>
+                                    <x-admin.badge :color="$statusColors[$inv['status']] ?? 'gray'">{{ __($inv['status']) }}</x-admin.badge>
                                 </td>
                                 <td class="px-6 py-4 text-gray-600 dark:text-gray-400">{{ $inv['date'] }}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-1">
-                                        <button class="p-1.5 text-gray-400 hover:text-medical-blue" x-on:click="current = {{ Js::from($inv) }}; viewOpen = true">@svg('lucide-eye', 'w-[18px] h-[18px]')</button>
-                                        <button class="p-1.5 text-gray-400 hover:text-medical-blue">@svg('lucide-download', 'w-[18px] h-[18px]')</button>
-                                        <button class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                                        <button class="p-1.5 text-gray-400 hover:text-medical-blue" title="{{ __('view') }}" x-on:click="current = {{ Js::from($inv) }}; viewOpen = true">@svg('lucide-eye', 'w-[18px] h-[18px]')</button>
+                                        @if ($inv['status'] !== 'paid')
+                                            <form method="POST" action="{{ route('admin.invoices.paid', $inv['id']) }}">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="p-1.5 text-gray-400 hover:text-green-500" title="{{ __('markPaid') }}">@svg('lucide-check-circle', 'w-[18px] h-[18px]')</button>
+                                            </form>
+                                        @endif
+                                        <form method="POST" action="{{ route('admin.invoices.destroy', $inv['id']) }}" onsubmit="return confirm('{{ __('confirmDelete') }}')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr><td colspan="7" class="px-6 py-10 text-center text-gray-400">{{ __('noRecords') }}</td></tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -62,17 +84,23 @@
 
     {{-- Create invoice --}}
     <x-admin.modal :title="__('issue_invoice')" var="createOpen">
-        <form class="grid md:grid-cols-2 gap-4" @submit.prevent="createOpen = false">
-            <x-ui.input :label="__('patient_name')" name="patient" />
-            <x-ui.input :label="__('phone')" name="phone" />
-            <x-ui.input :label="__('serviceLabel')" name="service" />
-            <x-ui.input :label="__('cost')" name="amount" type="number" />
-            <x-ui.input :label="__('date')" name="date" type="date" />
+        <form method="POST" action="{{ route('admin.invoices.store') }}" class="grid md:grid-cols-2 gap-4">
+            @csrf
+            <div class="md:col-span-2">
+                <x-ui.select :label="__('patient_name')" name="patient_id" :options="$patientOptions" :placeholder="__('selectPatient')" required />
+            </div>
+            <div class="md:col-span-2">
+                <x-ui.input :label="__('serviceLabel')" name="service" required />
+            </div>
+            <x-ui.input :label="__('amount')" name="amount" type="number" min="0" required />
+            <x-ui.select :label="__('payment_method')" name="payment_method" :options="$methodOptions" />
+            <x-ui.input :label="__('date')" name="date" type="date" value="{{ now()->toDateString() }}" />
+            <x-ui.select :label="__('status')" name="status" :options="$invoiceStatusOptions" />
+            <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <x-ui.button type="button" variant="outline" size="sm" x-on:click="createOpen = false">{{ __('cancel') }}</x-ui.button>
+                <x-ui.button type="submit" variant="primary" size="sm">{{ __('save') }}</x-ui.button>
+            </div>
         </form>
-        <x-slot:footer>
-            <x-ui.button variant="outline" size="sm" x-on:click="createOpen = false">{{ __('cancel') }}</x-ui.button>
-            <x-ui.button variant="primary" size="sm" x-on:click="createOpen = false">{{ __('save') }}</x-ui.button>
-        </x-slot:footer>
     </x-admin.modal>
 
     {{-- Printable invoice --}}
@@ -86,7 +114,7 @@
                         <p class="text-xs text-gray-500">{{ __('doctorTitleShort') }}</p>
                     </div>
                 </div>
-                <p class="font-mono text-sm text-gray-500" x-text="current.id"></p>
+                <p class="font-mono text-sm text-gray-500" x-text="current.number"></p>
             </div>
             <p class="text-sm text-gray-500 mb-1">{{ __('patient_name') }}</p>
             <p class="font-medium text-gray-800 dark:text-white mb-4" x-text="current.patient"></p>
