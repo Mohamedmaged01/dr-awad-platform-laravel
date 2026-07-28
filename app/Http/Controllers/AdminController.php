@@ -711,6 +711,7 @@ class AdminController extends Controller
                 'role_key' => $s->user?->role,
                 'email' => $s->user?->email,
                 'phone' => $s->phone,
+                'is_available' => (bool) $s->is_available,
                 'status' => $s->is_available ? 'active' : 'vacation',
             ])->all(),
             'roleOptions' => collect(config('clinic.staff_roles'))

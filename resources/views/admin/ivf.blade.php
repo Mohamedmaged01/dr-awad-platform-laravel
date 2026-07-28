@@ -14,14 +14,14 @@
 @endphp
 
 @section('content')
-    <div class="space-y-6">
+    <div class="space-y-6" x-data="{ newOpen: false }">
         {{-- Header --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white">مركز الحقن المجهري</h1>
                 <p class="text-gray-500">{{ $cycles->count() }} دورة علاج نشطة</p>
             </div>
-            <x-ui.button variant="primary">
+            <x-ui.button variant="primary" x-on:click="newOpen = true">
                 <x-slot:leftIcon>@svg('lucide-plus', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                 بدء دورة جديدة
             </x-ui.button>
@@ -93,8 +93,10 @@
                                 <span>الموعد القادم: {{ \Carbon\Carbon::parse($cycle->latestFollowup?->next_appointment)->locale('ar_EG')->isoFormat('D/M/YYYY') }}</span>
                             </div>
                             <div class="flex gap-2">
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">@svg('lucide-eye', 'w-[18px] h-[18px] text-gray-500')</button>
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">@svg('lucide-more-vertical', 'w-[18px] h-[18px] text-gray-500')</button>
+                                <form method="POST" action="{{ route('admin.ivf.destroy', $cycle->id) }}" onsubmit="return confirm('{{ __('confirmDelete') }}')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">@svg('lucide-trash-2', 'w-[18px] h-[18px] text-gray-500 hover:text-red-500')</button>
+                                </form>
                             </div>
                         </div>
 
@@ -139,5 +141,29 @@
                 </div>
             </x-ui.card-content>
         </x-ui.card>
+
+        {{-- New cycle modal --}}
+        <x-admin.modal title="{{ __('newCycleTitle') }}" var="newOpen" max-width="max-w-2xl">
+            <form method="POST" action="{{ route('admin.ivf.store') }}" class="grid md:grid-cols-2 gap-4">
+                @csrf
+                <div class="md:col-span-2">
+                    <x-ui.select :label="__('patient_name')" name="patient_id" :options="$patientOptions" :placeholder="__('selectPatient')" required />
+                </div>
+                <x-ui.select :label="__('cycleType')" name="cycle_type" :options="[
+                    ['value' => 'ICSI', 'label' => 'ICSI'],
+                    ['value' => 'IVF', 'label' => 'IVF'],
+                    ['value' => 'IUI', 'label' => 'IUI'],
+                ]" required />
+                <x-ui.input :label="__('protocol')" name="protocol" required />
+                <x-ui.select :label="__('cycleStage')" name="current_stage" :options="collect($stageConfig)->map(fn ($c, $k) => ['value' => $k, 'label' => $c['label']])->values()->all()" required />
+                <x-ui.input :label="__('dayOfCycle')" name="day_of_cycle" type="number" min="1" value="1" />
+                <x-ui.input :label="__('date')" name="start_date" type="date" required />
+                <x-ui.input :label="__('nextAppointment')" name="next_appointment" type="date" />
+                <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <x-ui.button type="button" variant="outline" size="sm" x-on:click="newOpen = false">{{ __('cancel') }}</x-ui.button>
+                    <x-ui.button type="submit" variant="primary" size="sm">{{ __('startCycle') }}</x-ui.button>
+                </div>
+            </form>
+        </x-admin.modal>
     </div>
 @endsection

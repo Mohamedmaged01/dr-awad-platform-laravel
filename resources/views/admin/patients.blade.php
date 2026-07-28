@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="space-y-6" x-data="{ search: '', showAddModal: false, matches(t) { return this.search === '' || t.includes(this.search) } }">
+    <div class="space-y-6" x-data="{ search: '', showAddModal: false, showEditModal: false, current: {}, matches(t) { return this.search === '' || t.includes(this.search) } }">
         {{-- Header --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -92,10 +92,18 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-2">
-                                            <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="عرض">
-                                                @svg('lucide-eye', 'w-[18px] h-[18px] text-gray-500')
-                                            </button>
-                                            <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="تعديل">
+                                            <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="تعديل"
+                                                    x-on:click="current = {{ Js::from([
+                                                        'id' => $patient->id,
+                                                        'first_name_ar' => $patient->first_name_ar,
+                                                        'last_name_ar' => $patient->last_name_ar,
+                                                        'phone' => $patient->phone,
+                                                        'phone_alt' => $patient->phone_alt,
+                                                        'email' => $patient->email,
+                                                        'address' => $patient->address,
+                                                        'case_type' => $patient->case_type,
+                                                        'demo_status' => $patient->demo_status,
+                                                    ]) }}; showEditModal = true">
                                                 @svg('lucide-edit', 'w-[18px] h-[18px] text-gray-500')
                                             </button>
                                             <form method="POST" action="{{ route('admin.patients.destroy', $patient->id) }}"
@@ -134,28 +142,65 @@
                     <button @click="showAddModal = false" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">✕</button>
                 </x-ui.card-header>
                 <x-ui.card-content>
-                    <form class="space-y-4" @submit.prevent="showAddModal = false">
+                    <form class="space-y-4" method="POST" action="{{ route('admin.patients.store') }}">
+                        @csrf
                         <div class="grid md:grid-cols-2 gap-4">
-                            <x-ui.input label="الاسم الأول (عربي)" name="firstNameAr" required />
-                            <x-ui.input label="اسم العائلة (عربي)" name="lastNameAr" required />
+                            <x-ui.input label="الاسم الأول (عربي)" name="first_name_ar" required />
+                            <x-ui.input label="اسم العائلة (عربي)" name="last_name_ar" required />
                         </div>
                         <div class="grid md:grid-cols-2 gap-4">
                             <x-ui.input label="رقم الهاتف" name="phone" type="tel" required />
-                            <x-ui.input label="هاتف بديل" name="phoneAlt" type="tel" />
+                            <x-ui.input label="هاتف بديل" name="phone_alt" type="tel" />
                         </div>
                         <x-ui.input label="البريد الإلكتروني" name="email" type="email" />
                         <div class="grid md:grid-cols-2 gap-4">
-                            <x-ui.input label="تاريخ الميلاد" name="dateOfBirth" type="date" />
-                            <x-ui.input label="الرقم القومي" name="nationalId" />
+                            <x-ui.input label="تاريخ الميلاد" name="date_of_birth" type="date" />
+                            <x-ui.input label="الرقم القومي" name="national_id" />
                         </div>
                         <x-ui.input label="العنوان" name="address" />
                         <div class="grid md:grid-cols-2 gap-4">
-                            <x-ui.input label="فصيلة الدم" name="bloodType" />
-                            <x-ui.input label="جهة الطوارئ" name="emergencyContact" />
+                            <x-ui.input label="نوع الحالة" name="case_type" />
+                            <x-ui.input label="جهة الطوارئ" name="emergency_contact" />
                         </div>
                         <div class="flex justify-end gap-3 pt-4">
                             <x-ui.button type="button" variant="outline" x-on:click="showAddModal = false">إلغاء</x-ui.button>
                             <x-ui.button type="submit" variant="primary">حفظ المريضة</x-ui.button>
+                        </div>
+                    </form>
+                </x-ui.card-content>
+            </x-ui.card>
+        </div>
+
+        {{-- Edit Modal --}}
+        <div x-show="showEditModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <x-ui.card class="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <x-ui.card-header class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-white">تعديل بيانات المريضة</h2>
+                    <button @click="showEditModal = false" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">✕</button>
+                </x-ui.card-header>
+                <x-ui.card-content>
+                    <form class="space-y-4" method="POST" :action="'{{ url('/admin/patients') }}/' + current.id">
+                        @csrf @method('PUT')
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <x-ui.input label="الاسم الأول (عربي)" name="first_name_ar" x-model="current.first_name_ar" required />
+                            <x-ui.input label="اسم العائلة (عربي)" name="last_name_ar" x-model="current.last_name_ar" required />
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <x-ui.input label="رقم الهاتف" name="phone" type="tel" x-model="current.phone" required />
+                            <x-ui.input label="هاتف بديل" name="phone_alt" type="tel" x-model="current.phone_alt" />
+                        </div>
+                        <x-ui.input label="البريد الإلكتروني" name="email" type="email" x-model="current.email" />
+                        <x-ui.input label="العنوان" name="address" x-model="current.address" />
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <x-ui.input label="نوع الحالة" name="case_type" x-model="current.case_type" />
+                            <x-ui.select label="الحالة" name="demo_status" x-model="current.demo_status" :options="[
+                                ['value' => 'active', 'label' => 'نشط'],
+                                ['value' => 'archived', 'label' => 'مؤرشف'],
+                            ]" />
+                        </div>
+                        <div class="flex justify-end gap-3 pt-4">
+                            <x-ui.button type="button" variant="outline" x-on:click="showEditModal = false">إلغاء</x-ui.button>
+                            <x-ui.button type="submit" variant="primary">حفظ التغييرات</x-ui.button>
                         </div>
                     </form>
                 </x-ui.card-content>
