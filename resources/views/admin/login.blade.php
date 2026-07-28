@@ -2,8 +2,15 @@
     $locale = app()->getLocale();
     $dir = $locale === 'ar' ? 'rtl' : 'ltr';
     $bodyFont = $locale === 'ar' ? 'font-cairo' : 'font-poppins';
-    $roles = ['admin', 'doctor', 'nurse', 'receptionist', 'lab_technician'];
     $roleLabels = config('clinic.role_labels');
+    // Real seeded accounts (all password: "password").
+    $quickAccounts = [
+        'admin' => 'admin@dr-awad.com',
+        'doctor' => 'dr.mohamed@dr-awad.com',
+        'nurse' => 'nurse@dr-awad.com',
+        'receptionist' => 'reception@dr-awad.com',
+        'lab_technician' => 'lab@dr-awad.com',
+    ];
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}" dir="{{ $dir }}" class="scroll-smooth">
@@ -26,7 +33,7 @@
 </head>
 <body class="{{ $bodyFont }} antialiased">
 <div class="min-h-screen flex items-center justify-center gradient-soft dark:bg-gray-900 p-4"
-     x-data="{ email: '', password: '', showPassword: false }">
+     x-data="{ email: @js(old('email', '')), password: '', showPassword: false }">
     <div class="w-full max-w-md">
         {{-- Logo --}}
         <div class="text-center mb-8">
@@ -44,6 +51,12 @@
                         {{ session('timeout_message') }}
                     </div>
                 @endif
+
+                @error('email')
+                    <div class="mb-6 p-3 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-sm">
+                        {{ $message }}
+                    </div>
+                @enderror
 
                 <form method="POST" action="/admin/login" class="space-y-5">
                     @csrf
@@ -74,9 +87,9 @@
                 <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
                     <p class="text-center text-xs font-semibold text-gray-500 mb-3">{{ __('quickAccess') }}</p>
                     <div class="grid grid-cols-2 gap-2">
-                        @foreach ($roles as $r)
+                        @foreach ($quickAccounts as $r => $accEmail)
                             <button type="button"
-                                    @click="email = '{{ $r }}@dr-awad.com'; password = 'password123'"
+                                    @click="email = '{{ $accEmail }}'; password = 'password'"
                                     class="px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-medical-blue hover:text-white hover:border-medical-blue transition-colors">
                                 {{ __($roleLabels[$r]) }}
                             </button>

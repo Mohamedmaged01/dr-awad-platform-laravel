@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Branch;
 use App\Models\IvfCycle;
+use App\Models\Message;
 use App\Models\Patient;
+use App\Models\Review;
 use App\Models\Setting;
 use App\Support\AdminDemoData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Admin dashboard. Demo login only (role inferred from email, no password check),
@@ -20,31 +25,47 @@ class AdminController extends Controller
 
     public function showLogin()
     {
+        if (Auth::check() && Auth::user()->role !== 'patient') {
+            return redirect('/admin');
+        }
+
         return view('admin.login');
     }
 
     public function login(Request $request)
     {
-        $email = strtolower((string) $request->input('email'));
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        $role = 'admin';
-        foreach (['doctor' => 'doctor', 'nurse' => 'nurse', 'reception' => 'receptionist', 'lab' => 'lab_technician'] as $needle => $r) {
-            if (str_contains($email, $needle)) {
-                $role = $r;
-                break;
-            }
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            throw ValidationException::withMessages(['email' => __('invalidCredentials')]);
         }
 
-        $request->session()->put('admin_role', $role);
+        $user = Auth::user();
 
-        return redirect('/admin');
+        // The admin area is staff-only; a patient account cannot sign in here.
+        if ($user->role === 'patient' || ! $user->is_active) {
+            Auth::logout();
+            throw ValidationException::withMessages(['email' => __('invalidCredentials')]);
+        }
+
+        $request->session()->regenerate();
+        $user->forceFill(['last_login_at' => now()])->saveQuietly();
+
+        return redirect()->intended('/admin');
     }
 
     public function logout(Request $request)
     {
-        $request->session()->forget('admin_role');
+        $timedOut = $request->query('reason') === 'timeout';
 
-        if ($request->query('reason') === 'timeout') {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        if ($timedOut) {
             $request->session()->flash('timeout_message', __('sessionTimedOut'));
         }
 
@@ -91,6 +112,31 @@ class AdminController extends Controller
         ]);
     }
 
+    public function updateAppointmentStatus(Request $request, Appointment $appointment)
+    {
+        $data = $request->validate([
+            'status' => ['required', 'in:pending,confirmed,waiting,completed,cancelled,no_show'],
+        ]);
+
+        $appointment->update(['status' => $data['status']]);
+
+        return back()->with('status', __('saved'));
+    }
+
+    public function destroyAppointment(Appointment $appointment)
+    {
+        $appointment->delete();
+
+        return back()->with('status', __('deleted'));
+    }
+
+    public function destroyPatient(Patient $patient)
+    {
+        $patient->delete();
+
+        return back()->with('status', __('deleted'));
+    }
+
     public function permissions()
     {
         return view('admin.permissions');
@@ -126,8 +172,29 @@ class AdminController extends Controller
     public function reviews()
     {
         return view('admin.reviews', [
-            'reviews' => AdminDemoData::reviews(),
+            'reviews' => Review::latest()->get()->map(fn (Review $r) => [
+                'id' => $r->id,
+                'patient' => $r->patient_name ?: $r->patient?->name,
+                'rating' => $r->rating,
+                'comment' => $r->content_ar,
+                'service' => $r->title_ar,
+                'status' => $r->is_approved ? 'approved' : 'pending',
+            ])->all(),
         ]);
+    }
+
+    public function approveReview(Review $review)
+    {
+        $review->update(['is_approved' => true]);
+
+        return back()->with('status', __('saved'));
+    }
+
+    public function destroyReview(Review $review)
+    {
+        $review->delete();
+
+        return back()->with('status', __('deleted'));
     }
 
     public function staff()
@@ -140,8 +207,61 @@ class AdminController extends Controller
     public function branches()
     {
         return view('admin.branches', [
-            'branches' => AdminDemoData::branches(),
+            'branches' => Branch::orderByDesc('is_main')->get()->map(fn (Branch $b) => [
+                'id' => $b->id,
+                'name' => $b->name_ar,
+                'address' => $b->address_ar,
+                'phone' => $b->phone,
+                'hours' => $b->working_hours['display'] ?? '',
+            ])->all(),
         ]);
+    }
+
+    public function storeBranch(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:200'],
+            'address' => ['required', 'string', 'max:500'],
+            'phone' => ['required', 'string', 'max:20'],
+            'hours' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        Branch::create([
+            'name_ar' => $data['name'],
+            'address_ar' => $data['address'],
+            'phone' => $data['phone'],
+            'whatsapp' => $data['phone'],
+            'working_hours' => ['display' => $data['hours'] ?? '', 'short' => $data['name']],
+            'is_active' => true,
+        ]);
+
+        return back()->with('status', __('saved'));
+    }
+
+    public function updateBranch(Request $request, Branch $branch)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:200'],
+            'address' => ['required', 'string', 'max:500'],
+            'phone' => ['required', 'string', 'max:20'],
+            'hours' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $branch->update([
+            'name_ar' => $data['name'],
+            'address_ar' => $data['address'],
+            'phone' => $data['phone'],
+            'working_hours' => array_merge($branch->working_hours ?? [], ['display' => $data['hours'] ?? '']),
+        ]);
+
+        return back()->with('status', __('saved'));
+    }
+
+    public function destroyBranch(Branch $branch)
+    {
+        $branch->delete();
+
+        return back()->with('status', __('deleted'));
     }
 
     public function content()
@@ -154,8 +274,37 @@ class AdminController extends Controller
     public function messages()
     {
         return view('admin.messages', [
-            'messages' => AdminDemoData::messages(),
+            'messages' => Message::latest()->get()->map(fn (Message $m) => [
+                'id' => $m->id,
+                'name' => $m->name,
+                'email' => $m->email,
+                'phone' => $m->phone,
+                'subject' => $m->subject,
+                'message' => $m->message,
+                'time' => $m->created_at?->diffForHumans(),
+                'unread' => $m->status === 'unread',
+            ])->all(),
         ]);
+    }
+
+    public function replyMessage(Request $request, Message $message)
+    {
+        $data = $request->validate(['reply' => ['nullable', 'string', 'max:2000']]);
+
+        $message->update([
+            'reply' => $data['reply'] ?? null,
+            'status' => 'replied',
+            'replied_at' => now(),
+        ]);
+
+        return back()->with('status', __('saved'));
+    }
+
+    public function destroyMessage(Message $message)
+    {
+        $message->delete();
+
+        return back()->with('status', __('deleted'));
     }
 
     public function settings()

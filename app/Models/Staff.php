@@ -23,4 +23,15 @@ class Staff extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /** Display name used across the admin staff page. */
+    public function getNameAttribute(): string
+    {
+        return trim($this->first_name_ar . ' ' . $this->last_name_ar);
+    }
 }

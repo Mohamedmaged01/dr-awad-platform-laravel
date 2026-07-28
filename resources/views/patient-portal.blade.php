@@ -3,11 +3,12 @@
 @section('title', __('patientPortal') . ' | ' . __('heroTitle'))
 
 @section('content')
-{{-- Mirrors patient-portal/page.tsx: demo login toggle, then a demo dashboard. --}}
-<div x-data="{ loggedIn: false, showLogin: true }">
+{{-- Real patient auth: login/register when signed out, live dashboard when signed in. --}}
+<div x-data="{ showLogin: {{ $errors->any() && ! $errors->has('portal') ? 'false' : 'true' }} }">
 
+    @if (! $patient)
     {{-- ===== Login / Register ===== --}}
-    <section x-show="!loggedIn" class="pt-32 pb-16 min-h-[80vh] flex items-center gradient-soft">
+    <section class="pt-32 pb-16 min-h-[80vh] flex items-center gradient-soft">
         <div class="container-custom">
             <div class="max-w-md mx-auto">
                 <x-ui.card class="shadow-xl">
@@ -27,9 +28,16 @@
                                     :class="!showLogin && 'bg-medical-blue text-white'">{{ __('newAccount') }}</button>
                         </div>
 
+                        @if ($errors->has('portal'))
+                            <div class="mb-5 p-3 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-sm">
+                                {{ $errors->first('portal') }}
+                            </div>
+                        @endif
+
                         {{-- Login --}}
-                        <form x-show="showLogin" @submit.prevent="loggedIn = true" class="space-y-5">
-                            <x-ui.input :label="__('emailOrPhone')" name="email" placeholder="example@email.com" required>
+                        <form x-show="showLogin" method="POST" action="{{ route('patient.login') }}" class="space-y-5">
+                            @csrf
+                            <x-ui.input :label="__('emailOrPhone')" name="email" type="email" :value="old('email')" placeholder="example@email.com" required>
                                 <x-slot:leftIcon>@svg('lucide-mail', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                             </x-ui.input>
                             <x-ui.input :label="__('password')" name="password" type="password" placeholder="••••••••" required>
@@ -49,20 +57,21 @@
                         </form>
 
                         {{-- Register --}}
-                        <form x-show="!showLogin" x-cloak @submit.prevent class="space-y-5">
-                            <x-ui.input :label="__('fullName')" name="reg_name" :placeholder="__('enterYourName')" required>
+                        <form x-show="!showLogin" x-cloak method="POST" action="{{ route('patient.register') }}" class="space-y-5">
+                            @csrf
+                            <x-ui.input :label="__('fullName')" name="name" :value="old('name')" :error="$errors->first('name')" :placeholder="__('enterYourName')" required>
                                 <x-slot:leftIcon>@svg('lucide-user', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                             </x-ui.input>
-                            <x-ui.input :label="__('phone')" name="reg_phone" type="tel" placeholder="01xxxxxxxxx" required>
+                            <x-ui.input :label="__('phone')" name="phone" type="tel" :value="old('phone')" :error="$errors->first('phone')" placeholder="01xxxxxxxxx" required>
                                 <x-slot:leftIcon>@svg('lucide-phone', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                             </x-ui.input>
-                            <x-ui.input :label="__('email')" name="reg_email" type="email" placeholder="example@email.com" required>
+                            <x-ui.input :label="__('email')" name="email" type="email" :value="old('email')" :error="$errors->first('email')" placeholder="example@email.com" required>
                                 <x-slot:leftIcon>@svg('lucide-mail', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                             </x-ui.input>
-                            <x-ui.input :label="__('password')" name="reg_password" type="password" placeholder="••••••••" required>
+                            <x-ui.input :label="__('password')" name="password" type="password" :error="$errors->first('password')" placeholder="••••••••" required>
                                 <x-slot:leftIcon>@svg('lucide-lock', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                             </x-ui.input>
-                            <x-ui.input :label="__('fileNumberOptional')" name="fileNumber" placeholder="P2024XXXXX">
+                            <x-ui.input :label="__('fileNumberOptional')" name="file_number" :value="old('file_number')" placeholder="P2024XXXXX">
                                 <x-slot:leftIcon>@svg('lucide-file-text', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                             </x-ui.input>
                             <x-ui.button type="submit" variant="primary" size="lg" class="w-full">{{ __('createAccount') }}</x-ui.button>
@@ -80,17 +89,18 @@
         </div>
     </section>
 
-    {{-- ===== Demo Dashboard ===== --}}
-    <div x-show="loggedIn" x-cloak class="bg-gray-50 dark:bg-gray-900">
+    @else
+    {{-- ===== Live Dashboard ===== --}}
+    <div class="bg-gray-50 dark:bg-gray-900">
         <section class="pt-32 pb-16">
             <div class="container-custom">
                 {{-- Welcome --}}
                 <div class="bg-gradient-to-r from-medical-blue to-medical-blue-dark rounded-2xl p-8 text-white mb-8">
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">س</div>
+                        <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">{{ mb_substr($patient->name, 0, 1) }}</div>
                         <div>
-                            <h1 class="text-2xl font-bold">{{ __('welcomeSara') }}</h1>
-                            <p class="text-white/80">{{ __('lastVisitDate') }}</p>
+                            <h1 class="text-2xl font-bold">{{ __('welcomeBack') }}، {{ $patient->first_name_ar }}</h1>
+                            <p class="text-white/80">{{ __('fileNumberColon') }} {{ $patient->file_number }}</p>
                         </div>
                     </div>
                 </div>
@@ -124,7 +134,7 @@
                             </x-ui.card-header>
                             <x-ui.card-content>
                                 <div class="space-y-4">
-                                    @foreach ($appointments as $appointment)
+                                    @forelse ($appointments as $appointment)
                                         <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
                                             <div class="flex items-center gap-4">
                                                 <div class="w-12 h-12 rounded-xl bg-medical-blue/10 flex items-center justify-center">
@@ -140,7 +150,9 @@
                                                 <p class="text-sm text-gray-500">{{ $appointment['time'] }}</p>
                                             </div>
                                         </div>
-                                    @endforeach
+                                    @empty
+                                        <p class="text-center text-gray-500 py-6">{{ __('noAppointments') }}</p>
+                                    @endforelse
                                 </div>
                             </x-ui.card-content>
                         </x-ui.card>
@@ -186,7 +198,7 @@
                             </x-ui.card-header>
                             <x-ui.card-content>
                                 <div class="space-y-3">
-                                    @foreach ($records as $record)
+                                    @forelse ($records as $record)
                                         <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                                             <div class="flex items-center gap-3">
                                                 @svg('lucide-file-text', 'w-5 h-5 text-medical-blue')
@@ -197,7 +209,9 @@
                                             </div>
                                             <button class="text-medical-blue text-sm hover:underline">{{ __('view') }}</button>
                                         </div>
-                                    @endforeach
+                                    @empty
+                                        <p class="text-center text-gray-500 py-6">{{ __('noRecords') }}</p>
+                                    @endforelse
                                 </div>
                             </x-ui.card-content>
                         </x-ui.card>
@@ -209,12 +223,12 @@
                         <x-ui.card>
                             <x-ui.card-content class="p-6">
                                 <div class="text-center">
-                                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-medical-blue/10 flex items-center justify-center text-3xl font-bold text-medical-blue">س</div>
-                                    <h3 class="font-bold text-gray-800 dark:text-white">{{ app()->getLocale() === 'en' ? 'Sara Ahmed' : 'سارة أحمد' }}</h3>
-                                    <p class="text-sm text-gray-500 mb-4">{{ __('fileNumberColon') }} P2024001</p>
-                                    <div class="text-left space-y-2 text-sm">
-                                        <p class="text-gray-600 dark:text-gray-400">📱 01012345678</p>
-                                        <p class="text-gray-600 dark:text-gray-400">✉️ sara@email.com</p>
+                                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-medical-blue/10 flex items-center justify-center text-3xl font-bold text-medical-blue">{{ mb_substr($patient->name, 0, 1) }}</div>
+                                    <h3 class="font-bold text-gray-800 dark:text-white">{{ $patient->name }}</h3>
+                                    <p class="text-sm text-gray-500 mb-4">{{ __('fileNumberColon') }} {{ $patient->file_number }}</p>
+                                    <div class="text-start space-y-2 text-sm">
+                                        <p class="text-gray-600 dark:text-gray-400">📱 {{ $patient->phone }}</p>
+                                        @if ($patient->email)<p class="text-gray-600 dark:text-gray-400">✉️ {{ $patient->email }}</p>@endif
                                     </div>
                                 </div>
                             </x-ui.card-content>
@@ -254,11 +268,11 @@
                                         @svg('lucide-lock', 'w-[18px] h-[18px] text-gray-500')
                                         <span class="text-gray-700 dark:text-gray-300">{{ __('changePassword') }}</span>
                                     </a>
-                                    <button @click="loggedIn = false"
-                                            class="w-full flex items-center gap-3 p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500">
-                                        @svg('lucide-log-in', 'w-[18px] h-[18px]')
+                                    <a href="/patient-portal/logout"
+                                       class="w-full flex items-center gap-3 p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500">
+                                        @svg('lucide-log-out', 'w-[18px] h-[18px]')
                                         <span>{{ __('logout') }}</span>
-                                    </button>
+                                    </a>
                                 </div>
                             </x-ui.card-content>
                         </x-ui.card>
@@ -267,5 +281,6 @@
             </div>
         </section>
     </div>
+    @endif
 </div>
 @endsection

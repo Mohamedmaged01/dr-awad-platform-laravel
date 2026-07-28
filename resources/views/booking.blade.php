@@ -20,8 +20,10 @@
         }
      }">
 
-    {{-- ===== Success state ===== --}}
-    <section x-show="success" x-cloak class="pt-32 pb-16 min-h-[80vh] flex items-center">
+    {{-- ===== Success state (server-rendered after a real submit) ===== --}}
+    @if (session('booking_success'))
+    @php $summary = session('booking_summary', []); @endphp
+    <section class="pt-32 pb-16 min-h-[80vh] flex items-center">
         <div class="container-custom">
             <x-ui.card class="max-w-2xl mx-auto text-center">
                 <x-ui.card-content class="py-16">
@@ -32,27 +34,28 @@
                     <p class="text-gray-600 dark:text-gray-400 text-lg mb-6">
                         {{ __('bookingReceivedDescLong') }}
                     </p>
+                    @if (! empty($summary))
                     <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mb-8 text-start">
                         <h3 class="font-bold text-gray-800 dark:text-white mb-4">{{ __('bookingDetails') }}</h3>
                         <div class="space-y-2 text-gray-600 dark:text-gray-400">
-                            <p><strong>{{ __('branch') }}:</strong> <span x-text="selectedBranch?.label"></span></p>
-                            <p><strong>{{ __('serviceLabel') }}:</strong> <span x-text="selectedService?.label"></span></p>
-                            <p><strong>{{ __('date') }}:</strong> <span x-text="form.date"></span></p>
-                            <p><strong>{{ __('time') }}:</strong> <span x-text="form.time"></span></p>
-                            <p><strong>{{ __('nameLabel') }}:</strong> <span x-text="form.name"></span></p>
+                            <p><strong>{{ __('nameLabel') }}:</strong> {{ $summary['name'] ?? '' }}</p>
+                            <p><strong>{{ __('date') }}:</strong> {{ $summary['date'] ?? '' }}</p>
+                            <p><strong>{{ __('time') }}:</strong> {{ $summary['time'] ?? '' }}</p>
                         </div>
                     </div>
+                    @endif
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <x-ui.button variant="primary" x-on:click="reset()">{{ __('bookAnother') }}</x-ui.button>
+                        <x-ui.button href="/booking" variant="primary">{{ __('bookAnother') }}</x-ui.button>
                         <x-ui.button href="/" variant="outline">{{ __('backToHome') }}</x-ui.button>
                     </div>
                 </x-ui.card-content>
             </x-ui.card>
         </div>
     </section>
+    @else
 
     {{-- ===== Wizard ===== --}}
-    <div x-show="!success">
+    <div>
         {{-- Hero --}}
         <section class="pt-32 pb-8 gradient-medical">
             <div class="container-custom text-center text-white">
@@ -87,7 +90,14 @@
             <div class="container-custom">
                 <x-ui.card class="max-w-3xl mx-auto shadow-xl">
                     <x-ui.card-content class="p-8">
-                        <form @submit.prevent="submit()">
+                        @if ($errors->any())
+                            <div class="mb-6 p-3 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-sm">
+                                {{ $errors->first() }}
+                            </div>
+                        @endif
+                        <form method="POST" action="{{ route('booking.submit') }}" @submit="submitting = true">
+                            @csrf
+                            <input type="hidden" name="time" :value="form.time">
                             {{-- Step 1: Service & Time --}}
                             <div x-show="step === 1" class="space-y-6">
                                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('step1Heading') }}</h2>
@@ -236,5 +246,6 @@
             </div>
         </section>
     </div>
+    @endif
 </div>
 @endsection

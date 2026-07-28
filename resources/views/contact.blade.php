@@ -17,11 +17,11 @@
     <section class="py-16">
         <div class="container-custom">
             <div class="grid lg:grid-cols-2 gap-12">
-                {{-- Contact Form (simulates a 2s submit, as in the source) --}}
-                <x-ui.card class="shadow-xl"
-                           x-data="{ submitting: false, success: false, submit() { this.submitting = true; setTimeout(() => { this.submitting = false; this.success = true }, 2000) } }">
+                {{-- Contact Form (persists to the messages table) --}}
+                <x-ui.card class="shadow-xl" x-data="{ submitting: false }">
                     <x-ui.card-content class="p-8">
-                        <div x-show="success" x-cloak class="text-center py-12">
+                        @if (session('contact_success'))
+                        <div class="text-center py-12">
                             <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
                                 @svg('lucide-check-circle', 'w-12 h-12 text-green-500')
                             </div>
@@ -29,12 +29,18 @@
                             <p class="text-gray-600 dark:text-gray-400 mb-6">
                                 {{ __('contactSuccessDesc') }}
                             </p>
-                            <x-ui.button variant="primary" x-on:click="success = false">{{ __('sendAnother') }}</x-ui.button>
+                            <x-ui.button href="/contact" variant="primary">{{ __('sendAnother') }}</x-ui.button>
                         </div>
-
-                        <div x-show="!success">
+                        @else
+                        <div>
                             <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('sendUsMessage') }}</h2>
-                            <form class="space-y-5" @submit.prevent="submit()">
+                            @if ($errors->any())
+                                <div class="mb-5 p-3 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-sm">
+                                    {{ $errors->first() }}
+                                </div>
+                            @endif
+                            <form method="POST" action="{{ route('contact.submit') }}" class="space-y-5" @submit="submitting = true">
+                                @csrf
                                 <x-ui.input :label="__('fullName')" name="name" :placeholder="__('enterFullName')" required />
                                 <div class="grid md:grid-cols-2 gap-5">
                                     <x-ui.input :label="__('phone')" name="phone" type="tel" placeholder="01xxxxxxxxx" required />
@@ -56,6 +62,7 @@
                                 </button>
                             </form>
                         </div>
+                        @endif
                     </x-ui.card-content>
                 </x-ui.card>
 

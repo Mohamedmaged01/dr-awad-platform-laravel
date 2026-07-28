@@ -84,14 +84,30 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     @if ($appointment->status === 'pending')
-                                        <x-ui.button variant="outline" size="sm">تأكيد</x-ui.button>
-                                        <x-ui.button variant="ghost" size="sm" class="text-red-500">إلغاء</x-ui.button>
+                                        <form method="POST" action="{{ route('admin.appointments.status', $appointment->id) }}">
+                                            @csrf @method('PATCH')
+                                            <input type="hidden" name="status" value="confirmed">
+                                            <x-ui.button type="submit" variant="outline" size="sm">تأكيد</x-ui.button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.appointments.status', $appointment->id) }}">
+                                            @csrf @method('PATCH')
+                                            <input type="hidden" name="status" value="cancelled">
+                                            <x-ui.button type="submit" variant="ghost" size="sm" class="text-red-500">إلغاء</x-ui.button>
+                                        </form>
                                     @elseif ($appointment->status === 'confirmed')
-                                        <x-ui.button variant="primary" size="sm">بدء الكشف</x-ui.button>
+                                        <form method="POST" action="{{ route('admin.appointments.status', $appointment->id) }}">
+                                            @csrf @method('PATCH')
+                                            <input type="hidden" name="status" value="waiting">
+                                            <x-ui.button type="submit" variant="primary" size="sm">بدء الكشف</x-ui.button>
+                                        </form>
                                     @endif
-                                    <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                                        @svg('lucide-more-vertical', 'w-[18px] h-[18px] text-gray-500')
-                                    </button>
+                                    <form method="POST" action="{{ route('admin.appointments.destroy', $appointment->id) }}"
+                                          onsubmit="return confirm('{{ __('confirmDelete') }}')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 hover:text-red-500">
+                                            @svg('lucide-trash-2', 'w-[18px] h-[18px]')
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         @endforeach

@@ -1,11 +1,11 @@
 @props(['branches' => [], 'services' => []])
 @php $contact = config('clinic.contact'); @endphp
 {{-- Mirrors BookingSection.tsx: submit simulates a 2s request, then swaps to a success card. --}}
-<section class="section-padding bg-gray-50 dark:bg-gray-900"
-         x-data="{ submitting: false, success: false, submit() { this.submitting = true; setTimeout(() => { this.submitting = false; this.success = true }, 2000) } }">
+<section id="booking" class="section-padding bg-gray-50 dark:bg-gray-900" x-data="{ submitting: false }">
     <div class="container-custom">
-        {{-- Success state --}}
-        <div x-show="success" x-cloak>
+        @if (session('booking_success'))
+        {{-- Success state (server-rendered after a real submit) --}}
+        <div>
             <x-ui.card class="max-w-2xl mx-auto text-center">
                 <x-ui.card-content class="py-16">
                     <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
@@ -13,12 +13,12 @@
                     </div>
                     <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">{{ __('bookingReceivedTitle') }}</h3>
                     <p class="text-gray-600 dark:text-gray-400 mb-8">{{ __('bookingReceivedDesc') }}</p>
-                    <x-ui.button variant="primary" x-on:click="success = false">{{ __('bookAnother') }}</x-ui.button>
+                    <x-ui.button href="/#booking" variant="primary">{{ __('bookAnother') }}</x-ui.button>
                 </x-ui.card-content>
             </x-ui.card>
         </div>
-
-        <div class="grid lg:grid-cols-2 gap-12" x-show="!success">
+        @else
+        <div class="grid lg:grid-cols-2 gap-12">
             {{-- Info Section --}}
             <div>
                 <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">{{ __('bookingEyebrow') }}</span>
@@ -79,7 +79,13 @@
                     <h3 class="text-xl font-bold text-gray-800 dark:text-white">{{ __('quickBookingForm') }}</h3>
                 </x-ui.card-header>
                 <x-ui.card-content>
-                    <form class="space-y-5" @submit.prevent="submit()">
+                    @if ($errors->any())
+                        <div class="mb-5 p-3 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-sm">
+                            {{ $errors->first() }}
+                        </div>
+                    @endif
+                    <form method="POST" action="{{ route('booking.submit') }}" class="space-y-5" @submit="submitting = true">
+                        @csrf
                         <x-ui.input :label="__('fullName')" name="name" :placeholder="__('enterFullName')" required>
                             <x-slot:leftIcon>@svg('lucide-user', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                         </x-ui.input>
@@ -120,5 +126,6 @@
                 </x-ui.card-content>
             </x-ui.card>
         </div>
+        @endif
     </div>
 </section>

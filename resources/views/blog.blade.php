@@ -86,13 +86,21 @@
             <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-xl mx-auto">
                 {{ __('newsletterDesc') }}
             </p>
-            <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="return false">
-                <input type="email" placeholder="{{ __('emailPlaceholder') }}"
-                       class="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-medical-blue">
-                <button type="submit" class="px-6 py-3 bg-medical-blue text-white rounded-lg font-semibold hover:bg-medical-blue-dark transition-colors">
-                    {{ __('subscribeBtn') }}
-                </button>
-            </form>
+            @if (session('newsletter_success'))
+                <div class="max-w-md mx-auto p-3 rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm">
+                    {{ __('newsletterSuccess') }}
+                </div>
+            @else
+                <form method="POST" action="{{ route('newsletter.subscribe') }}" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                    @csrf
+                    <input type="email" name="email" required placeholder="{{ __('emailPlaceholder') }}"
+                           class="flex-1 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                    <button type="submit" class="px-6 py-3 bg-medical-blue text-white rounded-lg font-semibold hover:bg-medical-blue-dark transition-colors">
+                        {{ __('subscribeBtn') }}
+                    </button>
+                </form>
+                @error('email')<p class="mt-3 text-sm text-red-600">{{ $message }}</p>@enderror
+            @endif
         </div>
     </section>
 @endsection

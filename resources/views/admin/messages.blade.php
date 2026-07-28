@@ -43,21 +43,26 @@
                                     <span class="flex items-center gap-1">@svg('lucide-phone', 'w-3.5 h-3.5') <span x-text="items[selected].phone"></span></span>
                                 </p>
                             </div>
-                            <button class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                            <form method="POST" :action="'{{ url('/admin/messages') }}/' + items[selected].id"
+                                  onsubmit="return confirm('{{ __('confirmDelete') }}')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                            </form>
                         </div>
                     </div>
                     <div class="p-6 flex-1 overflow-y-auto">
                         <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-gray-700 dark:text-gray-300" x-text="items[selected].message"></div>
                     </div>
-                    <div class="p-4 border-t border-gray-100 dark:border-gray-700">
+                    <form method="POST" :action="'{{ url('/admin/messages') }}/' + items[selected].id + '/reply'" class="p-4 border-t border-gray-100 dark:border-gray-700">
+                        @csrf @method('PATCH')
                         <x-ui.textarea name="reply" rows="2" :placeholder="__('yourMessage')" />
                         <div class="flex justify-end mt-3">
-                            <x-ui.button variant="primary" size="sm">
+                            <x-ui.button type="submit" variant="primary" size="sm">
                                 <x-slot:leftIcon>@svg('lucide-send', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                                 {{ __('send') }}
                             </x-ui.button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </template>
         </x-ui.card>

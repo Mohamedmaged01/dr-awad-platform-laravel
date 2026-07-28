@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsurePatient;
+use App\Http\Middleware\EnsureStaff;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Resolve the request locale (session-backed) for every web request.
         $middleware->web(append: [
             SetLocale::class,
+        ]);
+
+        $middleware->alias([
+            'staff' => EnsureStaff::class,
+            'patient' => EnsurePatient::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

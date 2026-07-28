@@ -4,12 +4,19 @@ namespace Database\Seeders;
 
 use App\Models\Appointment;
 use App\Models\Branch;
+use App\Models\Content;
+use App\Models\Invoice;
 use App\Models\IvfCycle;
 use App\Models\IvfFollowup;
+use App\Models\MedicalRecord;
+use App\Models\Message;
 use App\Models\Patient;
+use App\Models\Payment;
+use App\Models\Review;
 use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Staff;
+use App\Models\Surgery;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -34,7 +41,125 @@ class DemoSeeder extends Seeder
         $patients = $this->seedPatients();
         $this->seedAppointments($patients, $branches, $services);
         $this->seedIvfCycles($patients);
+        $this->seedSurgeries($patients, $branches);
+        $this->seedBilling($patients, $services);
+        $this->seedContent();
+        $this->seedEngagement();
         $this->seedSettings();
+    }
+
+    /** Scheduled/completed operations for the surgeries admin page. */
+    private function seedSurgeries(array $patients, array $branches): void
+    {
+        $doctorStaffId = $this->uuid('8007', 1);
+        $rows = [
+            ['file' => 'P2024001', 'type' => 'hysteroscopy', 'name' => 'منظار رحم تشخيصي', 'date' => '2024-01-22 10:00', 'status' => 'scheduled', 'cost' => 12000],
+            ['file' => 'P2024002', 'type' => 'laparoscopy', 'name' => 'استئصال كيس مبيض بالمنظار', 'date' => '2024-01-18 12:30', 'status' => 'completed', 'cost' => 18000],
+            ['file' => 'P2024003', 'type' => 'laparoscopy', 'name' => 'إزالة ورم ليفي بالمنظار', 'date' => '2024-01-25 09:30', 'status' => 'pending', 'cost' => 22000],
+            ['file' => 'P2024005', 'type' => 'cesarean', 'name' => 'ولادة قيصرية', 'date' => '2024-01-15 08:00', 'status' => 'completed', 'cost' => 25000],
+        ];
+
+        foreach ($rows as $i => $row) {
+            Surgery::create([
+                'id' => $this->uuid('800c', $i + 1),
+                'patient_id' => $patients[$row['file']]->id,
+                'staff_id' => $doctorStaffId,
+                'branch_id' => $branches['beni-mazar']->id,
+                'surgery_type' => $row['type'],
+                'surgery_name' => $row['name'],
+                'scheduled_date' => $row['date'],
+                'status' => $row['status'],
+                'total_cost' => $row['cost'],
+            ]);
+        }
+    }
+
+    /** Invoices (+ a payment for the paid ones) for the payments admin page. */
+    private function seedBilling(array $patients, array $services): void
+    {
+        $rows = [
+            ['file' => 'P2024001', 'service' => 'استشارة حقن مجهري', 'amount' => 700, 'method' => 'فيزا', 'status' => 'paid', 'date' => '2024-01-20'],
+            ['file' => 'P2024002', 'service' => 'متابعة حمل + سونار 4D', 'amount' => 600, 'method' => 'نقدي', 'status' => 'paid', 'date' => '2024-01-19'],
+            ['file' => 'P2024003', 'service' => 'كشف طبي عام', 'amount' => 500, 'method' => 'فودافون كاش', 'status' => 'pending', 'date' => '2024-01-18'],
+            ['file' => 'P2024005', 'service' => 'استشارة جراحية', 'amount' => 600, 'method' => 'فيزا', 'status' => 'paid', 'date' => '2024-01-17'],
+        ];
+
+        foreach ($rows as $i => $row) {
+            $paid = $row['status'] === 'paid';
+            $invoice = Invoice::create([
+                'id' => $this->uuid('800d', $i + 1),
+                'invoice_number' => sprintf('INV-2024-%03d', $i + 1),
+                'patient_id' => $patients[$row['file']]->id,
+                'subtotal' => $row['amount'],
+                'total' => $row['amount'],
+                'paid_amount' => $paid ? $row['amount'] : 0,
+                'status' => $row['status'],
+                'due_date' => $row['date'],
+                'paid_at' => $paid ? $row['date'] : null,
+                'items' => [['label' => $row['service'], 'amount' => $row['amount']]],
+                'notes' => $row['method'],
+            ]);
+
+            if ($paid) {
+                Payment::create([
+                    'id' => $this->uuid('800e', $i + 1),
+                    'invoice_id' => $invoice->id,
+                    'amount' => $row['amount'],
+                    'payment_method' => $row['method'],
+                    'status' => 'paid',
+                    'paid_at' => $row['date'],
+                ]);
+            }
+        }
+    }
+
+    /** Published articles / FAQ entries for the content admin page. */
+    private function seedContent(): void
+    {
+        $rows = [
+            ['type' => 'article', 'title_ar' => 'نصائح للحامل في الشهور الأولى', 'title_en' => 'Tips for early pregnancy', 'excerpt_ar' => 'أهم الإرشادات للعناية بصحة الأم والجنين خلال الثلث الأول.', 'published' => true],
+            ['type' => 'article', 'title_ar' => 'كل ما تريدين معرفته عن الحقن المجهري', 'title_en' => 'Everything about ICSI', 'excerpt_ar' => 'شرح مبسّط لمراحل الحقن المجهري ونسب النجاح.', 'published' => true],
+            ['type' => 'faq', 'title_ar' => 'ما هي تكلفة جلسة المتابعة؟', 'title_en' => 'What is the follow-up fee?', 'excerpt_ar' => 'تبدأ من 300 جنيه وتختلف حسب نوع الكشف.', 'published' => true],
+            ['type' => 'success_story', 'title_ar' => 'قصة نجاح: حمل بعد حقن مجهري', 'title_en' => 'Success story: pregnancy after ICSI', 'excerpt_ar' => 'رحلة إحدى المريضات حتى تحقق الحلم.', 'published' => false],
+        ];
+
+        foreach ($rows as $i => $row) {
+            Content::create([
+                'id' => $this->uuid('800f', $i + 1),
+                'type' => $row['type'],
+                'title_ar' => $row['title_ar'],
+                'title_en' => $row['title_en'],
+                'excerpt_ar' => $row['excerpt_ar'],
+                'is_published' => $row['published'],
+                'published_at' => $row['published'] ? now() : null,
+            ]);
+        }
+    }
+
+    /** Contact messages + patient reviews for the admin pages. */
+    private function seedEngagement(): void
+    {
+        $messages = [
+            ['name' => 'سارة أحمد', 'email' => 'sara@email.com', 'phone' => '01012345678', 'subject' => 'استفسار عن الحقن المجهري', 'message' => 'السلام عليكم، أريد الاستفسار عن مواعيد وتكلفة الحقن المجهري. شكراً لكم.', 'status' => 'unread'],
+            ['name' => 'منى خالد', 'email' => 'mona@email.com', 'phone' => '01087654321', 'subject' => 'حجز موعد متابعة حمل', 'message' => 'أريد حجز موعد لمتابعة الحمل في الأسبوع القادم إن أمكن.', 'status' => 'unread'],
+            ['name' => 'نورا محمد', 'email' => 'nora@email.com', 'phone' => '01011223344', 'subject' => 'شكر وتقدير', 'message' => 'شكراً جزيلاً على التعامل الرائع والمتابعة المستمرة.', 'status' => 'read'],
+        ];
+        foreach ($messages as $i => $m) {
+            Message::create(array_merge($m, [
+                'id' => $this->uuid('800a', $i + 1),
+                'source' => 'contact_form',
+            ]));
+        }
+
+        $reviews = [
+            ['patient_name' => 'سارة أحمد', 'rating' => 5, 'content_ar' => 'دكتور ممتاز ومتابعة رائعة، أنصح به بشدة.', 'title_ar' => 'الحقن المجهري', 'is_approved' => true],
+            ['patient_name' => 'منى خالد', 'rating' => 5, 'content_ar' => 'تعامل راقٍ ونتائج مبهرة، شكراً لكم.', 'title_ar' => 'متابعة الحمل', 'is_approved' => true],
+            ['patient_name' => 'نورا محمد', 'rating' => 4, 'content_ar' => 'تجربة جيدة جداً والتعافي كان سريعاً.', 'title_ar' => 'جراحات المناظير', 'is_approved' => false],
+            ['patient_name' => 'ريم سعيد', 'rating' => 5, 'content_ar' => 'أفضل عيادة نساء وتوليد تعاملت معها.', 'title_ar' => 'النساء والتوليد', 'is_approved' => true],
+        ];
+        foreach ($reviews as $i => $r) {
+            Review::create(array_merge($r, ['id' => $this->uuid('800b', $i + 1)]));
+        }
     }
 
     private function seedUsersAndStaff(): void
@@ -66,18 +191,46 @@ class DemoSeeder extends Seeder
             'last_name_en' => 'Awad',
             'title' => 'استشاري',
             'specialization' => 'النساء والتوليد والحقن المجهري وجراحات المناظير',
+            'phone' => '01005078266',
             'image_url' => '/images/dr-mohamed-awad.jpg',
             'is_available' => true,
         ]);
+
+        // Additional staff accounts (all password: "password") so every role can sign in,
+        // each with a matching Staff profile for the staff admin page.
+        $extra = [
+            3 => ['email' => 'nurse@dr-awad.com', 'role' => 'nurse', 'first' => 'فاطمة', 'last' => 'سيد', 'title' => 'طاقم تمريض', 'phone' => '01012345671', 'available' => true],
+            4 => ['email' => 'reception@dr-awad.com', 'role' => 'receptionist', 'first' => 'أحمد', 'last' => 'علي', 'title' => 'موظف استقبال', 'phone' => '01012345672', 'available' => true],
+            5 => ['email' => 'lab@dr-awad.com', 'role' => 'lab_technician', 'first' => 'سمر', 'last' => 'حسن', 'title' => 'فني معمل', 'phone' => '01012345673', 'available' => false],
+        ];
+        foreach ($extra as $n => $row) {
+            $user = User::create([
+                'id' => $this->uuid('8000', $n),
+                'email' => $row['email'],
+                'password' => Hash::make('password'),
+                'role' => $row['role'],
+                'is_active' => true,
+                'email_verified' => true,
+            ]);
+
+            Staff::create([
+                'id' => $this->uuid('8007', $n - 1),
+                'user_id' => $user->id,
+                'first_name_ar' => $row['first'],
+                'last_name_ar' => $row['last'],
+                'title' => $row['title'],
+                'phone' => $row['phone'],
+                'is_available' => $row['available'],
+            ]);
+        }
     }
 
     /** @return array<string, Branch> */
     private function seedBranches(): array
     {
         $rows = [
-            ['key' => 'dokki', 'name' => 'فرع الدقي - القاهرة', 'short' => 'فرع الدقي', 'address' => 'شارع التحرير، الدقي، الجيزة', 'phone' => '+20 123 456 7890', 'email' => 'dokki@dr-awad.com', 'hours' => 'السبت - الخميس: 9 ص - 9 م', 'lat' => 30.0444, 'lng' => 31.2357, 'main' => true],
-            ['key' => 'maadi', 'name' => 'فرع المعادي - القاهرة', 'short' => 'فرع المعادي', 'address' => 'شارع 9، المعادي، القاهرة', 'phone' => '+20 123 456 7891', 'email' => 'maadi@dr-awad.com', 'hours' => 'السبت - الخميس: 10 ص - 8 م', 'lat' => 29.9626, 'lng' => 31.2497, 'main' => false],
-            ['key' => 'alex', 'name' => 'فرع الإسكندرية', 'short' => 'فرع الإسكندرية', 'address' => 'سان ستيفانو، الإسكندرية', 'phone' => '+20 123 456 7892', 'email' => 'alex@dr-awad.com', 'hours' => 'السبت - الأربعاء: 10 ص - 6 م', 'lat' => 31.2435, 'lng' => 29.9619, 'main' => false],
+            ['key' => 'beni-mazar', 'name' => 'فرع بني مزار', 'short' => 'فرع بني مزار', 'address' => 'شارع موقف صندفا - بجوار مسجد سيدنا حمزة', 'phone' => '01005078266', 'email' => 'info@dr-awad.com', 'hours' => 'يومياً من 9 ص - 10 م', 'lat' => 28.5060, 'lng' => 30.8010, 'main' => true],
+            ['key' => 'sheikh-zayed', 'name' => 'فرع الشيخ زايد', 'short' => 'فرع الشيخ زايد', 'address' => 'الشيخ زايد - القاهرة', 'phone' => '01005078266', 'email' => 'info@dr-awad.com', 'hours' => 'يومياً من 9 ص - 10 م', 'lat' => 30.0755, 'lng' => 30.9760, 'main' => false],
         ];
 
         $branches = [];
@@ -160,17 +313,41 @@ class DemoSeeder extends Seeder
             ]);
         }
 
+        // A signed-in patient account for the portal (sara@email.com / password).
+        $portalUser = User::create([
+            'id' => $this->uuid('8000', 6),
+            'email' => 'sara@email.com',
+            'password' => Hash::make('password'),
+            'role' => 'patient',
+            'is_active' => true,
+            'email_verified' => true,
+        ]);
+        $patients['P2024001']->update(['user_id' => $portalUser->id]);
+
+        // A couple of medical records so the portal dashboard shows real data.
+        foreach ([
+            ['type' => 'تحاليل', 'title' => 'تحليل صورة دم كاملة (CBC)'],
+            ['type' => 'سونار', 'title' => 'سونار متابعة الأسبوع 20'],
+        ] as $i => $rec) {
+            MedicalRecord::create([
+                'id' => $this->uuid('8009', $i + 1),
+                'patient_id' => $patients['P2024001']->id,
+                'record_type' => $rec['type'],
+                'title' => $rec['title'],
+            ]);
+        }
+
         return $patients;
     }
 
     private function seedAppointments(array $patients, array $branches, array $services): void
     {
         $rows = [
-            ['file' => 'P2024001', 'service' => 'pregnancy', 'time' => '09:00', 'branch' => 'dokki', 'status' => 'confirmed', 'notes' => null],
-            ['file' => 'P2024002', 'service' => 'consultation', 'time' => '09:30', 'branch' => 'dokki', 'status' => 'waiting', 'notes' => null],
-            ['file' => 'P2024003', 'service' => 'ivf-consultation', 'time' => '10:00', 'branch' => 'dokki', 'status' => 'confirmed', 'notes' => 'مراجعة التحاليل'],
-            ['file' => 'P2024004', 'service' => 'followup', 'time' => '10:30', 'branch' => 'maadi', 'status' => 'pending', 'notes' => null],
-            ['file' => 'P2024005', 'service' => 'sonar-4d', 'time' => '11:00', 'branch' => 'dokki', 'status' => 'cancelled', 'notes' => 'تم الإلغاء بطلب المريضة'],
+            ['file' => 'P2024001', 'service' => 'pregnancy', 'time' => '09:00', 'branch' => 'beni-mazar', 'status' => 'confirmed', 'notes' => null],
+            ['file' => 'P2024002', 'service' => 'consultation', 'time' => '09:30', 'branch' => 'beni-mazar', 'status' => 'waiting', 'notes' => null],
+            ['file' => 'P2024003', 'service' => 'ivf-consultation', 'time' => '10:00', 'branch' => 'beni-mazar', 'status' => 'confirmed', 'notes' => 'مراجعة التحاليل'],
+            ['file' => 'P2024004', 'service' => 'followup', 'time' => '10:30', 'branch' => 'sheikh-zayed', 'status' => 'pending', 'notes' => null],
+            ['file' => 'P2024005', 'service' => 'sonar-4d', 'time' => '11:00', 'branch' => 'beni-mazar', 'status' => 'cancelled', 'notes' => 'تم الإلغاء بطلب المريضة'],
         ];
 
         foreach ($rows as $i => $row) {

@@ -28,6 +28,16 @@ class Patient extends Model
         return $this->hasMany(IvfCycle::class);
     }
 
+    public function medicalRecords()
+    {
+        return $this->hasMany(MedicalRecord::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     /** Display name used across the admin tables. */
     public function getNameAttribute(): string
     {

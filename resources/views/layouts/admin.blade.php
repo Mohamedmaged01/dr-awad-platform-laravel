@@ -5,7 +5,8 @@
     $current = '/' . request()->path();
     $menuKey = collect(config('clinic.dashboard_menu'))->firstWhere('href', $current)['name'] ?? 'dashboard';
     $roleLabels = collect(config('clinic.role_labels'))->map(fn ($k) => __($k))->all();
-    $staffRoles = config('clinic.staff_roles');
+    $authUser = auth()->user();
+    $authRole = $authUser?->role ?? 'admin';
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}" dir="{{ $dir }}" class="scroll-smooth">
@@ -33,8 +34,7 @@
 <div class="min-h-screen bg-gray-100 dark:bg-gray-900"
      x-data="{
         sidebar: true,
-        role: @js(session('admin_role', 'admin')),
-        showRoleSwitcher: false,
+        role: @js($authRole),
         showNotifications: false,
         roleLabels: @js($roleLabels),
         idleTimer: null,
@@ -80,23 +80,14 @@
             @endforeach
         </nav>
 
-        {{-- Role Switcher (Demo Only) --}}
+        {{-- Signed-in user --}}
         <div class="absolute bottom-0 w-full p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-            <button @click="showRoleSwitcher = !showRoleSwitcher"
-                    class="flex items-center gap-2 w-full px-3 py-2 text-xs font-semibold text-medical-blue bg-white dark:bg-gray-800 border border-medical-blue/20 rounded-lg hover:bg-medical-blue hover:text-white transition-all">
-                @svg('lucide-shield-check', 'w-4 h-4')
-                <span x-show="sidebar">{{ __('switchRoleDemo') }}</span>
-            </button>
-
-            <div x-show="showRoleSwitcher && sidebar" x-cloak @click.outside="showRoleSwitcher = false"
-                 class="absolute bottom-16 {{ $dir === 'rtl' ? 'right-4 left-4' : 'left-4 right-4' }} bg-white dark:bg-gray-700 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-600 p-2 z-50">
-                @foreach ($staffRoles as $r)
-                    <button @click="role = '{{ $r }}'; showRoleSwitcher = false"
-                            :class="role === '{{ $r }}' ? 'text-medical-blue font-bold bg-medical-blue/10' : 'text-gray-600 dark:text-gray-300'"
-                            class="w-full text-start px-4 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
-                        {{ $roleLabels[$r] ?? $r }}
-                    </button>
-                @endforeach
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></span>
+                <div x-show="sidebar" class="min-w-0">
+                    <p class="text-sm font-medium text-gray-800 dark:text-white truncate">{{ $authUser?->email }}</p>
+                    <p class="text-xs text-gray-500">{{ $roleLabels[$authRole] ?? $authRole }}</p>
+                </div>
             </div>
         </div>
     </aside>
@@ -153,7 +144,7 @@
                     <div class="w-10 h-10 rounded-full bg-medical-blue text-white flex items-center justify-center font-bold"
                          x-text="role.charAt(0).toUpperCase()"></div>
                     <div class="hidden sm:block">
-                        <p class="text-sm font-medium text-gray-800 dark:text-white">{{ __('platformUser') }}</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-white">{{ $authUser?->email ?? __('platformUser') }}</p>
                         <p class="text-xs text-gray-500" x-text="roleLabels[role]"></p>
                     </div>
                 </div>
@@ -166,6 +157,13 @@
 
         {{-- Page Content --}}
         <main class="p-6">
+            @if (session('status'))
+                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3500)" x-transition
+                     class="mb-4 p-3 rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm flex items-center gap-2">
+                    @svg('lucide-check-circle', 'w-4 h-4')
+                    {{ session('status') }}
+                </div>
+            @endif
             @yield('content')
         </main>
     </div>

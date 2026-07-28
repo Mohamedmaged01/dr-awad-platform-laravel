@@ -98,9 +98,13 @@
                                             <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="تعديل">
                                                 @svg('lucide-edit', 'w-[18px] h-[18px] text-gray-500')
                                             </button>
-                                            <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="حذف">
-                                                @svg('lucide-trash-2', 'w-[18px] h-[18px] text-red-500')
-                                            </button>
+                                            <form method="POST" action="{{ route('admin.patients.destroy', $patient->id) }}"
+                                                  onsubmit="return confirm('{{ __('confirmDelete') }}')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="حذف">
+                                                    @svg('lucide-trash-2', 'w-[18px] h-[18px] text-red-500')
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

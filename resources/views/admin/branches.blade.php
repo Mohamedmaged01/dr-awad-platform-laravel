@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div x-data="{ addOpen: false }">
+<div x-data="{ addOpen: false, editOpen: false, current: {} }">
     <x-admin.page-header :title="__('branches')">
         <x-slot:actions>
             <x-ui.button variant="primary" size="sm" x-on:click="addOpen = true">
@@ -27,25 +27,49 @@
                         <p class="flex items-center gap-2">@svg('lucide-clock', 'w-4 h-4 text-medical-blue flex-shrink-0') {{ $b['hours'] }}</p>
                     </div>
                     <div class="flex items-center gap-1 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <button class="p-1.5 text-gray-400 hover:text-medical-blue">@svg('lucide-pencil', 'w-[18px] h-[18px]')</button>
-                        <button class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                        <button type="button" class="p-1.5 text-gray-400 hover:text-medical-blue"
+                                x-on:click="current = {{ Js::from($b) }}; editOpen = true">
+                            @svg('lucide-pencil', 'w-[18px] h-[18px]')
+                        </button>
+                        <form method="POST" action="{{ route('admin.branches.destroy', $b['id']) }}"
+                              onsubmit="return confirm('{{ __('confirmDelete') }}')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                        </form>
                     </div>
                 </x-ui.card-content>
             </x-ui.card>
         @endforeach
     </div>
 
+    {{-- Add --}}
     <x-admin.modal :title="__('add_new')" var="addOpen">
-        <form class="space-y-4" @submit.prevent="addOpen = false">
-            <x-ui.input :label="__('branch')" name="name" />
-            <x-ui.textarea :label="__('location')" name="address" rows="2" />
-            <x-ui.input :label="__('phone')" name="phone" />
+        <form method="POST" action="{{ route('admin.branches.store') }}" class="space-y-4">
+            @csrf
+            <x-ui.input :label="__('branch')" name="name" required />
+            <x-ui.textarea :label="__('location')" name="address" rows="2" required />
+            <x-ui.input :label="__('phone')" name="phone" required />
             <x-ui.input :label="__('workingHoursLabel')" name="hours" />
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <x-ui.button type="button" variant="outline" size="sm" x-on:click="addOpen = false">{{ __('cancel') }}</x-ui.button>
+                <x-ui.button type="submit" variant="primary" size="sm">{{ __('save') }}</x-ui.button>
+            </div>
         </form>
-        <x-slot:footer>
-            <x-ui.button variant="outline" size="sm" x-on:click="addOpen = false">{{ __('cancel') }}</x-ui.button>
-            <x-ui.button variant="primary" size="sm" x-on:click="addOpen = false">{{ __('save') }}</x-ui.button>
-        </x-slot:footer>
+    </x-admin.modal>
+
+    {{-- Edit --}}
+    <x-admin.modal :title="__('edit_details')" var="editOpen">
+        <form :action="'{{ url('/admin/branches') }}/' + current.id" method="POST" class="space-y-4">
+            @csrf @method('PUT')
+            <x-ui.input :label="__('branch')" name="name" x-model="current.name" required />
+            <x-ui.textarea :label="__('location')" name="address" rows="2" x-model="current.address" required />
+            <x-ui.input :label="__('phone')" name="phone" x-model="current.phone" required />
+            <x-ui.input :label="__('workingHoursLabel')" name="hours" x-model="current.hours" />
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <x-ui.button type="button" variant="outline" size="sm" x-on:click="editOpen = false">{{ __('cancel') }}</x-ui.button>
+                <x-ui.button type="submit" variant="primary" size="sm">{{ __('save_changes') }}</x-ui.button>
+            </div>
+        </form>
     </x-admin.modal>
 </div>
 @endsection

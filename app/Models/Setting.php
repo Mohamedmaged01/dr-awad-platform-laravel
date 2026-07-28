@@ -25,4 +25,16 @@ class Setting extends Model
 
         return json_decode((string) $row->value, true) ?? $default;
     }
+
+    /** Fetch a plain scalar setting, falling back to a default. */
+    public static function get(string $key, ?string $default = null): ?string
+    {
+        return static::where('key', $key)->value('value') ?? $default;
+    }
+
+    /** Upsert a plain scalar setting. */
+    public static function put(string $key, ?string $value, string $group = 'general'): void
+    {
+        static::updateOrCreate(['key' => $key], ['value' => $value, 'type' => 'string', 'group' => $group]);
+    }
 }

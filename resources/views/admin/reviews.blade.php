@@ -50,9 +50,15 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-1">
                                         @if ($r['status'] === 'pending')
-                                            <button class="p-1.5 text-gray-400 hover:text-green-500">@svg('lucide-check-circle', 'w-[18px] h-[18px]')</button>
+                                            <form method="POST" action="{{ route('admin.reviews.approve', $r['id']) }}">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="p-1.5 text-gray-400 hover:text-green-500" title="{{ __('confirm') }}">@svg('lucide-check-circle', 'w-[18px] h-[18px]')</button>
+                                            </form>
                                         @endif
-                                        <button class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                                        <form method="POST" action="{{ route('admin.reviews.destroy', $r['id']) }}" onsubmit="return confirm('{{ __('confirmDelete') }}')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="p-1.5 text-gray-400 hover:text-red-500">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
