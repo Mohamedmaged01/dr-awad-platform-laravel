@@ -138,12 +138,13 @@ class AdminController extends Controller
             ['label' => 'إجمالي الإيرادات', 'value' => number_format($revenue), 'icon' => 'dollar-sign', 'color' => 'bg-yellow-500'],
         ];
 
-        // Appointments per calendar month (1-12) for the hand-rolled bar chart.
-        $byMonth = Appointment::selectRaw('EXTRACT(MONTH FROM appointment_date)::int as m, COUNT(*) as c')
-            ->groupBy('m')->pluck('c', 'm');
-        $monthly = [];
-        for ($m = 1; $m <= 12; $m++) {
-            $monthly[] = (int) ($byMonth[$m] ?? 0);
+        // Appointments per calendar month (1-12) — grouped in PHP to stay portable
+        // across MySQL/PostgreSQL (no vendor-specific date SQL).
+        $monthly = array_fill(0, 12, 0);
+        foreach (Appointment::get(['appointment_date']) as $appt) {
+            if ($appt->appointment_date) {
+                $monthly[(int) $appt->appointment_date->format('n') - 1]++;
+            }
         }
 
         // Appointment distribution by service for the donut.
