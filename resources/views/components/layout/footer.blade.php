@@ -11,8 +11,8 @@
             {{-- About --}}
             <div>
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 rounded-full gradient-medical flex items-center justify-center text-white font-bold text-xl">
-                        م.ع
+                    <div class="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center flex-shrink-0">
+                        <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain p-1">
                     </div>
                     <div>
                         <h3 class="font-bold text-lg">{{ __('heroTitle') }}</h3>

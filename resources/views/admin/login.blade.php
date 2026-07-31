@@ -37,8 +37,8 @@
     <div class="w-full max-w-md">
         {{-- Logo --}}
         <div class="text-center mb-8">
-            <div class="w-20 h-20 mx-auto mb-4 rounded-full gradient-medical flex items-center justify-center animate-pulse-glow">
-                @svg('lucide-shield-check', 'w-10 h-10 text-white')
+            <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-white shadow-lg flex items-center justify-center animate-pulse-glow ring-4 ring-medical-blue/10">
+                <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-16 h-16 object-contain">
             </div>
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white">{{ __('adminLoginTitle') }}</h1>
             <p class="text-gray-500 dark:text-gray-400 mt-1">{{ __('adminLoginSubtitle') }}</p>
@@ -61,13 +61,13 @@
                 <form method="POST" action="/admin/login" class="space-y-5">
                     @csrf
                     <x-ui.input :label="__('email')" name="email" type="email" x-model="email"
-                                placeholder="admin@dr-awad.com" required>
+                                autocomplete="username" placeholder="admin@dr-awad.com" required>
                         <x-slot:leftIcon>@svg('lucide-mail', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                     </x-ui.input>
 
                     <div class="relative">
-                        <x-ui.input :label="__('password')" name="password" ::type="showPassword ? 'text' : 'password'"
-                                    x-model="password" placeholder="••••••••">
+                        <x-ui.input :label="__('password')" name="password" type="password" ::type="showPassword ? 'text' : 'password'"
+                                    x-model="password" autocomplete="current-password" required placeholder="••••••••">
                             <x-slot:leftIcon>@svg('lucide-lock', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                         </x-ui.input>
                         <button type="button" @click="showPassword = !showPassword"

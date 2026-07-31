@@ -29,8 +29,8 @@
         <div class="flex items-center justify-between h-20">
             {{-- Logo --}}
             <a href="/" class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full border-2 border-white shadow-md overflow-hidden bg-white">
-                    <img src="/images/dr-mohamed-awad.jpg" alt="Dr. Mohamed Awad" class="w-full h-full object-cover">
+                <div class="w-14 h-14 rounded-full shadow-md overflow-hidden bg-white ring-1 ring-black/5 flex items-center justify-center">
+                    <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain p-1">
                 </div>
                 <div :class="scrolled ? 'text-gray-800 dark:text-white' : 'text-white'">
                     <h1 class="font-bold text-lg leading-tight">{{ __('heroTitle') }}</h1>
@@ -60,22 +60,23 @@
             {{-- Action Buttons --}}
             <div class="hidden lg:flex items-center gap-3">
                 {{-- Language switcher (AR / EN) --}}
-                <div class="flex items-center p-1 rounded-full border transition-all duration-300"
-                     :class="scrolled ? 'bg-gray-100/50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700' : 'bg-white/10 border-white/20 backdrop-blur-sm'">
+                <div class="flex items-center gap-0.5 ps-2 pe-1 py-1 rounded-full border shadow-sm transition-all duration-300"
+                     :class="scrolled ? 'bg-gray-100 border-gray-200 dark:bg-gray-800 dark:border-gray-700' : 'bg-white/10 border-white/25 backdrop-blur-md'">
+                    <span class="me-0.5" :class="scrolled ? 'text-gray-400 dark:text-gray-500' : 'text-white/70'">@svg('lucide-globe', 'w-4 h-4')</span>
                     <a href="/locale/ar"
                        @class([
-                           'px-3 py-1 rounded-full text-[11px] font-bold transition-all duration-300',
+                           'px-2.5 py-1 rounded-full text-xs font-bold transition-all duration-300',
                            'bg-white text-medical-blue shadow-sm dark:bg-medical-blue dark:text-white' => $locale === 'ar',
                        ])
-                       @if ($locale !== 'ar') :class="scrolled ? 'text-gray-500 hover:text-medical-blue' : 'text-white/70 hover:text-white'" @endif>
-                        ع
+                       @if ($locale !== 'ar') :class="scrolled ? 'text-gray-500 hover:text-medical-blue dark:text-gray-400' : 'text-white/70 hover:text-white'" @endif>
+                        عربي
                     </a>
                     <a href="/locale/en"
                        @class([
-                           'px-3 py-1 rounded-full text-[11px] font-bold transition-all duration-300',
+                           'px-2.5 py-1 rounded-full text-xs font-bold transition-all duration-300',
                            'bg-white text-medical-blue shadow-sm dark:bg-medical-blue dark:text-white' => $locale === 'en',
                        ])
-                       @if ($locale !== 'en') :class="scrolled ? 'text-gray-500 hover:text-medical-blue' : 'text-white/70 hover:text-white'" @endif>
+                       @if ($locale !== 'en') :class="scrolled ? 'text-gray-500 hover:text-medical-blue dark:text-gray-400' : 'text-white/70 hover:text-white'" @endif>
                         EN
                     </a>
                 </div>
@@ -150,22 +151,23 @@
                     {{ __('adminLogin') }}
                 </a>
                 {{-- Language switcher (AR / EN) --}}
-                <div class="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-xl mt-4">
+                <div class="flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-full mt-4 border border-gray-200 dark:border-gray-700">
+                    <span class="ps-3 text-gray-400 dark:text-gray-500">@svg('lucide-globe', 'w-[18px] h-[18px]')</span>
                     <a href="/locale/ar"
                        @class([
-                           'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all',
-                           'bg-white dark:bg-gray-700 text-medical-blue shadow-sm' => $locale === 'ar',
-                           'text-gray-500' => $locale !== 'ar',
+                           'flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-sm font-bold transition-all duration-300',
+                           'bg-white dark:bg-medical-blue text-medical-blue dark:text-white shadow-sm' => $locale === 'ar',
+                           'text-gray-500 dark:text-gray-400' => $locale !== 'ar',
                        ])>
-                        @svg('lucide-languages', 'w-4 h-4') العربية
+                        العربية
                     </a>
                     <a href="/locale/en"
                        @class([
-                           'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all',
-                           'bg-white dark:bg-gray-700 text-medical-blue shadow-sm' => $locale === 'en',
-                           'text-gray-500' => $locale !== 'en',
+                           'flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-sm font-bold transition-all duration-300',
+                           'bg-white dark:bg-medical-blue text-medical-blue dark:text-white shadow-sm' => $locale === 'en',
+                           'text-gray-500 dark:text-gray-400' => $locale !== 'en',
                        ])>
-                        @svg('lucide-languages', 'w-4 h-4') English
+                        English
                     </a>
                 </div>
 

@@ -52,8 +52,8 @@
         {{-- Logo --}}
         <div class="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
             <a href="/admin" class="flex items-center gap-3" x-show="sidebar">
-                <div class="w-10 h-10 rounded-full gradient-medical flex items-center justify-center text-white font-bold">
-                    م.ع
+                <div class="w-10 h-10 rounded-full bg-white ring-1 ring-black/5 shadow-sm flex items-center justify-center flex-shrink-0">
+                    <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain p-0.5">
                 </div>
                 <span class="font-bold text-gray-800 dark:text-white">{{ __('dashboard') }}</span>
             </a>
@@ -102,10 +102,21 @@
 
             <div class="flex items-center gap-4">
                 {{-- Language switch --}}
-                <a href="/locale/{{ $locale === 'ar' ? 'en' : 'ar' }}"
-                   class="px-3 py-1.5 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    {{ $locale === 'ar' ? 'EN' : 'ع' }}
-                </a>
+                <div class="flex items-center gap-0.5 ps-2 pe-1 py-1 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                    <span class="me-0.5 text-gray-400 dark:text-gray-500">@svg('lucide-globe', 'w-4 h-4')</span>
+                    <a href="/locale/ar"
+                       @class([
+                           'px-2.5 py-1 rounded-full text-xs font-bold transition-all duration-300',
+                           'bg-white text-medical-blue shadow-sm dark:bg-medical-blue dark:text-white' => $locale === 'ar',
+                           'text-gray-500 hover:text-medical-blue dark:text-gray-400' => $locale !== 'ar',
+                       ])>عربي</a>
+                    <a href="/locale/en"
+                       @class([
+                           'px-2.5 py-1 rounded-full text-xs font-bold transition-all duration-300',
+                           'bg-white text-medical-blue shadow-sm dark:bg-medical-blue dark:text-white' => $locale === 'en',
+                           'text-gray-500 hover:text-medical-blue dark:text-gray-400' => $locale !== 'en',
+                       ])>EN</a>
+                </div>
 
                 {{-- Theme Toggle --}}
                 <button @click="$store.theme.toggle()"
