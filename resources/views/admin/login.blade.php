@@ -37,8 +37,8 @@
     <div class="w-full max-w-md">
         {{-- Logo --}}
         <div class="text-center mb-8">
-            <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-white shadow-lg flex items-center justify-center animate-pulse-glow ring-4 ring-medical-blue/10">
-                <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-16 h-16 object-contain">
+            <div class="w-32 h-32 mx-auto mb-4 rounded-3xl bg-slate-900 shadow-xl flex items-center justify-center animate-pulse-glow ring-4 ring-medical-blue/20">
+                <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain p-1">
             </div>
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white">{{ __('adminLoginTitle') }}</h1>
             <p class="text-gray-500 dark:text-gray-400 mt-1">{{ __('adminLoginSubtitle') }}</p>

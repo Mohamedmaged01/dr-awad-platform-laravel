@@ -52,8 +52,8 @@
         {{-- Logo --}}
         <div class="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
             <a href="/admin" class="flex items-center gap-3" x-show="sidebar">
-                <div class="w-10 h-10 rounded-full bg-white ring-1 ring-black/5 shadow-sm flex items-center justify-center flex-shrink-0">
-                    <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain p-0.5">
+                <div class="w-10 h-10 rounded-xl bg-slate-900 ring-1 ring-white/10 shadow-sm flex items-center justify-center flex-shrink-0">
+                    <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
                 </div>
                 <span class="font-bold text-gray-800 dark:text-white">{{ __('dashboard') }}</span>
             </a>

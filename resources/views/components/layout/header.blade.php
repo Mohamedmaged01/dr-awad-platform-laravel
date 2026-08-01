@@ -29,8 +29,8 @@
         <div class="flex items-center justify-between h-20">
             {{-- Logo --}}
             <a href="/" class="flex items-center gap-3">
-                <div class="w-14 h-14 rounded-full shadow-md overflow-hidden bg-white ring-1 ring-black/5 flex items-center justify-center">
-                    <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain p-1">
+                <div class="w-14 h-14 rounded-2xl shadow-md overflow-hidden bg-slate-900 ring-1 ring-white/10 flex items-center justify-center">
+                    <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
                 </div>
                 <div :class="scrolled ? 'text-gray-800 dark:text-white' : 'text-white'">
                     <h1 class="font-bold text-lg leading-tight">{{ __('heroTitle') }}</h1>
