@@ -1,4 +1,4 @@
-<section class="relative min-h-screen flex items-center pt-32 pb-16 overflow-hidden">
+<section class="relative min-h-screen flex items-center pt-36 pb-16 overflow-hidden">
     {{-- Background --}}
     <div class="absolute inset-0 gradient-medical"></div>
     <div class="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10"></div>

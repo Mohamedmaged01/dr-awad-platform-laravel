@@ -4,7 +4,7 @@
 
 @section('content')
     {{-- Hero Section --}}
-    <section class="pt-32 pb-16 gradient-medical">
+    <section class="pt-36 pb-16 gradient-medical">
         <div class="container-custom">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="text-white">

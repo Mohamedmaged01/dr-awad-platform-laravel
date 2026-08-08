@@ -3,7 +3,7 @@
 @section('title', $article['title'] . ' | ' . __('heroTitle'))
 
 @section('content')
-    <section class="pt-32 pb-16 gradient-medical">
+    <section class="pt-36 pb-16 gradient-medical">
         <div class="container-custom text-center text-white max-w-3xl">
             <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-4">{{ $article['category'] }}</span>
             <h1 class="text-3xl md:text-4xl font-bold mb-4">{{ $article['title'] }}</h1>

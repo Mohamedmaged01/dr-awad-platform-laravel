@@ -3,7 +3,7 @@
 @section('title', $service['title'] . ' | ' . __('heroTitle'))
 
 @section('content')
-    <section class="pt-32 pb-16 gradient-medical">
+    <section class="pt-36 pb-16 gradient-medical">
         <div class="container-custom text-center text-white">
             <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 mb-6">
                 @svg('lucide-' . $service['icon'], 'w-10 h-10 text-white')

@@ -3,7 +3,7 @@
 @section('title', $pageTitle . ' | ' . __('heroTitle'))
 
 @section('content')
-    <section class="pt-32 pb-16 gradient-medical">
+    <section class="pt-36 pb-16 gradient-medical">
         <div class="container-custom text-center text-white">
             <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ $pageTitle }}</h1>
         </div>

@@ -8,7 +8,7 @@
 
     @if (! $patient)
     {{-- ===== Login / Register ===== --}}
-    <section class="pt-32 pb-16 min-h-[80vh] flex items-center gradient-soft">
+    <section class="pt-36 pb-16 min-h-[80vh] flex items-center gradient-soft">
         <div class="container-custom">
             <div class="max-w-md mx-auto">
                 <x-ui.card class="shadow-xl">
@@ -92,7 +92,7 @@
     @else
     {{-- ===== Live Dashboard ===== --}}
     <div class="bg-gray-50 dark:bg-gray-900">
-        <section class="pt-32 pb-16">
+        <section class="pt-36 pb-16">
             <div class="container-custom">
                 {{-- Welcome --}}
                 <div class="bg-gradient-to-r from-medical-blue to-medical-blue-dark rounded-2xl p-8 text-white mb-8">

@@ -899,7 +899,9 @@ class AdminController extends Controller
 
     public function settings()
     {
-        return view('admin.settings');
+        return view('admin.settings', [
+            'socialLinks' => json_decode(Setting::get('social_links', '[]'), true) ?: [],
+        ]);
     }
 
     public function updateSettings(Request $request)
@@ -912,11 +914,23 @@ class AdminController extends Controller
             'whatsapp' => ['nullable', 'string', 'max:30'],
             'meta_title' => ['nullable', 'string', 'max:200'],
             'meta_desc' => ['nullable', 'string', 'max:500'],
+            'social' => ['nullable', 'array'],
+            'social.*.platform' => ['required_with:social', 'string', 'in:facebook,instagram,twitter,youtube,tiktok,linkedin'],
+            'social.*.url' => ['nullable', 'url', 'max:300'],
         ]);
 
-        foreach ($data as $key => $value) {
-            Setting::put($key, $value, 'general');
+        foreach (['site_name_ar', 'site_name_en', 'email', 'phone', 'whatsapp', 'meta_title', 'meta_desc'] as $key) {
+            if (array_key_exists($key, $data)) {
+                Setting::put($key, $data[$key], 'general');
+            }
         }
+
+        // Social links: keep only rows with a URL; store as a JSON array.
+        $social = collect($data['social'] ?? [])
+            ->filter(fn ($row) => ! empty($row['url']))
+            ->map(fn ($row) => ['platform' => $row['platform'], 'url' => $row['url']])
+            ->values()->all();
+        Setting::put('social_links', json_encode($social, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'social');
 
         return back()->with('status', __('saved'));
     }

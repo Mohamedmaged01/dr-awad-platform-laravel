@@ -4,7 +4,7 @@
 
 @section('content')
     {{-- Hero Section --}}
-    <section class="pt-32 pb-16 gradient-medical">
+    <section class="pt-36 pb-16 gradient-medical">
         <div class="container-custom text-center text-white">
             <h1 class="text-4xl md:text-5xl font-bold mb-6">{{ __('servicesEyebrow') }}</h1>
             <p class="text-xl text-white/80 max-w-3xl mx-auto">

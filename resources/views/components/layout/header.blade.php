@@ -6,19 +6,19 @@
 @endphp
 <header x-data="{ scrolled: false, menuOpen: false }"
         @scroll.window="scrolled = window.scrollY > 50"
-        :class="scrolled ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg' : 'bg-transparent'"
-        class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        :class="scrolled && 'shadow-lg'"
+        class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white dark:bg-gray-900 shadow-sm">
 
     {{-- Top Bar --}}
-    <div class="hidden md:block bg-medical-blue text-white py-2">
+    <div class="hidden md:block bg-gray-50 dark:bg-gray-800 text-medical-blue dark:text-gray-300 py-2 border-b border-gray-100 dark:border-gray-700">
         <div class="container-custom flex justify-between items-center text-sm">
-            <div class="flex items-center gap-4">
-                <a href="tel:{{ $contact['phone_tel'] }}" class="flex items-center gap-2 hover:text-light-gold transition-colors">
+            <div class="flex items-center gap-4 font-semibold">
+                <a href="tel:{{ $contact['phone_tel'] }}" class="flex items-center gap-2 hover:text-light-gold transition-colors font-semibold">
                     @svg('lucide-phone', 'w-3.5 h-3.5')
                     <span>{{ $contact['phone_display'] }}</span>
                 </a>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4 font-semibold">
                 <span>{{ __('hoursDaily') }}</span>
             </div>
         </div>
@@ -26,13 +26,13 @@
 
     {{-- Main Navigation --}}
     <div class="container-custom">
-        <div class="flex items-center justify-between h-20">
+        <div class="flex items-center justify-between h-24">
             {{-- Logo --}}
-            <a href="/" class="flex items-center gap-3">
-                <div class="w-14 h-14 rounded-2xl shadow-md overflow-hidden bg-slate-900 ring-1 ring-white/10 flex items-center justify-center">
-                    <img src="{{ asset('images/brand-logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
+            <a href="/" class="flex items-center gap-4 group">
+                <div class="w-20 h-20 overflow-hidden transform group-hover:scale-110 transition-transform duration-300 drop-shadow-sm">
+                    <img src="{{ asset('images/logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
                 </div>
-                <div :class="scrolled ? 'text-gray-800 dark:text-white' : 'text-white'">
+                <div class="text-medical-blue dark:text-white">
                     <h1 class="font-bold text-lg leading-tight">{{ __('heroTitle') }}</h1>
                     <p class="text-xs opacity-80">{{ __('doctorTitleShort') }}</p>
                 </div>
@@ -43,12 +43,11 @@
                 @foreach ($nav as $item)
                     @php $active = $current === $item['href']; @endphp
                     <a href="{{ $item['href'] }}"
-                       @if ($active)
-                           class="font-medium transition-colors relative py-2 text-light-gold"
-                       @else
-                           class="font-medium transition-colors relative py-2"
-                           :class="scrolled ? 'text-gray-700 dark:text-gray-200 hover:text-medical-blue dark:hover:text-light-gold' : 'text-white/90 hover:text-white'"
-                       @endif>
+                       @class([
+                           'font-medium transition-colors relative py-2',
+                           'text-light-gold' => $active,
+                           'text-medical-blue/80 dark:text-gray-200 hover:text-medical-blue dark:hover:text-light-gold' => ! $active,
+                       ])>
                         {{ __($item['name']) }}
                         @if ($active)
                             <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-light-gold rounded-full"></span>
@@ -59,39 +58,26 @@
 
             {{-- Action Buttons --}}
             <div class="hidden lg:flex items-center gap-3">
-                {{-- Language switcher (AR / EN) --}}
-                <div class="flex items-center gap-0.5 ps-2 pe-1 py-1 rounded-full border shadow-sm transition-all duration-300"
-                     :class="scrolled ? 'bg-gray-100 border-gray-200 dark:bg-gray-800 dark:border-gray-700' : 'bg-white/10 border-white/25 backdrop-blur-md'">
-                    <span class="me-0.5" :class="scrolled ? 'text-gray-400 dark:text-gray-500' : 'text-white/70'">@svg('lucide-globe', 'w-4 h-4')</span>
-                    <a href="/locale/ar"
-                       @class([
-                           'px-2.5 py-1 rounded-full text-xs font-bold transition-all duration-300',
-                           'bg-white text-medical-blue shadow-sm dark:bg-medical-blue dark:text-white' => $locale === 'ar',
-                       ])
-                       @if ($locale !== 'ar') :class="scrolled ? 'text-gray-500 hover:text-medical-blue dark:text-gray-400' : 'text-white/70 hover:text-white'" @endif>
-                        عربي
-                    </a>
-                    <a href="/locale/en"
-                       @class([
-                           'px-2.5 py-1 rounded-full text-xs font-bold transition-all duration-300',
-                           'bg-white text-medical-blue shadow-sm dark:bg-medical-blue dark:text-white' => $locale === 'en',
-                       ])
-                       @if ($locale !== 'en') :class="scrolled ? 'text-gray-500 hover:text-medical-blue dark:text-gray-400' : 'text-white/70 hover:text-white'" @endif>
-                        EN
-                    </a>
-                </div>
+                {{-- Modern Globe Language Switcher --}}
+                <a href="/locale/{{ $locale === 'ar' ? 'en' : 'ar' }}"
+                   title="{{ $locale === 'ar' ? 'Switch to English' : 'التغيير إلى العربية' }}"
+                   class="flex items-center gap-2 px-3 py-2 rounded-full border transition-all duration-300 group bg-gray-50 border-gray-200 hover:border-medical-blue/30 hover:bg-white dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                    <span class="relative flex items-center">
+                        @svg('lucide-globe', 'w-[18px] h-[18px] text-medical-blue dark:text-light-gold animate-spin-slow group-hover:animate-none')
+                        <span class="absolute inset-0 bg-medical-blue/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    </span>
+                    <span class="text-[11px] font-bold text-gray-700 dark:text-gray-200">{{ $locale === 'ar' ? 'EN' : 'ع' }}</span>
+                </a>
 
                 <button @click="$store.theme.toggle()"
-                        class="p-2 rounded-lg transition-colors"
-                        :class="scrolled ? 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' : 'text-white/80 hover:text-white hover:bg-white/10'"
+                        class="p-2 rounded-lg transition-colors text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                         aria-label="Toggle theme">
                     <span x-show="!$store.theme.dark">@svg('lucide-moon', 'w-5 h-5')</span>
                     <span x-show="$store.theme.dark" x-cloak>@svg('lucide-sun', 'w-5 h-5')</span>
                 </button>
 
                 <a href="/patient-portal"
-                   class="inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1.5 text-sm gap-1.5 border-2"
-                   :class="scrolled ? 'border-medical-blue text-medical-blue hover:bg-medical-blue hover:text-white focus:ring-medical-blue' : 'border-white/50 text-white hover:bg-white hover:text-medical-blue focus:ring-medical-blue'">
+                   class="inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1.5 text-sm gap-1.5 border-2 border-medical-blue text-medical-blue hover:bg-medical-blue hover:text-white focus:ring-medical-blue">
                     @svg('lucide-user', 'w-[18px] h-[18px]')
                     {{ __('patientPortal') }}
                 </a>
@@ -102,16 +88,14 @@
                 </x-ui.button>
 
                 <a href="/admin/login" title="{{ __('adminLogin') }}"
-                   class="p-2 rounded-lg transition-colors border-2"
-                   :class="scrolled ? 'border-gray-100 dark:border-gray-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-medical-blue' : 'border-white/20 text-white/70 hover:bg-white/10 hover:text-white'">
+                   class="p-2 rounded-lg transition-colors border-2 border-gray-100 dark:border-gray-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-medical-blue">
                     @svg('lucide-lock', 'w-[18px] h-[18px]')
                 </a>
             </div>
 
             {{-- Mobile Menu Button --}}
             <button @click="menuOpen = !menuOpen"
-                    class="lg:hidden p-2 rounded-lg"
-                    :class="scrolled ? 'text-gray-600 dark:text-gray-300' : 'text-white'">
+                    class="lg:hidden p-2 rounded-lg text-medical-blue dark:text-gray-300">
                 <span x-show="!menuOpen">@svg('lucide-menu', 'w-6 h-6')</span>
                 <span x-show="menuOpen" x-cloak>@svg('lucide-x', 'w-6 h-6')</span>
             </button>

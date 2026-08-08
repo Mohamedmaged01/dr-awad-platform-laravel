@@ -13,7 +13,7 @@
 
 @theme {
   /* Medical Color Palette */
-  --color-medical-blue: #1e5f9f;
+  --color-medical-blue: #1a56a6; /* Clearer, more vibrant blue */
   --color-medical-blue-light: #3d7fc4;
   --color-medical-blue-dark: #0d3d6e;
   --color-soft-pink: #f8e8ee;
@@ -36,7 +36,7 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 208 67% 15%; /* Very dark blue for clarity */
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
@@ -490,4 +490,10 @@
 .dark .badge-info {
   background-color: rgba(30, 64, 175, 0.3);
   color: #93c5fd;
+}
+
+@layer utilities {
+  .animate-spin-slow {
+    animation: spin 8s linear infinite;
+  }
 }

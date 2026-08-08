@@ -23,7 +23,7 @@
     {{-- ===== Success state (server-rendered after a real submit) ===== --}}
     @if (session('booking_success'))
     @php $summary = session('booking_summary', []); @endphp
-    <section class="pt-32 pb-16 min-h-[80vh] flex items-center">
+    <section class="pt-36 pb-16 min-h-[80vh] flex items-center">
         <div class="container-custom">
             <x-ui.card class="max-w-2xl mx-auto text-center">
                 <x-ui.card-content class="py-16">
