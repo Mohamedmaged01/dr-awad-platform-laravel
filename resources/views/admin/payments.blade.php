@@ -108,7 +108,7 @@
         <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-6" id="invoice-print">
             <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 overflow-hidden flex items-center justify-center"><img src="{{ asset('images/logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain"></div>
+                    <div class="w-12 h-12 overflow-hidden flex items-center justify-center"><img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain"></div>
                     <div>
                         <p class="font-bold text-gray-800 dark:text-white">{{ __('heroTitle') }}</p>
                         <p class="text-xs text-gray-500">{{ __('doctorTitleShort') }}</p>

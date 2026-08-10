@@ -53,7 +53,7 @@
         <div class="h-20 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
             <a href="/admin" class="flex items-center gap-3" x-show="sidebar">
                 <div class="w-14 h-14 overflow-hidden flex-shrink-0">
-                    <img src="{{ asset('images/logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
                 </div>
                 <span class="font-bold text-gray-800 dark:text-white">{{ __('dashboard') }}</span>
             </a>

@@ -27,7 +27,7 @@
             <div>
                 <div class="flex items-center gap-3 mb-6">
                     <div class="w-24 h-24 overflow-hidden flex-shrink-0">
-                        <img src="{{ asset('images/logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
+                        <img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
                     </div>
                     <div>
                         <h3 class="font-bold text-lg">{{ __('heroTitle') }}</h3>

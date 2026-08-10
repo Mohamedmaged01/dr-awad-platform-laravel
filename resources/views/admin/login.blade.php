@@ -38,7 +38,7 @@
         {{-- Logo --}}
         <div class="text-center mb-6 sm:mb-8">
             <div class="w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-4 overflow-hidden drop-shadow-md">
-                <img src="{{ asset('images/logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
+                <img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
             </div>
             <h1 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">{{ __('adminLoginTitle') }}</h1>
             <p class="text-gray-500 dark:text-gray-400 mt-1">{{ __('adminLoginSubtitle') }}</p>

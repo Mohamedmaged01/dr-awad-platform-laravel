@@ -30,7 +30,7 @@
             {{-- Logo --}}
             <a href="/" class="flex items-center gap-4 group">
                 <div class="w-20 h-20 overflow-hidden transform group-hover:scale-110 transition-transform duration-300 drop-shadow-sm">
-                    <img src="{{ asset('images/logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
                 </div>
                 <div class="text-medical-blue dark:text-white">
                     <h1 class="font-bold text-lg leading-tight">{{ __('heroTitle') }}</h1>
