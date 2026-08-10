@@ -32,20 +32,20 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="{{ $bodyFont }} antialiased">
-<div class="min-h-screen flex items-center justify-center gradient-soft dark:bg-gray-900 p-4"
+<div class="min-h-dvh flex items-center justify-center gradient-soft dark:bg-gray-900 px-4 py-8 overflow-y-auto"
      x-data="{ email: @js(old('email', '')), password: '', showPassword: false }">
     <div class="w-full max-w-md">
         {{-- Logo --}}
-        <div class="text-center mb-8">
-            <div class="w-28 h-28 mx-auto mb-4 overflow-hidden drop-shadow-md">
+        <div class="text-center mb-6 sm:mb-8">
+            <div class="w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-4 overflow-hidden drop-shadow-md">
                 <img src="{{ asset('images/logo.png') }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
             </div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">{{ __('adminLoginTitle') }}</h1>
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">{{ __('adminLoginTitle') }}</h1>
             <p class="text-gray-500 dark:text-gray-400 mt-1">{{ __('adminLoginSubtitle') }}</p>
         </div>
 
         <x-ui.card class="shadow-xl">
-            <x-ui.card-content class="p-8">
+            <x-ui.card-content class="p-6 sm:p-8">
                 @if (session('timeout_message'))
                     <div class="mb-6 p-3 rounded-lg bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 text-sm">
                         {{ session('timeout_message') }}
@@ -61,7 +61,7 @@
                 <form method="POST" action="/admin/login" class="space-y-5">
                     @csrf
                     <x-ui.input :label="__('email')" name="email" type="email" x-model="email"
-                                autocomplete="username" placeholder="admin@dr-awad.com" required>
+                                autocomplete="username" placeholder="your@email.com" required>
                         <x-slot:leftIcon>@svg('lucide-mail', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                     </x-ui.input>
 
@@ -83,7 +83,9 @@
                     </x-ui.button>
                 </form>
 
-                {{-- Quick-access role grid (demo) --}}
+                {{-- Quick-access role grid (demo credentials). Disabled so no accounts are exposed on
+                     the login screen. To re-enable for local testing, change @if (false) to @if (true). --}}
+                @if (false)
                 <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
                     <p class="text-center text-xs font-semibold text-gray-500 mb-3">{{ __('quickAccess') }}</p>
                     <div class="grid grid-cols-2 gap-2">
@@ -96,6 +98,7 @@
                         @endforeach
                     </div>
                 </div>
+                @endif
             </x-ui.card-content>
         </x-ui.card>
 
