@@ -34,6 +34,7 @@
 <div class="min-h-screen bg-gray-100 dark:bg-gray-900"
      x-data="{
         sidebar: true,
+        mobileOpen: false,
         role: @js($authRole),
         showNotifications: false,
         roleLabels: @js($roleLabels),
@@ -47,18 +48,23 @@
      @mousemove.window="resetIdle()" @keydown.window="resetIdle()" @click.window="resetIdle()" @scroll.window="resetIdle()">
 
     {{-- Sidebar --}}
-    <aside :class="sidebar ? 'w-64' : 'w-20'"
-           class="fixed top-0 {{ $dir === 'rtl' ? 'right-0' : 'left-0' }} z-40 h-full bg-white dark:bg-gray-800 shadow-xl transition-all duration-300">
+    <aside x-bind:class="{
+               'translate-x-0': mobileOpen,
+               '{{ $dir === 'rtl' ? 'translate-x-full' : '-translate-x-full' }}': !mobileOpen,
+               'lg:w-64': sidebar,
+               'lg:w-20': !sidebar,
+           }"
+           class="fixed top-0 {{ $dir === 'rtl' ? 'right-0' : 'left-0' }} z-50 h-full w-64 bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 lg:translate-x-0">
         {{-- Logo --}}
         <div class="h-20 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
-            <a href="/admin" class="flex items-center gap-3" x-show="sidebar">
+            <a href="/admin" class="flex items-center gap-3" x-show="sidebar || mobileOpen">
                 <div class="w-14 h-14 overflow-hidden flex-shrink-0">
                     <img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
                 </div>
                 <span class="font-bold text-gray-800 dark:text-white">{{ __('dashboard') }}</span>
             </a>
-            <button @click="sidebar = !sidebar" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <span x-show="sidebar">@svg('lucide-x', 'w-5 h-5')</span>
+            <button @click="mobileOpen ? mobileOpen = false : sidebar = !sidebar" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                <span x-show="sidebar || mobileOpen">@svg('lucide-x', 'w-5 h-5')</span>
                 <span x-show="!sidebar">@svg('lucide-menu', 'w-5 h-5')</span>
             </button>
         </div>
@@ -75,7 +81,7 @@
                        'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' => ! $isActive,
                    ])>
                     @svg('lucide-' . $item['icon'], 'w-5 h-5 flex-shrink-0')
-                    <span x-show="sidebar">{{ __($item['name']) }}</span>
+                    <span x-show="sidebar || mobileOpen">{{ __($item['name']) }}</span>
                 </a>
             @endforeach
         </nav>
@@ -84,7 +90,7 @@
         <div class="absolute bottom-0 w-full p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></span>
-                <div x-show="sidebar" class="min-w-0">
+                <div x-show="sidebar || mobileOpen" class="min-w-0">
                     <p class="text-sm font-medium text-gray-800 dark:text-white truncate">{{ $authUser?->email }}</p>
                     <p class="text-xs text-gray-500">{{ $roleLabels[$authRole] ?? $authRole }}</p>
                 </div>
@@ -92,15 +98,22 @@
         </div>
     </aside>
 
+    {{-- Mobile backdrop --}}
+    <div x-show="mobileOpen" x-cloak x-transition.opacity @click="mobileOpen = false"
+         class="fixed inset-0 bg-black/50 z-40 lg:hidden"></div>
+
     {{-- Main Content --}}
-    <div :class="sidebar ? '{{ $dir === 'rtl' ? 'mr-64' : 'ml-64' }}' : '{{ $dir === 'rtl' ? 'mr-20' : 'ml-20' }}'" class="transition-all duration-300">
+    <div :class="sidebar ? '{{ $dir === 'rtl' ? 'lg:mr-64' : 'lg:ml-64' }}' : '{{ $dir === 'rtl' ? 'lg:mr-20' : 'lg:ml-20' }}'" class="transition-all duration-300">
         {{-- Top Bar --}}
-        <header class="h-16 bg-white dark:bg-gray-800 shadow-sm flex items-center justify-between px-6 sticky top-0 z-30">
-            <div class="flex items-center gap-4">
-                <h1 class="text-xl font-bold text-gray-800 dark:text-white">{{ __($menuKey) }}</h1>
+        <header class="h-16 bg-white dark:bg-gray-800 shadow-sm flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 gap-2">
+            <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+                <button @click="mobileOpen = true" class="lg:hidden p-2 -ms-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 flex-shrink-0">
+                    @svg('lucide-menu', 'w-6 h-6')
+                </button>
+                <h1 class="text-lg sm:text-xl font-bold text-gray-800 dark:text-white truncate">{{ __($menuKey) }}</h1>
             </div>
 
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                 {{-- Language switch --}}
                 <div class="flex items-center gap-0.5 ps-2 pe-1 py-1 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
                     <span class="me-0.5 text-gray-400 dark:text-gray-500">@svg('lucide-globe', 'w-4 h-4')</span>
@@ -151,7 +164,7 @@
                 </div>
 
                 {{-- User Menu --}}
-                <div class="flex items-center gap-3 border-s border-gray-200 dark:border-gray-700 ps-4 ms-4">
+                <div class="hidden sm:flex items-center gap-3 border-s border-gray-200 dark:border-gray-700 ps-4 ms-4">
                     <div class="w-10 h-10 rounded-full bg-medical-blue text-white flex items-center justify-center font-bold"
                          x-text="role.charAt(0).toUpperCase()"></div>
                     <div class="hidden sm:block">
@@ -167,7 +180,7 @@
         </header>
 
         {{-- Page Content --}}
-        <main class="p-6">
+        <main class="p-4 sm:p-6">
             @if (session('status'))
                 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3500)" x-transition
                      class="mb-4 p-3 rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm flex items-center gap-2">
