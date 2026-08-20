@@ -85,7 +85,9 @@
               :action="mode === 'edit' ? '{{ url('/admin/content') }}/' + current.id : '{{ route('admin.content.store') }}'"
               class="space-y-4">
             @csrf
-            <template x-if="mode === 'edit'"><input type="hidden" name="_method" value="PUT"></template>
+            {{-- Always present so method spoofing can't be missed by conditional rendering:
+                 PUT when editing, plain POST when adding. --}}
+            <input type="hidden" name="_method" :value="mode === 'edit' ? 'PUT' : 'POST'">
 
             <div class="grid md:grid-cols-2 gap-4">
                 <x-ui.select :label="__('content_type')" name="type" :options="$typeOptions" x-model="current.type" required />
