@@ -409,5 +409,13 @@
     "branchDetails": "Branch details",
     "mapUrl": "Map link",
     "icon": "Icon",
-    "color": "Color"
+    "color": "Color",
+    "resetPassword": "Reset password",
+    "resetPasswordHint": "Leave blank to keep the current password",
+    "permActive": "Active (permission granted)",
+    "permDisabled": "Disabled (permission locked)",
+    "permClickHint": "Click a lock to enable or disable a permission",
+    "permAlwaysOn": "Admin always has full access",
+    "permClickToLock": "Click to disable this permission",
+    "permClickToUnlock": "Click to enable this permission"
 }

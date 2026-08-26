@@ -701,6 +701,7 @@ class AdminController extends Controller
             'role' => ['required', Rule::in(config('clinic.staff_roles'))],
             'title' => ['nullable', 'string', 'max:100'],
             'phone' => ['nullable', 'string', 'max:20'],
+            'password' => ['nullable', 'string', 'min:6'],
             'is_available' => ['nullable', 'boolean'],
         ]);
 
@@ -712,10 +713,17 @@ class AdminController extends Controller
             'is_available' => $request->boolean('is_available'),
         ]);
 
-        $staff->user?->update([
+        // Reactivate the login when the member is marked available; keep it usable.
+        $userUpdate = [
             'email' => $data['email'],
             'role' => $data['role'],
-        ]);
+            'is_active' => $request->boolean('is_available'),
+        ];
+        // Optional password reset — only when a new one is provided.
+        if (! empty($data['password'])) {
+            $userUpdate['password'] = Hash::make($data['password']);
+        }
+        $staff->user?->update($userUpdate);
 
         return back()->with('status', __('saved'));
     }
@@ -873,6 +881,21 @@ class AdminController extends Controller
     public function permissions()
     {
         return view('admin.permissions');
+    }
+
+    /** Flip one (role, feature) cell in the permission matrix. Admin is never toggleable. */
+    public function togglePermission(Request $request)
+    {
+        $data = $request->validate([
+            'role' => ['required', Rule::in(config('clinic.staff_roles'))],
+            'feature' => ['required', 'string'],
+        ]);
+
+        if ($data['role'] !== 'admin') {
+            \App\Support\Access::toggle($data['role'], $data['feature']);
+        }
+
+        return back()->with('status', __('saved'));
     }
 
     /* ---------------------------------------------------------------- Helpers */

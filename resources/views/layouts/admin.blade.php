@@ -74,10 +74,9 @@
 
         {{-- Menu --}}
         <nav class="p-4 space-y-1 overflow-y-auto h-[calc(100vh-8rem)]">
-            @foreach (config('clinic.dashboard_menu') as $item)
+            @foreach (\App\Support\Access::allowedMenu($authRole) as $item)
                 @php $isActive = $current === $item['href'] || ($item['href'] !== '/admin' && str_starts_with($current, $item['href'] . '/')); @endphp
                 <a href="{{ $item['href'] }}"
-                   x-show="{{ Js::from($item['roles']) }}.includes(role)"
                    @class([
                        'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
                        'bg-medical-blue text-white' => $isActive,

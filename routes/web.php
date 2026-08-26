@@ -59,34 +59,34 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/login', [AdminController::class, 'login'])->middleware('throttle:10,1');
     Route::get('/logout', [AdminController::class, 'logout'])->name('logout');
 
-    // Everything below requires an authenticated staff user.
+    // Everything below requires an authenticated staff user. Per-feature access is
+    // enforced dynamically by EnsureStaff via the admin-managed permission matrix
+    // (App\Support\Access), so individual routes no longer hard-code role lists.
     Route::middleware('staff')->group(function () {
         Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
 
-        Route::middleware('staff:admin,doctor,nurse,receptionist')->group(function () {
-            Route::get('/patients', [AdminController::class, 'patients'])->name('patients');
-            Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
-        });
+        Route::get('/patients', [AdminController::class, 'patients'])->name('patients');
+        Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
+        Route::get('/ivf', [AdminController::class, 'ivf'])->name('ivf');
+        Route::get('/surgeries', [AdminController::class, 'surgeries'])->name('surgeries');
+        Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
 
-        Route::get('/ivf', [AdminController::class, 'ivf'])->middleware('staff:admin,doctor,lab_technician')->name('ivf');
-        Route::get('/surgeries', [AdminController::class, 'surgeries'])->middleware('staff:admin,doctor')->name('surgeries');
-        Route::get('/reports', [AdminController::class, 'reports'])->middleware('staff:admin,doctor')->name('reports');
         // Site content hub — edit the public pages (blog, videos, services, about, contact).
-        Route::middleware('staff:admin,doctor')->group(function () {
-            Route::get('/content', [SiteContentController::class, 'hub'])->name('content');
-            Route::get('/content/blog', [SiteContentController::class, 'blog'])->name('content.blog');
-            Route::get('/content/videos', [SiteContentController::class, 'videos'])->name('content.videos');
-            Route::get('/content/services', [SiteContentController::class, 'services'])->name('content.services');
-            Route::get('/content/about', [SiteContentController::class, 'about'])->name('content.about');
-            Route::get('/content/contact', [SiteContentController::class, 'contact'])->name('content.contact');
-        });
-        Route::get('/messages', [AdminController::class, 'messages'])->middleware('staff:admin,receptionist')->name('messages');
-        Route::get('/payments', [AdminController::class, 'payments'])->middleware('staff:admin,receptionist')->name('payments');
-        Route::get('/reviews', [AdminController::class, 'reviews'])->middleware('staff:admin')->name('reviews');
-        Route::get('/branches', [AdminController::class, 'branches'])->middleware('staff:admin')->name('branches');
-        Route::get('/staff', [AdminController::class, 'staff'])->middleware('staff:admin')->name('staff');
-        Route::get('/settings', [AdminController::class, 'settings'])->middleware('staff:admin')->name('settings');
-        Route::get('/settings/permissions', [AdminController::class, 'permissions'])->middleware('staff:admin')->name('permissions');
+        Route::get('/content', [SiteContentController::class, 'hub'])->name('content');
+        Route::get('/content/blog', [SiteContentController::class, 'blog'])->name('content.blog');
+        Route::get('/content/videos', [SiteContentController::class, 'videos'])->name('content.videos');
+        Route::get('/content/services', [SiteContentController::class, 'services'])->name('content.services');
+        Route::get('/content/about', [SiteContentController::class, 'about'])->name('content.about');
+        Route::get('/content/contact', [SiteContentController::class, 'contact'])->name('content.contact');
+
+        Route::get('/messages', [AdminController::class, 'messages'])->name('messages');
+        Route::get('/payments', [AdminController::class, 'payments'])->name('payments');
+        Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
+        Route::get('/branches', [AdminController::class, 'branches'])->name('branches');
+        Route::get('/staff', [AdminController::class, 'staff'])->name('staff');
+        Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
+        Route::get('/settings/permissions', [AdminController::class, 'permissions'])->name('permissions');
+        Route::put('/settings/permissions/toggle', [AdminController::class, 'togglePermission'])->name('permissions.toggle');
 
         // Admin CRUD write endpoints.
         require __DIR__.'/admin.php';

@@ -95,7 +95,8 @@
             </div>
         </div>
 
-        {{-- Quick Actions --}}
+        {{-- Quick Actions — only those the current role may access --}}
+        @php $authRole = auth()->user()->role; @endphp
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @foreach ([
                 ['label' => 'إضافة مريضة', 'href' => '/admin/patients', 'icon' => 'users'],
@@ -103,6 +104,8 @@
                 ['label' => 'بدء دورة علاج', 'href' => '/admin/ivf', 'icon' => 'baby'],
                 ['label' => 'التقارير', 'href' => '/admin/reports', 'icon' => 'activity'],
             ] as $action)
+                @php $feat = \App\Support\Access::featureForPath($action['href']); @endphp
+                @continue($feat && ! \App\Support\Access::allows($authRole, $feat))
                 <a href="{{ $action['href'] }}"
                    class="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow group">
                     <div class="w-10 h-10 rounded-lg bg-medical-blue/10 flex items-center justify-center group-hover:bg-medical-blue transition-colors">

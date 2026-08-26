@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Access;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,8 +22,17 @@ class EnsureStaff
             return redirect()->guest(route('admin.login'));
         }
 
+        // Explicit role list on a route (kept for any hard-coded guards).
         if (! empty($roles) && ! in_array($user->role, $roles, true)) {
             abort(403);
+        }
+
+        // Dynamic feature permissions (admin-managed matrix). Admin bypasses.
+        if ($user->role !== 'admin') {
+            $feature = Access::featureForPath($request->path());
+            if ($feature && ! Access::allows($user->role, $feature)) {
+                abort(403);
+            }
         }
 
         return $next($request);

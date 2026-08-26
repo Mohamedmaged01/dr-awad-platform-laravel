@@ -74,6 +74,9 @@
             <x-ui.select :label="__('job_role')" name="role" :options="$roleOptions" x-model="current.role_key" required />
             <x-ui.input :label="__('jobTitle')" name="title" x-model="current.title" />
             <x-ui.input :label="__('phone')" name="phone" x-model="current.phone" />
+            <div class="md:col-span-2">
+                <x-ui.input :label="__('resetPassword')" name="password" type="password" autocomplete="new-password" :hint="__('resetPasswordHint')" />
+            </div>
             <label class="md:col-span-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                 <input type="checkbox" name="is_available" value="1" x-model="current.is_available"
                        class="w-4 h-4 rounded border-gray-300 text-medical-blue focus:ring-medical-blue">
