@@ -12,7 +12,7 @@
 <div x-data="{ open: false, mode: 'add', current: @js($blank) }">
     <x-admin.page-header :title="__('blog')">
         <x-slot:actions>
-            <x-ui.button variant="primary" size="sm" x-on:click="mode = 'add'; current = @js($blank); open = true">
+            <x-ui.button variant="primary" size="sm" x-on:click="mode = 'add'; current = {{ Js::from($blank) }}; open = true">
                 <x-slot:leftIcon>@svg('lucide-plus', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                 {{ __('add_new') }}
             </x-ui.button>
