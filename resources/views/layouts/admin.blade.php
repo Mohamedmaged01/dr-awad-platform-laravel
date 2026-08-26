@@ -3,7 +3,10 @@
     $dir = $locale === 'ar' ? 'rtl' : 'ltr';
     $bodyFont = $locale === 'ar' ? 'font-cairo' : 'font-poppins';
     $current = '/' . request()->path();
-    $menuKey = collect(config('clinic.dashboard_menu'))->firstWhere('href', $current)['name'] ?? 'dashboard';
+    $menuItems = collect(config('clinic.dashboard_menu'));
+    $menuKey = $menuItems->firstWhere('href', $current)['name']
+        ?? optional($menuItems->first(fn ($m) => $m['href'] !== '/admin' && str_starts_with($current, $m['href'] . '/')))['name']
+        ?? 'dashboard';
     $roleLabels = collect(config('clinic.role_labels'))->map(fn ($k) => __($k))->all();
     $authUser = auth()->user();
     $authRole = $authUser?->role ?? 'admin';
@@ -72,7 +75,7 @@
         {{-- Menu --}}
         <nav class="p-4 space-y-1 overflow-y-auto h-[calc(100vh-8rem)]">
             @foreach (config('clinic.dashboard_menu') as $item)
-                @php $isActive = $current === $item['href']; @endphp
+                @php $isActive = $current === $item['href'] || ($item['href'] !== '/admin' && str_starts_with($current, $item['href'] . '/')); @endphp
                 <a href="{{ $item['href'] }}"
                    x-show="{{ Js::from($item['roles']) }}.includes(role)"
                    @class([

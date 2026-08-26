@@ -37,25 +37,38 @@
             <div class="grid md:grid-cols-2 gap-8">
                 @foreach ($videos as $video)
                     <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden card-hover group">
-                        {{-- Video Embed --}}
-                        <div class="relative aspect-video">
-                            <iframe src="https://www.youtube.com/embed/{{ $video['id'] }}"
-                                    title="{{ $video['title'] }}"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen
-                                    class="absolute inset-0 w-full h-full"></iframe>
+                        {{-- Video Embed: YouTube iframe, uploaded file, or thumbnail --}}
+                        <div class="relative aspect-video bg-gray-900">
+                            @if (!empty($video['youtube']))
+                                <iframe src="https://www.youtube.com/embed/{{ $video['youtube'] }}"
+                                        title="{{ $video['title'] }}"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen
+                                        class="absolute inset-0 w-full h-full"></iframe>
+                            @elseif (!empty($video['file']))
+                                <video controls preload="metadata" @if(!empty($video['thumbnail'])) poster="{{ $video['thumbnail'] }}" @endif
+                                       class="absolute inset-0 w-full h-full object-cover">
+                                    <source src="{{ $video['file'] }}">
+                                </video>
+                            @elseif (!empty($video['thumbnail']))
+                                <img src="{{ $video['thumbnail'] }}" alt="{{ $video['title'] }}" class="absolute inset-0 w-full h-full object-cover">
+                            @endif
                         </div>
 
                         {{-- Video Info --}}
                         <div class="p-6">
                             <div class="flex items-center gap-3 mb-3">
-                                <span class="px-3 py-1 bg-medical-blue/10 text-medical-blue rounded-full text-sm font-medium">
-                                    {{ $video['category'] }}
-                                </span>
-                                <div class="flex items-center gap-1 text-sm text-gray-500">
-                                    @svg('lucide-clock', 'w-3.5 h-3.5')
-                                    {{ $video['duration'] }}
-                                </div>
+                                @if (!empty($video['category']))
+                                    <span class="px-3 py-1 bg-medical-blue/10 text-medical-blue rounded-full text-sm font-medium">
+                                        {{ $video['category'] }}
+                                    </span>
+                                @endif
+                                @if (!empty($video['duration']))
+                                    <div class="flex items-center gap-1 text-sm text-gray-500">
+                                        @svg('lucide-clock', 'w-3.5 h-3.5')
+                                        {{ $video['duration'] }}
+                                    </div>
+                                @endif
                             </div>
 
                             <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">{{ $video['title'] }}</h2>
@@ -63,20 +76,26 @@
 
                             <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                                 <div class="flex items-center gap-4 text-sm text-gray-500">
-                                    <span class="flex items-center gap-1">
-                                        @svg('lucide-eye', 'w-3.5 h-3.5')
-                                        {{ $video['views'] }} {{ __('viewsLabel') }}
-                                    </span>
-                                    <span class="flex items-center gap-1">
-                                        @svg('lucide-calendar', 'w-3.5 h-3.5')
-                                        {{ \Carbon\Carbon::parse($video['date'])->locale(app()->getLocale() === 'en' ? 'en' : 'ar_EG')->isoFormat('D/M/YYYY') }}
-                                    </span>
+                                    @if (!empty($video['views']))
+                                        <span class="flex items-center gap-1">
+                                            @svg('lucide-eye', 'w-3.5 h-3.5')
+                                            {{ $video['views'] }} {{ __('viewsLabel') }}
+                                        </span>
+                                    @endif
+                                    @if (!empty($video['date']))
+                                        <span class="flex items-center gap-1">
+                                            @svg('lucide-calendar', 'w-3.5 h-3.5')
+                                            {{ \Carbon\Carbon::parse($video['date'])->locale(app()->getLocale() === 'en' ? 'en' : 'ar_EG')->isoFormat('D/M/YYYY') }}
+                                        </span>
+                                    @endif
                                 </div>
-                                <a href="https://www.youtube.com/watch?v={{ $video['id'] }}" target="_blank" rel="noopener noreferrer"
-                                   class="text-medical-blue font-medium hover:underline flex items-center gap-1">
-                                    {{ __('watchOnYoutube') }}
-                                    @svg('lucide-play', 'w-3.5 h-3.5')
-                                </a>
+                                @if (!empty($video['youtube']))
+                                    <a href="https://www.youtube.com/watch?v={{ $video['youtube'] }}" target="_blank" rel="noopener noreferrer"
+                                       class="text-medical-blue font-medium hover:underline flex items-center gap-1">
+                                        {{ __('watchOnYoutube') }}
+                                        @svg('lucide-play', 'w-3.5 h-3.5')
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </article>

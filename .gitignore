@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# User-uploaded content (blog/video/service/about images & videos)
+/public/uploads/*
+!/public/uploads/.gitkeep

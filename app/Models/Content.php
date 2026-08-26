@@ -16,5 +16,6 @@ class Content extends Model
         'is_published' => 'boolean',
         'is_featured' => 'boolean',
         'published_at' => 'datetime',
+        'meta' => 'array',
     ];
 }

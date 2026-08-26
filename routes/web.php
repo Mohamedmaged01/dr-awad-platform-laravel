@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SiteContentController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PatientAuthController;
 use App\Http\Controllers\PublicController;
@@ -70,7 +71,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/ivf', [AdminController::class, 'ivf'])->middleware('staff:admin,doctor,lab_technician')->name('ivf');
         Route::get('/surgeries', [AdminController::class, 'surgeries'])->middleware('staff:admin,doctor')->name('surgeries');
         Route::get('/reports', [AdminController::class, 'reports'])->middleware('staff:admin,doctor')->name('reports');
-        Route::get('/content', [AdminController::class, 'content'])->middleware('staff:admin,doctor')->name('content');
+        // Site content hub — edit the public pages (blog, videos, services, about, contact).
+        Route::middleware('staff:admin,doctor')->group(function () {
+            Route::get('/content', [SiteContentController::class, 'hub'])->name('content');
+            Route::get('/content/blog', [SiteContentController::class, 'blog'])->name('content.blog');
+            Route::get('/content/videos', [SiteContentController::class, 'videos'])->name('content.videos');
+            Route::get('/content/services', [SiteContentController::class, 'services'])->name('content.services');
+            Route::get('/content/about', [SiteContentController::class, 'about'])->name('content.about');
+            Route::get('/content/contact', [SiteContentController::class, 'contact'])->name('content.contact');
+        });
         Route::get('/messages', [AdminController::class, 'messages'])->middleware('staff:admin,receptionist')->name('messages');
         Route::get('/payments', [AdminController::class, 'payments'])->middleware('staff:admin,receptionist')->name('payments');
         Route::get('/reviews', [AdminController::class, 'reviews'])->middleware('staff:admin')->name('reviews');

@@ -10,7 +10,6 @@
     "login": "تسجيل الدخول",
     "register": "إنشاء حساب",
     "logout": "تسجيل الخروج",
-
     "heroTitle": "د. محمد عوض",
     "heroSubtitle": "استشاري النساء والتوليد والحقن المجهري وجراحات المناظير",
     "heroDescription": "نقدم أعلى معايير الرعاية الطبية للمرأة في مجالات النساء والتوليد، علاج العقم، والحقن المجهري، وجراحات المناظير المتقدمة",
@@ -22,12 +21,10 @@
     "bookNow": "احجز موعدك الآن",
     "callNow": "اتصل بنا",
     "whatsapp": "واتساب",
-
     "yearsExperience": "سنوات الخبرة",
     "successfulSurgeries": "عملية ناجحة",
     "ivfSuccessRate": "نسبة نجاح الحقن المجهري",
     "happyPatients": "مريضة سعيدة",
-
     "servicesTitle": "خدماتنا الطبية",
     "servicesSubtitle": "نقدم مجموعة شاملة من الخدمات الطبية المتخصصة",
     "servicesEyebrow": "خدماتنا الطبية",
@@ -51,7 +48,6 @@
     "infertility": "علاج العقم",
     "pregnancyCare": "متابعة الحمل",
     "ivfShort": "الحقن المجهري",
-
     "aboutTitle": "عن الدكتور محمد عوض",
     "aboutEyebrow": "عن الدكتور",
     "qualifications": "المؤهلات العلمية",
@@ -69,7 +65,6 @@
     "ctaHeading": "احجزي موعدك الآن",
     "ctaDesc": "نحن هنا لمساعدتك في رحلتك نحو الأمومة أو للعناية بصحتك النسائية",
     "bookAppointmentBtn": "احجزي موعد",
-
     "bookingTitle": "حجز موعد",
     "bookingEyebrow": "احجز موعدك",
     "bookingHelpTitle": "نحن هنا لمساعدتك",
@@ -126,7 +121,6 @@
     "bookingDetails": "تفاصيل الحجز:",
     "serviceLabel": "الخدمة",
     "nameLabel": "الاسم",
-
     "portalLoginSubtitle": "تسجيل الدخول للوصول لملفك الطبي",
     "portalRegisterSubtitle": "إنشاء حساب جديد",
     "newAccount": "حساب جديد",
@@ -142,7 +136,7 @@
     "welcomeSara": "مرحباً سارة",
     "welcomeBack": "مرحباً",
     "noAppointments": "لا توجد لديك مواعيد قادمة.",
-    "noRecords": "لا توجد سجلات طبية بعد.",
+    "noRecords": "لا توجد سجلات بعد",
     "lastVisitDate": "آخر زيارة: 15 يناير 2024",
     "messageToDoctor": "رسالة للطبيب",
     "upcomingAppointments": "المواعيد القادمة",
@@ -169,7 +163,6 @@
     "labResults": "نتائج التحاليل",
     "prescriptions": "الوصفات الطبية",
     "messages": "الرسائل",
-
     "contactTitle": "تواصل معنا",
     "contactSubtitle": "نحن هنا للإجابة على استفساراتك ومساعدتك. تواصلي معنا عبر أي من الطرق التالية",
     "sendMessage": "أرسل رسالة",
@@ -186,13 +179,11 @@
     "hoursDailyLong": "يومياً: 9 صباحاً - 10 مساءً",
     "forBookingInquiries": "للحجز والاستفسار:",
     "mapBtn": "الخريطة",
-
     "faqTitle": "أسئلة متكررة",
     "faqSubtitle": "إجابات على أكثر الأسئلة شيوعاً حول خدماتنا وعلاجاتنا",
     "faqEyebrow": "الأسئلة الشائعة",
     "faqCtaText": "لم تجدي إجابة سؤالك؟",
     "contactViaWhatsApp": "تواصلي معنا عبر الواتساب",
-
     "readMore": "اقرأ المزيد",
     "viewAll": "عرض الكل",
     "submit": "إرسال",
@@ -217,14 +208,11 @@
     "details": "التفاصيل",
     "backToHome": "العودة للرئيسية",
     "backToSite": "العودة للموقع",
-
     "successStories": "قصص النجاح",
     "successStoriesTitle": "قصص نجاح ملهمة",
     "successStoriesSubtitle": "آلاف السيدات حققن حلمهن بالأمومة وتغلبن على التحديات الصحية بفضل الله ثم بفضل خبرتنا ورعايتنا المتميزة.",
     "testimonials": "آراء المريضات",
-
     "faq": "الأسئلة الشائعة",
-
     "quickLinks": "روابط سريعة",
     "ourServices": "خدماتنا",
     "contactInfo": "معلومات التواصل",
@@ -239,7 +227,6 @@
     "privacyPolicy": "سياسة الخصوصية",
     "termsConditions": "الشروط والأحكام",
     "adminLogin": "دخول المشرفين",
-
     "metaTitle": "د. محمد عوض | استشاري النساء والتوليد والحقن المجهري",
     "metaDescription": "منصة متكاملة لعيادة الدكتور محمد عوض المتخصصة في النساء والتوليد، الحقن المجهري وأطفال الأنابيب، وجراحات المناظير. احجزي موعدك الآن.",
     "videosTitle": "مكتبة الفيديوهات",
@@ -269,7 +256,6 @@
     "minutes": "دقائق قراءة",
     "subscribeNow": "اشترك الآن",
     "newsletter": "النشرة البريدية",
-
     "roleAdmin": "مدير النظام",
     "roleDoctor": "طبيب استشاري",
     "roleNurse": "طاقم تمريض",
@@ -361,7 +347,6 @@
     "subtotal": "المجموع الفرعي",
     "selectPatient": "اختر المريضة",
     "selectStatus": "اختر الحالة",
-    "noRecords": "لا توجد سجلات بعد",
     "surgery_type": "نوع العملية",
     "hysteroscopy": "منظار رحم",
     "cesarean": "ولادة قيصرية",
@@ -393,10 +378,36 @@
     "lastName": "اسم العائلة",
     "jobTitle": "المسمى الوظيفي",
     "specialization": "التخصص",
-    "password": "كلمة المرور",
     "in_progress": "قيد التنفيذ",
     "unread": "غير مقروءة",
     "read": "مقروءة",
     "replied": "تم الرد",
-    "socialLinks": "روابط التواصل الاجتماعي"
+    "socialLinks": "روابط التواصل الاجتماعي",
+    "aboutDoctor": "عن الدكتور",
+    "category": "التصنيف",
+    "author": "الكاتب",
+    "readTime": "وقت القراءة",
+    "coverImage": "صورة الغلاف",
+    "thumbnail": "الصورة المصغّرة",
+    "videoSource": "مصدر الفيديو",
+    "videoSourceHint": "الصق رابط يوتيوب أو ارفع ملف فيديو (mp4/webm)",
+    "orPasteUrl": "أو الصق رابطاً",
+    "duration": "المدة",
+    "order": "الترتيب",
+    "featured": "مميّزة",
+    "descriptionLabel": "الوصف",
+    "featuresLabel": "المميزات (كل ميزة في سطر)",
+    "featuresHint": "اكتب كل ميزة في سطر منفصل",
+    "doctorBio": "نبذة عن الدكتور",
+    "doctorPhoto": "صورة الدكتور",
+    "qualificationsLabel": "المؤهلات",
+    "experienceLabel": "الخبرات",
+    "membershipsLabel": "العضويات",
+    "whyChooseUsLabel": "لماذا تختارنا",
+    "contactIntro": "مقدمة صفحة التواصل",
+    "addBranch": "إضافة فرع",
+    "branchDetails": "بيانات الفرع",
+    "mapUrl": "رابط الخريطة",
+    "icon": "الأيقونة",
+    "color": "اللون"
 }

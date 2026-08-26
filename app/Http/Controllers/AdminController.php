@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Branch;
-use App\Models\Content;
 use App\Models\Invoice;
 use App\Models\IvfCycle;
 use App\Models\IvfFollowup;
@@ -598,70 +597,6 @@ class AdminController extends Controller
             'payment_method' => $method,
             'status' => 'paid',
             'paid_at' => $date,
-        ]);
-    }
-
-    /* ---------------------------------------------------------------- Content */
-
-    public function content()
-    {
-        return view('admin.content', [
-            'items' => Content::latest()->get(),
-        ]);
-    }
-
-    public function storeContent(Request $request)
-    {
-        $data = $this->validateContent($request);
-
-        Content::create([
-            'type' => $data['type'],
-            'title_ar' => $data['title_ar'],
-            'title_en' => $data['title_en'] ?? null,
-            'excerpt_ar' => $data['excerpt_ar'] ?? null,
-            'content_ar' => $data['content_ar'] ?? null,
-            'image_url' => $data['image_url'] ?? null,
-            'is_published' => $request->boolean('is_published'),
-            'published_at' => $request->boolean('is_published') ? now() : null,
-        ]);
-
-        return back()->with('status', __('saved'));
-    }
-
-    public function updateContent(Request $request, Content $content)
-    {
-        $data = $this->validateContent($request);
-
-        $content->update([
-            'type' => $data['type'],
-            'title_ar' => $data['title_ar'],
-            'title_en' => $data['title_en'] ?? null,
-            'excerpt_ar' => $data['excerpt_ar'] ?? null,
-            'content_ar' => $data['content_ar'] ?? null,
-            'image_url' => $data['image_url'] ?? null,
-            'is_published' => $request->boolean('is_published'),
-            'published_at' => $request->boolean('is_published') ? ($content->published_at ?? now()) : null,
-        ]);
-
-        return back()->with('status', __('saved'));
-    }
-
-    public function destroyContent(Content $content)
-    {
-        $content->delete();
-
-        return back()->with('status', __('deleted'));
-    }
-
-    private function validateContent(Request $request): array
-    {
-        return $request->validate([
-            'type' => ['required', 'in:article,video,faq,success_story,news,offer'],
-            'title_ar' => ['required', 'string', 'max:300'],
-            'title_en' => ['nullable', 'string', 'max:300'],
-            'excerpt_ar' => ['nullable', 'string', 'max:1000'],
-            'content_ar' => ['nullable', 'string'],
-            'image_url' => ['nullable', 'string', 'max:500'],
         ]);
     }
 

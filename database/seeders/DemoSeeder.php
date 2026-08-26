@@ -18,7 +18,9 @@ use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\Surgery;
 use App\Models\User;
+use App\Support\ClinicData;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -44,6 +46,7 @@ class DemoSeeder extends Seeder
         $this->seedSurgeries($patients, $branches);
         $this->seedBilling($patients, $services);
         $this->seedContent();
+        $this->seedSiteContent();
         $this->seedEngagement();
         $this->seedSettings();
     }
@@ -114,26 +117,96 @@ class DemoSeeder extends Seeder
     }
 
     /** Published articles / FAQ entries for the content admin page. */
+    /** Blog + videos, seeded from ClinicData so the public pages look identical but are now editable. */
     private function seedContent(): void
     {
-        $rows = [
-            ['type' => 'article', 'title_ar' => 'نصائح للحامل في الشهور الأولى', 'title_en' => 'Tips for early pregnancy', 'excerpt_ar' => 'أهم الإرشادات للعناية بصحة الأم والجنين خلال الثلث الأول.', 'published' => true],
-            ['type' => 'article', 'title_ar' => 'كل ما تريدين معرفته عن الحقن المجهري', 'title_en' => 'Everything about ICSI', 'excerpt_ar' => 'شرح مبسّط لمراحل الحقن المجهري ونسب النجاح.', 'published' => true],
-            ['type' => 'faq', 'title_ar' => 'ما هي تكلفة جلسة المتابعة؟', 'title_en' => 'What is the follow-up fee?', 'excerpt_ar' => 'تبدأ من 300 جنيه وتختلف حسب نوع الكشف.', 'published' => true],
-            ['type' => 'success_story', 'title_ar' => 'قصة نجاح: حمل بعد حقن مجهري', 'title_en' => 'Success story: pregnancy after ICSI', 'excerpt_ar' => 'رحلة إحدى المريضات حتى تحقق الحلم.', 'published' => false],
-        ];
+        App::setLocale('ar');
 
-        foreach ($rows as $i => $row) {
+        foreach (ClinicData::articles() as $i => $a) {
             Content::create([
                 'id' => $this->uuid('800f', $i + 1),
-                'type' => $row['type'],
-                'title_ar' => $row['title_ar'],
-                'title_en' => $row['title_en'],
-                'excerpt_ar' => $row['excerpt_ar'],
-                'is_published' => $row['published'],
-                'published_at' => $row['published'] ? now() : null,
+                'type' => 'article',
+                'title_ar' => $a['title'],
+                'excerpt_ar' => $a['excerpt'],
+                'content_ar' => $a['excerpt'],
+                'meta' => ['category' => $a['category'], 'author_name' => $a['author'], 'read_time' => $a['readTime']],
+                'is_published' => true,
+                'published_at' => \Illuminate\Support\Carbon::parse($a['date']),
             ]);
         }
+
+        foreach (ClinicData::videos() as $i => $v) {
+            Content::create([
+                'id' => $this->uuid('8010', $i + 1),
+                'type' => 'video',
+                'title_ar' => $v['title'],
+                'excerpt_ar' => $v['description'],
+                'video_url' => $v['id'],
+                'meta' => ['category' => $v['category'], 'duration' => $v['duration'], 'views_label' => $v['views']],
+                'is_published' => true,
+                'published_at' => \Illuminate\Support\Carbon::parse($v['date']),
+            ]);
+        }
+    }
+
+    /** Featured service categories (for /services) + the editable About-page settings. */
+    private function seedSiteContent(): void
+    {
+        App::setLocale('ar');
+        $servicesAr = ClinicData::services();
+        App::setLocale('en');
+        $servicesEn = ClinicData::services();
+        App::setLocale('ar');
+
+        foreach ($servicesAr as $i => $s) {
+            Service::create([
+                'id' => $this->uuid('8011', $i + 1),
+                'name_ar' => $s['title'],
+                'name_en' => $servicesEn[$i]['title'] ?? null,
+                'description_ar' => $s['description'],
+                'description_en' => $servicesEn[$i]['description'] ?? null,
+                'features' => $s['features'],
+                'icon' => $s['icon'],
+                'color' => $s['color'],
+                'image_url' => $s['image'],
+                'slug' => $s['id'],
+                'is_active' => true,
+                'is_featured' => true,
+                'sort_order' => $i,
+            ]);
+        }
+
+        // About-page lists, stored bilingually as JSON settings.
+        $this->putBilingual('about_qualifications', 'qualifications');
+        $this->putBilingual('about_experience', 'experience');
+        $this->putBilingual('about_memberships', 'memberships');
+
+        App::setLocale('ar');
+        $whyAr = ClinicData::whyChooseUs();
+        App::setLocale('en');
+        $whyEn = ClinicData::whyChooseUs();
+        App::setLocale('ar');
+        $why = collect($whyAr)->map(fn ($r, $i) => [
+            'icon' => $r['icon'],
+            'title_ar' => $r['title'],
+            'title_en' => $whyEn[$i]['title'] ?? '',
+            'desc_ar' => $r['desc'],
+            'desc_en' => $whyEn[$i]['desc'] ?? '',
+        ])->all();
+        Setting::put('about_why', json_encode($why, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'about');
+    }
+
+    /** Zip the Arabic + English variant of a ClinicData list method into a bilingual JSON setting. */
+    private function putBilingual(string $settingKey, string $method): void
+    {
+        App::setLocale('ar');
+        $ar = ClinicData::{$method}();
+        App::setLocale('en');
+        $en = ClinicData::{$method}();
+        App::setLocale('ar');
+
+        $rows = collect($ar)->map(fn ($v, $i) => ['ar' => $v, 'en' => $en[$i] ?? ''])->all();
+        Setting::put($settingKey, json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'about');
     }
 
     /** Contact messages + patient reviews for the admin pages. */

@@ -32,9 +32,15 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($articles as $article)
                     <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden card-hover">
-                        <div class="aspect-video bg-gradient-to-br from-medical-blue to-medical-blue-dark flex items-center justify-center">
-                            <span class="text-6xl text-white/20">📄</span>
-                        </div>
+                        @if (!empty($article['image']))
+                            <div class="aspect-video overflow-hidden">
+                                <img src="{{ $article['image'] }}" alt="{{ $article['title'] }}" class="w-full h-full object-cover">
+                            </div>
+                        @else
+                            <div class="aspect-video bg-gradient-to-br from-medical-blue to-medical-blue-dark flex items-center justify-center">
+                                <span class="text-6xl text-white/20">📄</span>
+                            </div>
+                        @endif
                         <div class="p-6">
                             <div class="flex items-center gap-3 mb-3">
                                 <span class="px-3 py-1 bg-medical-blue/10 text-medical-blue rounded-full text-sm font-medium">

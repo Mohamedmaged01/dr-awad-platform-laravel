@@ -10,7 +10,6 @@
     "login": "Login",
     "register": "Register",
     "logout": "Logout",
-
     "heroTitle": "Dr. Mohamed Awad",
     "heroSubtitle": "Consultant of Obstetrics, Gynecology, IVF & Laparoscopic Surgery",
     "heroDescription": "We provide the highest standards of medical care for women in obstetrics, gynecology, infertility treatment, IVF, and advanced laparoscopic surgery",
@@ -22,12 +21,10 @@
     "bookNow": "Book Your Appointment",
     "callNow": "Call Us",
     "whatsapp": "WhatsApp",
-
     "yearsExperience": "Years of Experience",
     "successfulSurgeries": "Successful Surgeries",
     "ivfSuccessRate": "IVF Success Rate",
     "happyPatients": "Happy Patients",
-
     "servicesTitle": "Our Medical Services",
     "servicesSubtitle": "We offer a comprehensive range of specialized medical services",
     "servicesEyebrow": "Our Medical Services",
@@ -51,7 +48,6 @@
     "infertility": "Infertility Treatment",
     "pregnancyCare": "Pregnancy Follow-up",
     "ivfShort": "IVF & ICSI",
-
     "aboutTitle": "About Dr. Mohamed Awad",
     "aboutEyebrow": "About the Doctor",
     "qualifications": "Qualifications",
@@ -69,7 +65,6 @@
     "ctaHeading": "Book Your Appointment Now",
     "ctaDesc": "We're here to help you on your journey to motherhood or to care for your gynecological health",
     "bookAppointmentBtn": "Book Appointment",
-
     "bookingTitle": "Book Appointment",
     "bookingEyebrow": "Book Your Appointment",
     "bookingHelpTitle": "We're Here to Help You",
@@ -126,7 +121,6 @@
     "bookingDetails": "Booking details:",
     "serviceLabel": "Service",
     "nameLabel": "Name",
-
     "portalLoginSubtitle": "Log in to access your medical file",
     "portalRegisterSubtitle": "Create a new account",
     "newAccount": "New Account",
@@ -142,7 +136,7 @@
     "welcomeSara": "Welcome, Sara",
     "welcomeBack": "Welcome back",
     "noAppointments": "You have no upcoming appointments.",
-    "noRecords": "No medical records yet.",
+    "noRecords": "No records yet",
     "lastVisitDate": "Last visit: 15 January 2024",
     "messageToDoctor": "Message to Doctor",
     "upcomingAppointments": "Upcoming Appointments",
@@ -169,7 +163,6 @@
     "labResults": "Lab Results",
     "prescriptions": "Prescriptions",
     "messages": "Messages",
-
     "contactTitle": "Contact Us",
     "contactSubtitle": "We're here to answer your questions and help you. Reach us through any of the following ways",
     "sendMessage": "Send Message",
@@ -186,13 +179,11 @@
     "hoursDailyLong": "Daily: 9 AM - 10 PM",
     "forBookingInquiries": "For booking & inquiries:",
     "mapBtn": "Map",
-
     "faqTitle": "Frequently Asked Questions",
     "faqSubtitle": "Answers to the most common questions about our services and treatments",
     "faqEyebrow": "FAQ",
     "faqCtaText": "Didn't find the answer to your question?",
     "contactViaWhatsApp": "Contact us on WhatsApp",
-
     "readMore": "Read More",
     "viewAll": "View All",
     "submit": "Submit",
@@ -217,14 +208,11 @@
     "details": "Details",
     "backToHome": "Back to Home",
     "backToSite": "Back to Site",
-
     "successStories": "Success Stories",
     "successStoriesTitle": "Inspiring Success Stories",
     "successStoriesSubtitle": "Thousands of women achieved their dream of motherhood and overcame health challenges through our distinguished care.",
     "testimonials": "Testimonials",
-
     "faq": "FAQ",
-
     "quickLinks": "Quick Links",
     "ourServices": "Our Services",
     "contactInfo": "Contact Info",
@@ -239,7 +227,6 @@
     "privacyPolicy": "Privacy Policy",
     "termsConditions": "Terms & Conditions",
     "adminLogin": "Admin Login",
-
     "metaTitle": "Dr. Mohamed Awad | OB/GYN, IVF & Laparoscopic Surgery Consultant",
     "metaDescription": "An integrated platform for Dr. Mohamed Awad's clinic, specialized in obstetrics & gynecology, IVF, and laparoscopic surgery. Book your appointment now.",
     "videosTitle": "Video Library",
@@ -269,7 +256,6 @@
     "minutes": "min read",
     "subscribeNow": "Subscribe Now",
     "newsletter": "Newsletter",
-
     "roleAdmin": "System Administrator",
     "roleDoctor": "Consultant Doctor",
     "roleNurse": "Nursing Staff",
@@ -361,7 +347,6 @@
     "subtotal": "Subtotal",
     "selectPatient": "Select patient",
     "selectStatus": "Select status",
-    "noRecords": "No records yet",
     "surgery_type": "Surgery Type",
     "hysteroscopy": "Hysteroscopy",
     "cesarean": "Cesarean Section",
@@ -393,10 +378,36 @@
     "lastName": "Last Name",
     "jobTitle": "Job Title",
     "specialization": "Specialization",
-    "password": "Password",
     "in_progress": "In Progress",
     "unread": "Unread",
     "read": "Read",
     "replied": "Replied",
-    "socialLinks": "Social Links"
+    "socialLinks": "Social Links",
+    "aboutDoctor": "About the Doctor",
+    "category": "Category",
+    "author": "Author",
+    "readTime": "Read time",
+    "coverImage": "Cover image",
+    "thumbnail": "Thumbnail",
+    "videoSource": "Video source",
+    "videoSourceHint": "Paste a YouTube link or upload a video file (mp4/webm)",
+    "orPasteUrl": "or paste a URL",
+    "duration": "Duration",
+    "order": "Order",
+    "featured": "Featured",
+    "descriptionLabel": "Description",
+    "featuresLabel": "Features (one per line)",
+    "featuresHint": "Write one feature per line",
+    "doctorBio": "Doctor bio",
+    "doctorPhoto": "Doctor photo",
+    "qualificationsLabel": "Qualifications",
+    "experienceLabel": "Experience",
+    "membershipsLabel": "Memberships",
+    "whyChooseUsLabel": "Why choose us",
+    "contactIntro": "Contact page intro",
+    "addBranch": "Add branch",
+    "branchDetails": "Branch details",
+    "mapUrl": "Map link",
+    "icon": "Icon",
+    "color": "Color"
 }

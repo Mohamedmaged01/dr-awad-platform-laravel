@@ -16,5 +16,6 @@ class Service extends Model
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'price' => 'decimal:2',
+        'features' => 'array',
     ];
 }

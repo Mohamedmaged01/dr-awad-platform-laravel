@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SiteContentController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,11 +37,31 @@ Route::middleware('staff:admin,doctor')->group(function () {
     Route::delete('/surgeries/{surgery}', [AdminController::class, 'destroySurgery'])->name('surgeries.destroy');
 });
 
-// Content
+// Site content hub — blog, videos, services, about, contact/branches.
 Route::middleware('staff:admin,doctor')->group(function () {
-    Route::post('/content', [AdminController::class, 'storeContent'])->name('content.store');
-    Route::put('/content/{content}', [AdminController::class, 'updateContent'])->name('content.update');
-    Route::delete('/content/{content}', [AdminController::class, 'destroyContent'])->name('content.destroy');
+    // Blog
+    Route::post('/content/blog', [SiteContentController::class, 'storeBlog'])->name('content.blog.store');
+    Route::put('/content/blog/{content}', [SiteContentController::class, 'updateBlog'])->name('content.blog.update');
+    Route::delete('/content/blog/{content}', [SiteContentController::class, 'destroyBlog'])->name('content.blog.destroy');
+
+    // Videos
+    Route::post('/content/videos', [SiteContentController::class, 'storeVideo'])->name('content.videos.store');
+    Route::put('/content/videos/{content}', [SiteContentController::class, 'updateVideo'])->name('content.videos.update');
+    Route::delete('/content/videos/{content}', [SiteContentController::class, 'destroyVideo'])->name('content.videos.destroy');
+
+    // Services
+    Route::post('/content/services', [SiteContentController::class, 'storeService'])->name('content.services.store');
+    Route::put('/content/services/{service}', [SiteContentController::class, 'updateService'])->name('content.services.update');
+    Route::delete('/content/services/{service}', [SiteContentController::class, 'destroyService'])->name('content.services.destroy');
+
+    // About
+    Route::put('/content/about', [SiteContentController::class, 'updateAbout'])->name('content.about.update');
+
+    // Contact / branches
+    Route::put('/content/contact/intro', [SiteContentController::class, 'updateContactIntro'])->name('content.contact.intro');
+    Route::post('/content/contact/branches', [SiteContentController::class, 'storeBranch'])->name('content.contact.branches.store');
+    Route::put('/content/contact/branches/{branch}', [SiteContentController::class, 'updateBranch'])->name('content.contact.branches.update');
+    Route::delete('/content/contact/branches/{branch}', [SiteContentController::class, 'destroyBranch'])->name('content.contact.branches.destroy');
 });
 
 // Payments / invoices

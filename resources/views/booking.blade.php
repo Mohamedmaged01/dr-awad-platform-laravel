@@ -107,7 +107,7 @@
                                              :placeholder="__('selectBranchPlaceholder')" required />
 
                                 <x-ui.select :label="__('serviceType')" name="service" x-model="form.service"
-                                             :options="collect($services)->map(fn ($s) => ['value' => $s['value'], 'label' => $s['label'] . ' - ' . $s['price'] . ' ' . __('egp')])->all()"
+                                             :options="collect($services)->map(fn ($s) => ['value' => $s['value'], 'label' => $s['label']])->all()"
                                              :placeholder="__('selectServicePlaceholder')" required />
 
                                 <x-ui.input :label="__('date')" name="date" type="date" x-model="form.date"
@@ -206,13 +206,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="flex items-center justify-between pt-2">
+                                    <div class="flex items-center gap-3 pt-2">
+                                        @svg('lucide-stethoscope', 'w-5 h-5 text-medical-blue')
                                         <div>
                                             <p class="font-medium text-gray-800 dark:text-white" x-text="selectedService?.label"></p>
                                             <p class="text-sm text-gray-500">{{ __('requestedService') }}</p>
-                                        </div>
-                                        <div class="text-2xl font-bold text-medical-blue">
-                                            <span x-text="selectedService?.price"></span> {{ __('egp') }}
                                         </div>
                                     </div>
                                 </div>

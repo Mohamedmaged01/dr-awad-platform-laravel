@@ -10,14 +10,14 @@
                 <div class="text-white">
                     <h1 class="text-4xl md:text-5xl font-bold mb-6">{{ __('heroTitle') }}</h1>
                     <p class="text-xl text-light-gold mb-4">{{ __('heroSubtitle') }}</p>
-                    <p class="text-white/80 text-lg leading-relaxed mb-8">
-                        {{ __('aboutHeroDesc') }}
+                    <p class="text-white/80 text-lg leading-relaxed mb-8 whitespace-pre-line">
+                        {{ $bio ?? __('aboutHeroDesc') }}
                     </p>
                 </div>
                 <div class="hidden lg:block">
                     <div class="relative">
                         <div class="aspect-square rounded-3xl overflow-hidden border-8 border-white/20 shadow-2xl">
-                            <img src="/images/dr-mohamed-awad.jpg" alt="Dr. Mohamed Awad" class="w-full h-full object-cover">
+                            <img src="{{ $doctorImage ?? '/images/dr-mohamed-awad.jpg' }}" alt="Dr. Mohamed Awad" class="w-full h-full object-cover">
                         </div>
                         <div class="absolute -bottom-4 -right-4 bg-light-gold text-white rounded-2xl p-4 shadow-xl">
                             <div class="flex items-center gap-2">
