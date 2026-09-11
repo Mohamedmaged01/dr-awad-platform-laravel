@@ -1,7 +1,7 @@
 @php
     $current = '/' . ltrim(request()->path(), '/');
     $nav = config('clinic.navigation');
-    $contact = config('clinic.contact');
+    $contact = \App\Support\SiteInfo::contact();
     $locale = app()->getLocale();
 @endphp
 <header x-data="{ scrolled: false, menuOpen: false }"
@@ -33,8 +33,8 @@
                     <img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
                 </div>
                 <div class="text-medical-blue dark:text-white">
-                    <h1 class="font-bold text-lg leading-tight">{{ __('heroTitle') }}</h1>
-                    <p class="text-xs opacity-80">{{ __('doctorTitleShort') }}</p>
+                    <h1 class="font-bold text-lg leading-tight">{{ \App\Support\SiteInfo::name() }}</h1>
+                    <p class="text-xs opacity-80">{{ \App\Support\SiteInfo::title() }}</p>
                 </div>
             </a>
 

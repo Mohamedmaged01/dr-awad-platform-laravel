@@ -1,5 +1,5 @@
 @php
-    $contact = config('clinic.contact');
+    $contact = \App\Support\SiteInfo::contact();
     $quickLinks = config('clinic.footer_links');
     $services = config('clinic.footer_services');
     $currentYear = date('Y');
@@ -30,8 +30,8 @@
                         <img src="{{ asset('images/logo.png') }}?v={{ filemtime(public_path('images/logo.png')) }}" alt="{{ __('heroTitle') }}" class="w-full h-full object-contain">
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg">{{ __('heroTitle') }}</h3>
-                        <p class="text-sm text-gray-400">{{ __('doctorTitleShort') }}</p>
+                        <h3 class="font-bold text-lg">{{ \App\Support\SiteInfo::name() }}</h3>
+                        <p class="text-sm text-gray-400">{{ \App\Support\SiteInfo::title() }}</p>
                     </div>
                 </div>
                 <p class="text-gray-400 mb-6 leading-relaxed">

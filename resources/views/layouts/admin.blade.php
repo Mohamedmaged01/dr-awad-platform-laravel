@@ -38,6 +38,7 @@
      x-data="{
         sidebar: true,
         mobileOpen: false,
+        passwordOpen: {{ $errors->hasAny(['current_password', 'password']) ? 'true' : 'false' }},
         role: @js($authRole),
         showNotifications: false,
         roleLabels: @js($roleLabels),
@@ -175,11 +176,35 @@
                     </div>
                 </div>
 
+                <button @click="passwordOpen = true" type="button"
+                        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300" title="{{ __('changePassword') }}">
+                    @svg('lucide-key-round', 'w-5 h-5')
+                </button>
+
                 <a href="/admin/logout" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300" title="{{ __('logout') }}">
                     @svg('lucide-log-out', 'w-5 h-5')
                 </a>
             </div>
         </header>
+
+        {{-- Change-password modal (self-service, any staff role) --}}
+        <x-admin.modal :title="__('changePassword')" var="passwordOpen" max-width="max-w-md">
+            <form method="POST" action="{{ route('admin.account.password') }}" class="space-y-4">
+                @csrf @method('PUT')
+                @if ($errors->hasAny(['current_password', 'password']))
+                    <div class="p-3 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-sm">
+                        {{ $errors->first('current_password') ?: $errors->first('password') }}
+                    </div>
+                @endif
+                <x-ui.input :label="__('currentPassword')" name="current_password" type="password" autocomplete="current-password" required />
+                <x-ui.input :label="__('newPassword')" name="password" type="password" autocomplete="new-password" required :hint="__('passwordMinHint')" />
+                <x-ui.input :label="__('confirmNewPassword')" name="password_confirmation" type="password" autocomplete="new-password" required />
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <x-ui.button type="button" variant="outline" size="sm" x-on:click="passwordOpen = false">{{ __('cancel') }}</x-ui.button>
+                    <x-ui.button type="submit" variant="primary" size="sm">{{ __('save_changes') }}</x-ui.button>
+                </div>
+            </form>
+        </x-admin.modal>
 
         {{-- Page Content --}}
         <main class="p-4 sm:p-6">

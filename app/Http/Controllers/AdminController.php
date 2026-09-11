@@ -898,6 +898,19 @@ class AdminController extends Controller
         return back()->with('status', __('saved'));
     }
 
+    /** Any signed-in staff member changes their own password. */
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $request->user()->update(['password' => Hash::make($request->input('password'))]);
+
+        return back()->with('status', __('passwordChanged'));
+    }
+
     /* ---------------------------------------------------------------- Helpers */
 
     /** Options for a patient <select> across the admin write forms. */

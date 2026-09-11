@@ -417,5 +417,15 @@
     "permClickHint": "اضغط على القفل لتفعيل أو إيقاف الصلاحية",
     "permAlwaysOn": "المدير لديه كل الصلاحيات دائماً",
     "permClickToLock": "اضغط لإغلاق هذه الصلاحية",
-    "permClickToUnlock": "اضغط لتفعيل هذه الصلاحية"
+    "permClickToUnlock": "اضغط لتفعيل هذه الصلاحية",
+    "doctorInfo": "معلومات الطبيب",
+    "doctorName": "اسم الطبيب",
+    "doctorTitleLabel": "اللقب / التخصص",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "passwordMinHint": "8 أحرف على الأقل",
+    "passwordChanged": "تم تغيير كلمة المرور بنجاح",
+    "sendBookingRequest": "إرسال طلب الحجز",
+    "reviewRequest": "مراجعة الطلب"
 }

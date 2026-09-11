@@ -8,8 +8,8 @@
                     <img src="/images/dr-mohamed-awad.jpg" alt="د. محمد عوض" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-medical-blue/80 via-transparent to-transparent flex items-end p-8">
                         <div class="text-white">
-                            <h3 class="text-2xl font-bold mb-1">{{ __('heroTitle') }}</h3>
-                            <p class="text-white/90 text-sm">{{ __('doctorTitleShort') }}</p>
+                            <h3 class="text-2xl font-bold mb-1">{{ \App\Support\SiteInfo::name() }}</h3>
+                            <p class="text-white/90 text-sm">{{ \App\Support\SiteInfo::title() }}</p>
                         </div>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
             {{-- Content Section --}}
             <div>
                 <span class="inline-block text-medical-blue dark:text-light-gold font-semibold mb-4">{{ __('aboutEyebrow') }}</span>
-                <h2 class="heading-primary mb-6">{{ __('heroTitle') }}</h2>
+                <h2 class="heading-primary mb-6">{{ \App\Support\SiteInfo::name() }}</h2>
                 <p class="text-xl text-medical-blue dark:text-light-gold font-medium mb-4">
                     {{ __('heroSubtitle') }}
                 </p>

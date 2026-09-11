@@ -17,7 +17,7 @@
                 </div>
 
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                    <span class="text-light-gold">{{ __('heroTitle') }}</span>
+                    <span class="text-light-gold">{{ \App\Support\SiteInfo::name() }}</span>
                     <br>
                     {{ __('heroSubtitle') }}
                 </h1>

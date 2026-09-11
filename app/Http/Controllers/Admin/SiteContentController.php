@@ -243,6 +243,10 @@ class SiteContentController extends Controller
     public function about()
     {
         return view('admin.content.about', [
+            'nameAr' => Setting::get('doctor_name_ar', ''),
+            'nameEn' => Setting::get('doctor_name_en', ''),
+            'titleAr' => Setting::get('doctor_title_ar', ''),
+            'titleEn' => Setting::get('doctor_title_en', ''),
             'bioAr' => Setting::get('about_bio_ar', ''),
             'bioEn' => Setting::get('about_bio_en', ''),
             'doctorImage' => Setting::get('about_doctor_image', ''),
@@ -256,6 +260,10 @@ class SiteContentController extends Controller
     public function updateAbout(Request $request)
     {
         $data = $request->validate([
+            'name_ar' => ['nullable', 'string', 'max:200'],
+            'name_en' => ['nullable', 'string', 'max:200'],
+            'title_ar' => ['nullable', 'string', 'max:200'],
+            'title_en' => ['nullable', 'string', 'max:200'],
             'bio_ar' => ['nullable', 'string'],
             'bio_en' => ['nullable', 'string'],
             'doctor_image_url' => ['nullable', 'string', 'max:500'],
@@ -266,6 +274,10 @@ class SiteContentController extends Controller
             'why' => ['nullable', 'array'],
         ]);
 
+        Setting::put('doctor_name_ar', $data['name_ar'] ?? null, 'about');
+        Setting::put('doctor_name_en', $data['name_en'] ?? null, 'about');
+        Setting::put('doctor_title_ar', $data['title_ar'] ?? null, 'about');
+        Setting::put('doctor_title_en', $data['title_en'] ?? null, 'about');
         Setting::put('about_bio_ar', $data['bio_ar'] ?? null, 'about');
         Setting::put('about_bio_en', $data['bio_en'] ?? null, 'about');
         Setting::put(

@@ -17,6 +17,19 @@
     <form method="POST" action="{{ route('admin.content.about.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf @method('PUT')
 
+        {{-- Doctor identity --}}
+        <x-ui.card>
+            <x-ui.card-header><h2 class="font-bold text-gray-800 dark:text-white">{{ __('doctorInfo') }}</h2></x-ui.card-header>
+            <x-ui.card-content class="space-y-4">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <x-ui.input :label="__('doctorName') . ' (AR)'" name="name_ar" :value="$nameAr" :placeholder="__('heroTitle')" />
+                    <x-ui.input :label="__('doctorName') . ' (EN)'" name="name_en" :value="$nameEn" placeholder="Dr. Mohamed Awad" />
+                    <x-ui.input :label="__('doctorTitleLabel') . ' (AR)'" name="title_ar" :value="$titleAr" :placeholder="__('doctorTitleShort')" />
+                    <x-ui.input :label="__('doctorTitleLabel') . ' (EN)'" name="title_en" :value="$titleEn" placeholder="Consultant of Obstetrics & Gynecology" />
+                </div>
+            </x-ui.card-content>
+        </x-ui.card>
+
         {{-- Bio + photo --}}
         <x-ui.card>
             <x-ui.card-header><h2 class="font-bold text-gray-800 dark:text-white">{{ __('doctorBio') }}</h2></x-ui.card-header>

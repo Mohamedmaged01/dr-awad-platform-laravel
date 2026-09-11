@@ -417,5 +417,15 @@
     "permClickHint": "Click a lock to enable or disable a permission",
     "permAlwaysOn": "Admin always has full access",
     "permClickToLock": "Click to disable this permission",
-    "permClickToUnlock": "Click to enable this permission"
+    "permClickToUnlock": "Click to enable this permission",
+    "doctorInfo": "Doctor information",
+    "doctorName": "Doctor name",
+    "doctorTitleLabel": "Title / specialization",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "passwordMinHint": "At least 8 characters",
+    "passwordChanged": "Your password was changed successfully",
+    "sendBookingRequest": "Send booking request",
+    "reviewRequest": "Review your request"
 }

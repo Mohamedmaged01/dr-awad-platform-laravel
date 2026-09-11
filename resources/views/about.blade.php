@@ -8,8 +8,8 @@
         <div class="container-custom">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="text-white">
-                    <h1 class="text-4xl md:text-5xl font-bold mb-6">{{ __('heroTitle') }}</h1>
-                    <p class="text-xl text-light-gold mb-4">{{ __('heroSubtitle') }}</p>
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">{{ \App\Support\SiteInfo::name() }}</h1>
+                    <p class="text-xl text-light-gold mb-4">{{ \App\Support\SiteInfo::title() }}</p>
                     <p class="text-white/80 text-lg leading-relaxed mb-8 whitespace-pre-line">
                         {{ $bio ?? __('aboutHeroDesc') }}
                     </p>

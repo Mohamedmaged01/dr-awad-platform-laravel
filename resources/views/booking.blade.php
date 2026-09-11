@@ -171,7 +171,7 @@
 
                             {{-- Step 3: Confirmation --}}
                             <div x-show="step === 3" x-cloak class="space-y-6">
-                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('confirmBooking') }}</h2>
+                                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('reviewRequest') }}</h2>
 
                                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 space-y-4">
                                     <div class="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
@@ -233,8 +233,8 @@
                                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                             </svg>
                                         </span>
-                                        <span x-show="!submitting" class="flex-shrink-0">@svg('lucide-check-circle', 'w-[18px] h-[18px]')</span>
-                                        {{ __('confirmBooking') }}
+                                        <span x-show="!submitting" class="flex-shrink-0">@svg('lucide-send', 'w-[18px] h-[18px]')</span>
+                                        {{ __('sendBookingRequest') }}
                                     </button>
                                 </div>
                             </div>

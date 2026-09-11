@@ -4,7 +4,7 @@
 
 @section('content')
 {{-- Real patient auth: login/register when signed out, live dashboard when signed in. --}}
-<div x-data="{ showLogin: {{ $errors->any() && ! $errors->has('portal') ? 'false' : 'true' }} }">
+<div x-data="{ showLogin: {{ $errors->any() && ! $errors->has('portal') ? 'false' : 'true' }}, passwordOpen: {{ $errors->hasAny(['current_password', 'password']) ? 'true' : 'false' }} }">
 
     @if (! $patient)
     {{-- ===== Login / Register ===== --}}
@@ -264,10 +264,10 @@
                                         @svg('lucide-settings', 'w-[18px] h-[18px] text-gray-500')
                                         <span class="text-gray-700 dark:text-gray-300">{{ __('accountSettings') }}</span>
                                     </a>
-                                    <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
+                                    <button type="button" @click="passwordOpen = true" class="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg text-start">
                                         @svg('lucide-lock', 'w-[18px] h-[18px] text-gray-500')
                                         <span class="text-gray-700 dark:text-gray-300">{{ __('changePassword') }}</span>
-                                    </a>
+                                    </button>
                                     <a href="/patient-portal/logout"
                                        class="w-full flex items-center gap-3 p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500">
                                         @svg('lucide-log-out', 'w-[18px] h-[18px]')
@@ -280,6 +280,32 @@
                 </div>
             </div>
         </section>
+
+        {{-- Change-password modal --}}
+        <div x-show="passwordOpen" x-cloak x-transition.opacity @keydown.escape.window="passwordOpen = false"
+             class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div @click.outside="passwordOpen = false" class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ __('changePassword') }}</h3>
+                    <button type="button" @click="passwordOpen = false" class="p-1 text-gray-400 hover:text-gray-600">@svg('lucide-x', 'w-5 h-5')</button>
+                </div>
+                <form method="POST" action="{{ route('patient.password') }}" class="space-y-4">
+                    @csrf @method('PUT')
+                    @if ($errors->hasAny(['current_password', 'password']))
+                        <div class="p-3 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-sm">
+                            {{ $errors->first('current_password') ?: $errors->first('password') }}
+                        </div>
+                    @endif
+                    <x-ui.input :label="__('currentPassword')" name="current_password" type="password" autocomplete="current-password" required />
+                    <x-ui.input :label="__('newPassword')" name="password" type="password" autocomplete="new-password" required />
+                    <x-ui.input :label="__('confirmNewPassword')" name="password_confirmation" type="password" autocomplete="new-password" required />
+                    <div class="flex justify-end gap-3 pt-2">
+                        <x-ui.button type="button" variant="outline" size="sm" x-on:click="passwordOpen = false">{{ __('cancel') }}</x-ui.button>
+                        <x-ui.button type="submit" variant="primary" size="sm">{{ __('save_changes') }}</x-ui.button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
     @endif
 </div>

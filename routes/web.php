@@ -27,6 +27,7 @@ Route::middleware('throttle:20,1')->group(function () {
     Route::post('/patient-portal/register', [PatientAuthController::class, 'register'])->name('patient.register');
 });
 Route::get('/patient-portal/logout', [PatientAuthController::class, 'logout'])->name('patient.logout');
+Route::put('/patient-portal/password', [PatientAuthController::class, 'updatePassword'])->middleware('patient')->name('patient.password');
 
 // Public form submissions (persisted; light rate-limiting to deter abuse).
 Route::middleware('throttle:20,1')->group(function () {
@@ -87,6 +88,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
         Route::get('/settings/permissions', [AdminController::class, 'permissions'])->name('permissions');
         Route::put('/settings/permissions/toggle', [AdminController::class, 'togglePermission'])->name('permissions.toggle');
+
+        // Self-service: any signed-in staff member changes their own password.
+        Route::put('/account/password', [AdminController::class, 'updatePassword'])->name('account.password');
 
         // Admin CRUD write endpoints.
         require __DIR__.'/admin.php';
