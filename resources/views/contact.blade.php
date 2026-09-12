@@ -3,6 +3,7 @@
 @section('title', __('contactTitle') . ' | ' . __('heroTitle'))
 
 @section('content')
+    @php $contact = \App\Support\SiteInfo::contact(); @endphp
     {{-- Hero --}}
     <section class="pt-36 pb-16 gradient-medical">
         <div class="container-custom text-center text-white">
@@ -71,36 +72,36 @@
                     <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('quickContact') }}</h2>
 
                     <div class="grid gap-4">
-                        <a href="tel:{{ config('clinic.contact.phone_tel') }}"
+                        <a href="tel:{{ $contact['phone_tel'] }}"
                            class="flex items-center gap-4 p-5 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow">
                             <div class="w-14 h-14 rounded-full bg-medical-blue/10 flex items-center justify-center flex-shrink-0">
                                 @svg('lucide-phone', 'w-6 h-6 text-medical-blue')
                             </div>
                             <div>
                                 <p class="font-semibold text-gray-800 dark:text-white">{{ __('callNow') }}</p>
-                                <p class="text-medical-blue">{{ config('clinic.contact.phone_display') }}</p>
+                                <p class="text-medical-blue">{{ $contact['phone_display'] }}</p>
                             </div>
                         </a>
 
-                        <a href="https://wa.me/{{ config('clinic.contact.whatsapp') }}" target="_blank" rel="noopener noreferrer"
+                        <a href="https://wa.me/{{ $contact['whatsapp'] }}" target="_blank" rel="noopener noreferrer"
                            class="flex items-center gap-4 p-5 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow">
                             <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                                 @svg('lucide-message-circle', 'w-6 h-6 text-green-600')
                             </div>
                             <div>
                                 <p class="font-semibold text-gray-800 dark:text-white">{{ __('whatsapp') }}</p>
-                                <p class="text-green-600">{{ config('clinic.contact.phone_display') }}</p>
+                                <p class="text-green-600">{{ $contact['phone_display'] }}</p>
                             </div>
                         </a>
 
-                        <a href="mailto:{{ config('clinic.contact.email') }}"
+                        <a href="mailto:{{ $contact['email'] }}"
                            class="flex items-center gap-4 p-5 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow">
                             <div class="w-14 h-14 rounded-full bg-light-gold/10 flex items-center justify-center flex-shrink-0">
                                 @svg('lucide-mail', 'w-6 h-6 text-light-gold')
                             </div>
                             <div>
                                 <p class="font-semibold text-gray-800 dark:text-white">{{ __('email') }}</p>
-                                <p class="text-light-gold">{{ config('clinic.contact.email') }}</p>
+                                <p class="text-light-gold">{{ $contact['email'] }}</p>
                             </div>
                         </a>
                     </div>
@@ -112,7 +113,7 @@
                         </div>
                         <div class="space-y-2 text-gray-600 dark:text-gray-400">
                             <p>{{ __('hoursDailyLong') }}</p>
-                            <p>{{ __('forBookingInquiries') }} {{ config('clinic.contact.phone_display') }}</p>
+                            <p>{{ __('forBookingInquiries') }} {{ $contact['phone_display'] }}</p>
                         </div>
                     </div>
                 </div>

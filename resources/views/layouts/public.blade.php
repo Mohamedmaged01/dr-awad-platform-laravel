@@ -34,7 +34,7 @@
         @yield('content')
 
         <x-layout.footer />
-        <x-whatsapp-button />
+        <x-whatsapp-button :phone-number="\App\Support\SiteInfo::contact()['whatsapp']" />
         <x-scroll-to-top />
     </main>
 </body>

@@ -1,5 +1,5 @@
 @props(['branches' => [], 'services' => []])
-@php $contact = config('clinic.contact'); @endphp
+@php $contact = \App\Support\SiteInfo::contact(); @endphp
 {{-- Mirrors BookingSection.tsx: submit simulates a 2s request, then swaps to a success card. --}}
 <section id="booking" class="section-padding bg-gray-50 dark:bg-gray-900" x-data="{ submitting: false }">
     <div class="container-custom">

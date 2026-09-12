@@ -66,7 +66,7 @@
                 <a href="/booking" class="bg-medical-blue text-white px-8 py-4 rounded-lg font-semibold hover:bg-medical-blue-dark transition-colors">
                     {{ __('bookAppointmentBtn') }}
                 </a>
-                <a href="https://wa.me/{{ config('clinic.contact.whatsapp') }}" class="bg-green-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                <a href="https://wa.me/{{ \App\Support\SiteInfo::contact()['whatsapp'] }}" class="bg-green-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-600 transition-colors">
                     {{ __('contactViaWhatsAppBtn') }}
                 </a>
             </div>

@@ -1,3 +1,4 @@
+@php $contact = \App\Support\SiteInfo::contact(); @endphp
 <section class="relative min-h-screen flex items-center pt-36 pb-16 overflow-hidden">
     {{-- Background --}}
     <div class="absolute inset-0 gradient-medical"></div>
@@ -32,13 +33,13 @@
                         {{ __('bookNow') }}
                     </x-ui.button>
 
-                    <x-ui.button href="tel:{{ config('clinic.contact.phone_tel') }}" variant="outline" size="lg"
+                    <x-ui.button href="tel:{{ $contact['phone_tel'] }}" variant="outline" size="lg"
                                  class="border-white/50 text-white hover:bg-white hover:text-medical-blue">
                         <x-slot:leftIcon>@svg('lucide-phone', 'w-5 h-5')</x-slot:leftIcon>
                         {{ __('callNow') }}
                     </x-ui.button>
 
-                    <x-ui.button href="https://wa.me/{{ config('clinic.contact.whatsapp') }}" target="_blank" rel="noopener noreferrer"
+                    <x-ui.button href="https://wa.me/{{ $contact['whatsapp'] }}" target="_blank" rel="noopener noreferrer"
                                  variant="secondary" size="lg" class="bg-green-500 text-white hover:bg-green-600 border-none">
                         <x-slot:leftIcon>@svg('lucide-message-circle', 'w-5 h-5')</x-slot:leftIcon>
                         {{ __('whatsapp') }}
@@ -51,7 +52,7 @@
                 <div class="relative w-full aspect-square max-w-lg mx-auto">
                     {{-- Main Image Circle --}}
                     <div class="absolute inset-8 rounded-full bg-white shadow-2xl overflow-hidden animate-pulse-glow border-4 border-white/50">
-                        <img src="/images/dr-mohamed-awad.jpg" alt="د. محمد عوض" class="w-full h-full object-cover">
+                        <img src="{{ \App\Support\SiteInfo::doctorImage() }}" alt="{{ \App\Support\SiteInfo::name() }}" class="w-full h-full object-cover">
                     </div>
 
                     {{-- Video Play Button --}}

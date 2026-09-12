@@ -43,7 +43,7 @@
         {{-- CTA --}}
         <div class="text-center mt-12">
             <p class="text-gray-600 dark:text-gray-400 mb-4">{{ __('faqCtaText') }}</p>
-            <a href="https://wa.me/{{ config('clinic.contact.whatsapp') }}"
+            <a href="https://wa.me/{{ \App\Support\SiteInfo::contact()['whatsapp'] }}"
                class="inline-flex items-center gap-2 text-medical-blue dark:text-light-gold font-semibold hover:underline">
                 {{ __('contactViaWhatsApp') }}
             </a>
