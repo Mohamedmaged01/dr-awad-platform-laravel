@@ -55,6 +55,21 @@ class SiteInfo
             ?? __('doctorTitleShort');
     }
 
+    /** Locale-aware editable doctor bio; falls back to a translation key. */
+    public static function bio(string $fallbackKey = 'aboutBioHome'): string
+    {
+        $en = App::getLocale() === 'en';
+
+        return ($en ? self::get('about_bio_en') : self::get('about_bio_ar'))
+            ?? __($fallbackKey);
+    }
+
+    /** Editable doctor photo URL, or the bundled default. */
+    public static function doctorImage(): string
+    {
+        return self::get('about_doctor_image') ?? '/images/dr-mohamed-awad.jpg';
+    }
+
     /** Config contact array with phone/whatsapp/email overridden by settings. */
     public static function contact(): array
     {

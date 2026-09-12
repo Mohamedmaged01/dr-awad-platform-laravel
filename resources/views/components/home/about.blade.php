@@ -5,7 +5,7 @@
             {{-- Image Section --}}
             <div class="relative">
                 <div class="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl">
-                    <img src="/images/dr-mohamed-awad.jpg" alt="د. محمد عوض" class="w-full h-full object-cover">
+                    <img src="{{ \App\Support\SiteInfo::doctorImage() }}" alt="{{ \App\Support\SiteInfo::name() }}" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-medical-blue/80 via-transparent to-transparent flex items-end p-8">
                         <div class="text-white">
                             <h3 class="text-2xl font-bold mb-1">{{ \App\Support\SiteInfo::name() }}</h3>
@@ -32,8 +32,8 @@
                 <p class="text-xl text-medical-blue dark:text-light-gold font-medium mb-4">
                     {{ __('heroSubtitle') }}
                 </p>
-                <p class="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                    {{ __('aboutBioHome') }}
+                <p class="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed whitespace-pre-line">
+                    {{ \App\Support\SiteInfo::bio() }}
                 </p>
 
                 {{-- Achievements Grid --}}
