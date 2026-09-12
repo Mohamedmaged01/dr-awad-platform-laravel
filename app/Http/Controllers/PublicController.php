@@ -200,7 +200,6 @@ class PublicController extends Controller
         return view('booking', [
             'branches' => $this->branchOptions(),
             'services' => $this->serviceOptions(),
-            'timeSlots' => ClinicData::timeSlots(),
         ]);
     }
 

@@ -23,7 +23,6 @@ class PublicFormController extends Controller
             'branch' => ['required', 'exists:branches,id'],
             'service' => ['nullable', 'exists:services,id'],
             'date' => ['required', 'date', 'after_or_equal:today'],
-            'time' => ['required', 'string', 'max:10'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -34,7 +33,8 @@ class PublicFormController extends Controller
             'branch_id' => $data['branch'],
             'service_id' => $data['service'] ?? null,
             'appointment_date' => $data['date'],
-            'appointment_time' => $data['time'],
+            // Patients pick a date only; the clinic sets the exact time on confirmation.
+            'appointment_time' => null,
             'status' => 'pending',
             'type' => 'online',
             'patient_notes' => $data['notes'] ?? null,
@@ -43,7 +43,6 @@ class PublicFormController extends Controller
         return back()->with('booking_success', true)->with('booking_summary', [
             'name' => $data['name'],
             'date' => $data['date'],
-            'time' => $data['time'],
         ]);
     }
 

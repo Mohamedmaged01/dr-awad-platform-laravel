@@ -36,9 +36,11 @@ class Appointment extends Model
         return $this->belongsTo(Staff::class);
     }
 
-    /** "09:00" — the source rendered bare HH:MM. */
+    /** "09:00" — bare HH:MM, or a dash when the time hasn't been set yet. */
     public function getTimeLabelAttribute(): string
     {
-        return substr((string) $this->appointment_time, 0, 5);
+        $time = substr((string) $this->appointment_time, 0, 5);
+
+        return $time !== '' ? $time : '—';
     }
 }

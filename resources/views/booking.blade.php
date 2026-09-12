@@ -8,7 +8,7 @@
         step: 1,
         submitting: false,
         success: false,
-        form: { branch: '', service: '', date: '', time: '', name: '', phone: '', email: '', notes: '' },
+        form: { branch: '', service: '', date: '', name: '', phone: '', email: '', notes: '' },
         branches: @js($branches),
         services: @js($services),
         get selectedBranch() { return this.branches.find(b => b.value === this.form.branch) },
@@ -16,7 +16,7 @@
         submit() { this.submitting = true; setTimeout(() => { this.submitting = false; this.success = true }, 2000) },
         reset() {
             this.success = false; this.step = 1;
-            this.form = { branch: '', service: '', date: '', time: '', name: '', phone: '', email: '', notes: '' };
+            this.form = { branch: '', service: '', date: '', name: '', phone: '', email: '', notes: '' };
         }
      }">
 
@@ -40,7 +40,6 @@
                         <div class="space-y-2 text-gray-600 dark:text-gray-400">
                             <p><strong>{{ __('nameLabel') }}:</strong> {{ $summary['name'] ?? '' }}</p>
                             <p><strong>{{ __('date') }}:</strong> {{ $summary['date'] ?? '' }}</p>
-                            <p><strong>{{ __('time') }}:</strong> {{ $summary['time'] ?? '' }}</p>
                         </div>
                     </div>
                     @endif
@@ -97,7 +96,6 @@
                         @endif
                         <form method="POST" action="{{ route('booking.submit') }}" @submit="submitting = true">
                             @csrf
-                            <input type="hidden" name="time" :value="form.time">
                             {{-- Step 1: Service & Time --}}
                             <div x-show="step === 1" class="space-y-6">
                                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">{{ __('step1Heading') }}</h2>
@@ -113,24 +111,15 @@
                                 <x-ui.input :label="__('date')" name="date" type="date" x-model="form.date"
                                             min="{{ now()->toDateString() }}" required />
 
-                                <div x-show="form.date" x-cloak>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ __('chooseTime') }}</label>
-                                    <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                                        @foreach ($timeSlots as $slot)
-                                            <button type="button" @click="form.time = '{{ $slot }}'"
-                                                    :class="form.time === '{{ $slot }}'
-                                                        ? 'bg-medical-blue text-white'
-                                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-medical-blue/10'"
-                                                    class="py-2 px-3 rounded-lg text-sm font-medium transition-colors">
-                                                {{ $slot }}
-                                            </button>
-                                        @endforeach
-                                    </div>
+                                <div x-show="form.date" x-cloak
+                                     class="flex items-start gap-2 p-3 rounded-lg bg-medical-blue/5 text-sm text-gray-600 dark:text-gray-300">
+                                    @svg('lucide-clock', 'w-[18px] h-[18px] text-medical-blue flex-shrink-0 mt-0.5')
+                                    <span>{{ __('timeSetByClinicNote') }}</span>
                                 </div>
 
                                 <div class="flex justify-end pt-6">
                                     <x-ui.button type="button" variant="primary" size="lg" x-on:click="step = 2"
-                                                 ::disabled="!form.branch || !form.service || !form.date || !form.time">
+                                                 ::disabled="!form.branch || !form.service || !form.date">
                                         {{ __('next') }}
                                         <x-slot:rightIcon>@svg('lucide-arrow-left', 'w-[18px] h-[18px]')</x-slot:rightIcon>
                                     </x-ui.button>
@@ -187,14 +176,6 @@
                                         <div>
                                             <p class="font-medium text-gray-800 dark:text-white" x-text="form.date"></p>
                                             <p class="text-sm text-gray-500">{{ __('selectedDate') }}</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700">
-                                        @svg('lucide-clock', 'w-5 h-5 text-medical-blue')
-                                        <div>
-                                            <p class="font-medium text-gray-800 dark:text-white" x-text="form.time"></p>
-                                            <p class="text-sm text-gray-500">{{ __('selectedTime') }}</p>
                                         </div>
                                     </div>
 
