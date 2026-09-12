@@ -107,7 +107,7 @@
                                                 'branch_id' => $appointment->branch_id,
                                                 'service_id' => $appointment->service_id,
                                                 'appointment_date' => optional($appointment->appointment_date)->format('Y-m-d'),
-                                                'appointment_time' => $appointment->time_label,
+                                                'appointment_time' => $appointment->appointment_time ? substr((string) $appointment->appointment_time, 0, 5) : '',
                                                 'status' => $appointment->status,
                                                 'notes' => $appointment->notes,
                                             ]) }}; editOpen = true">
@@ -206,7 +206,6 @@
                 <x-ui.select label="الفرع" name="branch_id" :options="$branchOptions" required />
                 <x-ui.select label="الخدمة" name="service_id" :options="$serviceOptions" placeholder="اختر الخدمة" />
                 <x-ui.input label="التاريخ" name="appointment_date" type="date" value="{{ now()->toDateString() }}" required />
-                <x-ui.input label="الوقت" name="appointment_time" type="time" value="09:00" required />
                 <x-ui.select label="الحالة" name="status" :options="$statusOptions" />
                 <div class="md:col-span-2">
                     <x-ui.textarea label="ملاحظات" name="notes" rows="2" />
@@ -225,7 +224,7 @@
                 <x-ui.select label="الفرع" name="branch_id" :options="$branchOptions" x-model="current.branch_id" required />
                 <x-ui.select label="الخدمة" name="service_id" :options="$serviceOptions" x-model="current.service_id" placeholder="اختر الخدمة" />
                 <x-ui.input label="التاريخ" name="appointment_date" type="date" x-model="current.appointment_date" required />
-                <x-ui.input label="الوقت" name="appointment_time" type="time" x-model="current.appointment_time" required />
+                <x-ui.input label="الوقت (اختياري)" name="appointment_time" type="time" x-model="current.appointment_time" />
                 <x-ui.select label="الحالة" name="status" :options="$statusOptions" x-model="current.status" />
                 <div class="md:col-span-2">
                     <x-ui.textarea label="ملاحظات" name="notes" rows="2" x-model="current.notes" />

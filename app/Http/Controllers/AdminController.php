@@ -300,10 +300,13 @@ class AdminController extends Controller
             'branch_id' => ['required', 'exists:branches,id'],
             'service_id' => ['nullable', 'exists:services,id'],
             'appointment_date' => ['required', 'date'],
-            'appointment_time' => ['required'],
+            'appointment_time' => ['nullable'],
             'status' => ['required', 'in:pending,confirmed,waiting,completed,cancelled,no_show'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        // Time is optional — the clinic sets it when confirming; empty means unset.
+        $data['appointment_time'] = ($data['appointment_time'] ?? null) ?: null;
 
         Appointment::create($data + ['type' => 'clinic']);
 
@@ -316,10 +319,13 @@ class AdminController extends Controller
             'branch_id' => ['required', 'exists:branches,id'],
             'service_id' => ['nullable', 'exists:services,id'],
             'appointment_date' => ['required', 'date'],
-            'appointment_time' => ['required'],
+            'appointment_time' => ['nullable'],
             'status' => ['required', 'in:pending,confirmed,waiting,completed,cancelled,no_show'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        // Empty time clears it (kept unset until the clinic schedules it).
+        $data['appointment_time'] = ($data['appointment_time'] ?? null) ?: null;
 
         $appointment->update($data);
 
