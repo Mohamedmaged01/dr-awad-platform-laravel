@@ -427,6 +427,7 @@
     "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
     "passwordMinHint": "8 أحرف على الأقل",
     "passwordChanged": "تم تغيير كلمة المرور بنجاح",
+    "cannotSetPatientPassword": "لإنشاء حساب دخول للمريضة أدخلي بريدًا إلكترونيًا غير مستخدم.",
     "sendBookingRequest": "إرسال طلب الحجز",
     "reviewRequest": "مراجعة الطلب"
 }

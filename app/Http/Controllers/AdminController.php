@@ -230,6 +230,7 @@ class AdminController extends Controller
             'address' => ['nullable', 'string', 'max:500'],
             'case_type' => ['nullable', 'string', 'max:100'],
             'demo_status' => ['nullable', 'in:active,archived'],
+            'password' => ['nullable', 'string', 'min:6'],
         ]);
 
         $history = $patient->medical_history ?? [];
@@ -250,6 +251,24 @@ class AdminController extends Controller
             'address' => $data['address'] ?? $patient->address,
             'medical_history' => $history,
         ]);
+
+        // Admin sets/resets the patient's portal login password. If the patient
+        // has no login yet, one is created when a free email is available.
+        if (! empty($data['password'])) {
+            if ($patient->user) {
+                $patient->user->update(['password' => Hash::make($data['password'])]);
+            } elseif (! empty($patient->email) && ! User::where('email', $patient->email)->exists()) {
+                $user = User::create([
+                    'email' => $patient->email,
+                    'password' => Hash::make($data['password']),
+                    'role' => 'patient',
+                    'is_active' => true,
+                ]);
+                $patient->update(['user_id' => $user->id]);
+            } else {
+                throw ValidationException::withMessages(['password' => __('cannotSetPatientPassword')]);
+            }
+        }
 
         return back()->with('status', __('saved'));
     }

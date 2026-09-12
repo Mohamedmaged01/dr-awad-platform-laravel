@@ -103,6 +103,8 @@
                                                         'address' => $patient->address,
                                                         'case_type' => $patient->case_type,
                                                         'demo_status' => $patient->demo_status,
+                                                        'has_login' => (bool) $patient->user_id,
+                                                        'password' => '',
                                                     ]) }}; showEditModal = true">
                                                 @svg('lucide-edit', 'w-[18px] h-[18px] text-gray-500')
                                             </button>
@@ -197,6 +199,11 @@
                                 ['value' => 'active', 'label' => 'نشط'],
                                 ['value' => 'archived', 'label' => 'مؤرشف'],
                             ]" />
+                        </div>
+                        <div class="pt-2 border-t border-gray-100 dark:border-gray-700">
+                            <x-ui.input label="كلمة مرور الدخول (اختياري)" name="password" type="password" x-model="current.password" autocomplete="new-password" />
+                            <p class="text-xs text-gray-400 mt-1"
+                               x-text="current.has_login ? 'اتركيها فارغة للإبقاء على كلمة المرور الحالية، أو أدخلي كلمة مرور جديدة لإعادة تعيينها.' : 'أدخلي كلمة مرور لإنشاء حساب دخول للمريضة (يتطلب بريدًا إلكترونيًا غير مستخدم).'"></p>
                         </div>
                         <div class="flex justify-end gap-3 pt-4">
                             <x-ui.button type="button" variant="outline" x-on:click="showEditModal = false">إلغاء</x-ui.button>
