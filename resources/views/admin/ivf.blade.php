@@ -70,7 +70,7 @@
                     <x-ui.card-content class="p-6">
                         <div class="flex items-start justify-between mb-4">
                             <div>
-                                <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ $cycle->patient->short_name }}</h3>
+                                <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ $cycle->patient?->short_name ?? '—' }}</h3>
                                 <p class="text-sm text-gray-500">{{ $cycle->cycle_type }} - الدورة #{{ $cycle->cycle_number }}</p>
                             </div>
                             <span class="px-3 py-1 rounded-full text-xs font-medium {{ $stage['color'] }} text-white">{{ $stage['label'] }}</span>

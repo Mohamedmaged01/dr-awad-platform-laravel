@@ -64,7 +64,7 @@
                                     <div class="w-px h-12 bg-gray-200 dark:bg-gray-700"></div>
                                     <div>
                                         <div class="flex items-center gap-2">
-                                            <h3 class="font-medium text-gray-800 dark:text-white">{{ $appointment->patient->name }}</h3>
+                                            <h3 class="font-medium text-gray-800 dark:text-white">{{ $appointment->patient?->name ?? '—' }}</h3>
                                             <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $info['color'] }}">
                                                 @svg('lucide-' . $info['icon'], 'inline w-3 h-3 mr-1')
                                                 {{ $info['label'] }}
@@ -73,9 +73,9 @@
                                         <div class="flex items-center gap-4 mt-1 text-sm text-gray-500">
                                             <span>{{ $appointment->service?->name_ar }}</span>
                                             <span>•</span>
-                                            <span>{{ $appointment->branch->short_name }}</span>
+                                            <span>{{ $appointment->branch?->short_name }}</span>
                                             <span>•</span>
-                                            <span>{{ $appointment->patient->phone }}</span>
+                                            <span>{{ $appointment->patient?->phone }}</span>
                                         </div>
                                         @if ($appointment->notes)
                                             <p class="text-sm text-gray-400 mt-1">📝 {{ $appointment->notes }}</p>

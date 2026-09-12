@@ -266,7 +266,14 @@ class AdminController extends Controller
     public function appointments()
     {
         return view('admin.appointments', [
-            'appointments' => Appointment::with(['patient', 'branch', 'service'])
+            // Load related records including soft-deleted ones, so an appointment
+            // whose patient/branch/service was later deleted still renders (and
+            // never crashes the page on a null relation).
+            'appointments' => Appointment::with([
+                'patient' => fn ($q) => $q->withTrashed(),
+                'branch' => fn ($q) => $q->withTrashed(),
+                'service' => fn ($q) => $q->withTrashed(),
+            ])
                 ->orderBy('appointment_time')
                 ->get(),
             'stats' => $this->appointmentStats(),
@@ -342,7 +349,7 @@ class AdminController extends Controller
     public function ivf()
     {
         return view('admin.ivf', [
-            'cycles' => IvfCycle::with(['patient', 'latestFollowup'])
+            'cycles' => IvfCycle::with(['patient' => fn ($q) => $q->withTrashed(), 'latestFollowup'])
                 ->orderBy('cycle_number')
                 ->orderBy('start_date')
                 ->get(),
