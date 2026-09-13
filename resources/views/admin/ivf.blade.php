@@ -14,7 +14,8 @@
 @endphp
 
 @section('content')
-    <div class="space-y-6" x-data="{ newOpen: false }">
+    <div class="space-y-6" x-data="{ newOpen: false, search: '', stage: 'all',
+            matches(t, st) { return (this.search === '' || t.includes(this.search)) && (this.stage === 'all' || this.stage === st) } }">
         {{-- Header --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -49,14 +50,17 @@
             <x-ui.card-content class="p-4">
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex-1">
-                        <x-ui.input placeholder="بحث بالاسم...">
+                        <x-ui.input placeholder="بحث بالاسم..." x-model="search">
                             <x-slot:leftIcon>@svg('lucide-search', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                         </x-ui.input>
                     </div>
-                    <x-ui.button variant="outline">
-                        <x-slot:leftIcon>@svg('lucide-filter', 'w-[18px] h-[18px]')</x-slot:leftIcon>
-                        تصفية حسب المرحلة
-                    </x-ui.button>
+                    <select x-model="stage"
+                            class="px-4 py-2.5 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                        <option value="all">كل المراحل</option>
+                        @foreach ($stageConfig as $key => $cfg)
+                            <option value="{{ $key }}">{{ $cfg['label'] }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </x-ui.card-content>
         </x-ui.card>
@@ -65,6 +69,7 @@
         <div class="grid md:grid-cols-2 gap-6">
             @foreach ($cycles as $cycle)
                 @php $stage = $stageConfig[$cycle->current_stage] ?? $stageConfig['consultation']; @endphp
+                <div x-show="matches(@js(trim(($cycle->patient?->short_name ?? '') . ' ' . ($cycle->cycle_type ?? ''))), @js($cycle->current_stage))">
                 <x-ui.card class="overflow-hidden">
                     <div class="h-2 {{ $stage['color'] }}" style="width: {{ $stage['progress'] }}%"></div>
                     <x-ui.card-content class="p-6">
@@ -112,6 +117,7 @@
                         </div>
                     </x-ui.card-content>
                 </x-ui.card>
+                </div>
             @endforeach
         </div>
 

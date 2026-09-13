@@ -8,11 +8,16 @@
         'cancelled' => ['label' => 'ملغي', 'color' => 'bg-red-100 text-red-700', 'icon' => 'x-circle'],
         'completed' => ['label' => 'مكتمل', 'color' => 'bg-gray-100 text-gray-700', 'icon' => 'check-circle'],
     ];
-    $today = $appointments->where('appointment_date', '2024-01-20')->count();
+    $today = $appointments->filter(fn ($a) => $a->appointment_date && $a->appointment_date->isToday())->count();
 @endphp
 
 @section('content')
-    <div class="space-y-6" x-data="{ view: 'list', selectedDate: '{{ now()->toDateString() }}', createOpen: false, editOpen: false, current: {} }">
+    <div class="space-y-6" x-data="{ view: 'list', search: '', status: 'all', selectedDate: '', createOpen: false, editOpen: false, current: {},
+            matches(t, st, d) {
+                return (this.search === '' || t.includes(this.search))
+                    && (this.status === 'all' || this.status === st)
+                    && (this.selectedDate === '' || this.selectedDate === d);
+            } }">
         {{-- Header --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -36,15 +41,26 @@
             <x-ui.card-content class="p-4">
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex-1">
-                        <x-ui.input placeholder="بحث بالاسم أو الهاتف...">
+                        <x-ui.input placeholder="بحث بالاسم أو الهاتف..." x-model="search">
                             <x-slot:leftIcon>@svg('lucide-search', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                         </x-ui.input>
                     </div>
                     <x-ui.input type="date" x-model="selectedDate" class="w-auto" />
-                    <x-ui.button variant="outline">
-                        <x-slot:leftIcon>@svg('lucide-filter', 'w-[18px] h-[18px]')</x-slot:leftIcon>
-                        تصفية
-                    </x-ui.button>
+                    <select x-model="status"
+                            class="px-4 py-2.5 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                        <option value="all">كل الحالات</option>
+                        <option value="pending">معلق</option>
+                        <option value="confirmed">مؤكد</option>
+                        <option value="waiting">في الانتظار</option>
+                        <option value="completed">مكتمل</option>
+                        <option value="cancelled">ملغي</option>
+                        <option value="no_show">لم يحضر</option>
+                    </select>
+                    <button type="button" x-show="search !== '' || status !== 'all' || selectedDate !== ''"
+                            x-on:click="search = ''; status = 'all'; selectedDate = ''"
+                            class="px-4 py-2.5 text-sm text-gray-500 hover:text-red-500 flex items-center gap-1">
+                        @svg('lucide-x', 'w-4 h-4') مسح
+                    </button>
                 </div>
             </x-ui.card-content>
         </x-ui.card>
@@ -56,7 +72,8 @@
                     <div class="divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach ($appointments as $appointment)
                             @php $info = $statusConfig[$appointment->status] ?? $statusConfig['pending']; @endphp
-                            <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between">
+                            <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between"
+                                 x-show="matches(@js(trim(($appointment->patient?->name ?? '') . ' ' . ($appointment->patient?->phone ?? ''))), @js($appointment->status), @js(optional($appointment->appointment_date)->format('Y-m-d')))">
                                 <div class="flex items-center gap-4">
                                     <div class="text-center min-w-[60px]">
                                         <div class="text-2xl font-bold text-medical-blue">{{ $appointment->time_label }}</div>

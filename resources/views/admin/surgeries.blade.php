@@ -18,7 +18,8 @@
 @endphp
 
 @section('content')
-<div x-data="{ addOpen: false, editOpen: false, viewOpen: false, current: {} }">
+<div x-data="{ addOpen: false, editOpen: false, viewOpen: false, current: {}, search: '', status: 'all',
+        matches(t, st) { return (this.search === '' || t.includes(this.search)) && (this.status === 'all' || this.status === st) } }">
     <x-admin.page-header :title="__('surgeries')">
         <x-slot:actions>
             <x-ui.button variant="primary" size="sm" x-on:click="addOpen = true">
@@ -34,6 +35,26 @@
             <x-admin.stat-tile :label="$s['label']" :value="$s['value']" :icon="$s['icon']" :color="$s['color']" />
         @endforeach
     </div>
+
+    {{-- Filters --}}
+    <x-ui.card class="mb-6">
+        <x-ui.card-content class="p-4">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <x-ui.input :placeholder="__('search') . '...'" x-model="search">
+                        <x-slot:leftIcon>@svg('lucide-search', 'w-[18px] h-[18px]')</x-slot:leftIcon>
+                    </x-ui.input>
+                </div>
+                <select x-model="status"
+                        class="px-4 py-2.5 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                    <option value="all">{{ __('all') }}</option>
+                    @foreach ($statusOptions as $opt)
+                        <option value="{{ $opt['value'] }}">{{ $opt['label'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </x-ui.card-content>
+    </x-ui.card>
 
     {{-- Table --}}
     <x-ui.card>
@@ -53,7 +74,8 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                         @forelse ($surgeries as $s)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                x-show="matches(@js(trim(($s['patient'] ?? '') . ' ' . ($s['file'] ?? '') . ' ' . ($s['operation'] ?? ''))), @js($s['status']))">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-full bg-medical-blue/10 flex items-center justify-center text-medical-blue font-bold">{{ mb_substr($s['patient'], 0, 1) }}</div>
