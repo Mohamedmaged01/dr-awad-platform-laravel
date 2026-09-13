@@ -11,6 +11,8 @@
         experience: @js($experience ?: []),
         memberships: @js($memberships ?: []),
         why: @js($why ?: []),
+        achievements: @js($achievements ?: []),
+        highlights: @js($highlights ?: []),
      }" class="max-w-4xl">
     <x-admin.page-header :title="__('aboutDoctor')" />
 
@@ -46,6 +48,39 @@
                 @include('admin.content._bilingual-list', ['var' => 'qualifications', 'name' => 'qualifications', 'title' => __('qualificationsLabel')])
                 @include('admin.content._bilingual-list', ['var' => 'experience', 'name' => 'experience', 'title' => __('experienceLabel')])
                 @include('admin.content._bilingual-list', ['var' => 'memberships', 'name' => 'memberships', 'title' => __('membershipsLabel')])
+                @include('admin.content._bilingual-list', ['var' => 'highlights', 'name' => 'highlights', 'title' => __('highlightsLabel')])
+            </x-ui.card-content>
+        </x-ui.card>
+
+        {{-- Home credential cards (icon + label + desc, bilingual) --}}
+        <x-ui.card>
+            <x-ui.card-header class="flex flex-row items-center justify-between">
+                <h2 class="font-bold text-gray-800 dark:text-white">{{ __('achievementsLabel') }}</h2>
+                <x-ui.button type="button" variant="outline" size="sm" x-on:click="achievements.push({ icon: 'award', label_ar: '', label_en: '', desc_ar: '', desc_en: '' })">
+                    <x-slot:leftIcon>@svg('lucide-plus', 'w-4 h-4')</x-slot:leftIcon>{{ __('add_new') }}
+                </x-ui.button>
+            </x-ui.card-header>
+            <x-ui.card-content class="space-y-4">
+                <template x-for="(row, i) in achievements" :key="i">
+                    <div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <select :name="'achievements[' + i + '][icon]'" x-model="row.icon"
+                                    class="px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                                @foreach (['graduation-cap', 'award', 'building', 'globe', 'star', 'users', 'heart', 'shield-check', 'stethoscope', 'microscope'] as $ic)
+                                    <option value="{{ $ic }}">{{ $ic }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button" x-on:click="achievements.splice(i, 1)" class="p-2 text-gray-400 hover:text-red-500 ms-auto">@svg('lucide-trash-2', 'w-[18px] h-[18px]')</button>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-2">
+                            <input :name="'achievements[' + i + '][label_ar]'" x-model="row.label_ar" placeholder="العنوان (عربي)" dir="rtl" class="px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                            <input :name="'achievements[' + i + '][label_en]'" x-model="row.label_en" placeholder="Title (English)" dir="ltr" class="px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                            <input :name="'achievements[' + i + '][desc_ar]'" x-model="row.desc_ar" placeholder="الوصف (عربي)" dir="rtl" class="px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                            <input :name="'achievements[' + i + '][desc_en]'" x-model="row.desc_en" placeholder="Description (English)" dir="ltr" class="px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                        </div>
+                    </div>
+                </template>
+                <p x-show="achievements.length === 0" class="text-sm text-gray-400">{{ __('noRecords') }}</p>
             </x-ui.card-content>
         </x-ui.card>
 

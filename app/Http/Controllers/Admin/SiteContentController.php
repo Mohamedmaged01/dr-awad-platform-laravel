@@ -254,6 +254,8 @@ class SiteContentController extends Controller
             'experience' => $this->readList('about_experience'),
             'memberships' => $this->readList('about_memberships'),
             'why' => $this->readList('about_why'),
+            'achievements' => $this->readList('about_achievements'),
+            'highlights' => $this->readList('about_highlights'),
         ]);
     }
 
@@ -272,6 +274,8 @@ class SiteContentController extends Controller
             'experience' => ['nullable', 'array'],
             'memberships' => ['nullable', 'array'],
             'why' => ['nullable', 'array'],
+            'achievements' => ['nullable', 'array'],
+            'highlights' => ['nullable', 'array'],
         ]);
 
         Setting::put('doctor_name_ar', $data['name_ar'] ?? null, 'about');
@@ -291,6 +295,10 @@ class SiteContentController extends Controller
         $this->writeList('about_experience', $request->input('experience', []), ['ar', 'en']);
         $this->writeList('about_memberships', $request->input('memberships', []), ['ar', 'en']);
         $this->writeList('about_why', $request->input('why', []), ['icon', 'title_ar', 'title_en', 'desc_ar', 'desc_en'], 'title_ar');
+
+        // Home "about the doctor": credential cards + the highlights checklist.
+        $this->writeList('about_achievements', $request->input('achievements', []), ['icon', 'label_ar', 'label_en', 'desc_ar', 'desc_en'], 'label_ar');
+        $this->writeList('about_highlights', $request->input('highlights', []), ['ar', 'en']);
 
         return back()->with('status', __('saved'));
     }

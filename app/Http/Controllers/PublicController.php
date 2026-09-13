@@ -13,15 +13,29 @@ class PublicController extends Controller
 {
     public function home()
     {
+        $en = App::getLocale() === 'en';
+
         return view('home', [
             'homeServices' => ClinicData::homeServices(),
-            'aboutAchievements' => ClinicData::aboutAchievements(),
-            'aboutHighlights' => ClinicData::aboutHighlights(),
+            // Editable from the About editor; fall back to ClinicData when unset.
+            'aboutAchievements' => $this->aboutAchievements($en) ?: ClinicData::aboutAchievements(),
+            'aboutHighlights' => $this->aboutList('about_highlights', $en) ?: ClinicData::aboutHighlights(),
             'testimonials' => ClinicData::testimonials(),
             'bookingBranches' => $this->branchOptions(),
             'bookingServices' => $this->serviceOptions(),
             'faqs' => ClinicData::faqs(),
         ]);
+    }
+
+    /** Decode the editable home credential cards into locale-aware rows. */
+    private function aboutAchievements(bool $en): array
+    {
+        return collect(json_decode(Setting::get('about_achievements', '[]'), true) ?: [])
+            ->map(fn ($r) => [
+                'icon' => $r['icon'] ?? 'award',
+                'label' => $en && ! empty($r['label_en']) ? $r['label_en'] : ($r['label_ar'] ?? ''),
+                'desc' => $en && ! empty($r['desc_en']) ? $r['desc_en'] : ($r['desc_ar'] ?? ''),
+            ])->filter(fn ($r) => $r['label'] !== '')->values()->all();
     }
 
     /** DB-backed, locale-aware branch options for the booking selects. */
