@@ -174,7 +174,9 @@ class AdminController extends Controller
     public function patients()
     {
         return view('admin.patients', [
-            'patients' => Patient::orderBy('file_number')->get(),
+            // Newest patients first. id is a time-ordered UUID (v7), so it is a
+            // stable tiebreak that also reflects creation order for same-timestamp rows.
+            'patients' => Patient::orderByDesc('created_at')->orderByDesc('id')->get(),
         ]);
     }
 
