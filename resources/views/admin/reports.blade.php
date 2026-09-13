@@ -79,6 +79,90 @@
         </x-ui.card>
     </div>
 
+    {{-- Surgeries report --}}
+    <x-ui.card class="mb-6">
+        <x-ui.card-header>
+            <div class="flex items-center gap-2">
+                @svg('lucide-activity', 'w-5 h-5 text-medical-blue')
+                <h2 class="font-bold text-gray-800 dark:text-white">تقرير العمليات</h2>
+            </div>
+        </x-ui.card-header>
+        <x-ui.card-content>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                @foreach ($surgeryReport['kpis'] as $k)
+                    <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800">
+                        <p class="text-sm text-gray-500">{{ $k['label'] }}</p>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white mt-1">{{ $k['value'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+            <div class="space-y-3">
+                @foreach ($surgeryReport['types'] as $t)
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-600 dark:text-gray-400">{{ $t['label'] }}</span>
+                            <span class="font-medium text-gray-800 dark:text-white">{{ $t['count'] }}</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div class="h-full bg-medical-blue rounded-full transition-all" style="width: {{ $t['percent'] }}%"></div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </x-ui.card-content>
+    </x-ui.card>
+
+    {{-- Staff + Payments reports --}}
+    <div class="grid lg:grid-cols-2 gap-6 mb-6">
+        <x-ui.card>
+            <x-ui.card-header>
+                <div class="flex items-center gap-2">
+                    @svg('lucide-users', 'w-5 h-5 text-medical-blue')
+                    <h2 class="font-bold text-gray-800 dark:text-white">تقرير الفريق الطبي</h2>
+                </div>
+            </x-ui.card-header>
+            <x-ui.card-content>
+                <div class="space-y-3">
+                    @foreach ($staffReport as $r)
+                        <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                            <span class="text-gray-600 dark:text-gray-400">{{ $r['label'] }}</span>
+                            <span class="font-bold text-gray-800 dark:text-white">{{ $r['count'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </x-ui.card-content>
+        </x-ui.card>
+
+        <x-ui.card>
+            <x-ui.card-header>
+                <div class="flex items-center gap-2">
+                    @svg('lucide-dollar-sign', 'w-5 h-5 text-medical-blue')
+                    <h2 class="font-bold text-gray-800 dark:text-white">تقرير المدفوعات</h2>
+                </div>
+            </x-ui.card-header>
+            <x-ui.card-content>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    @foreach ($paymentReport['kpis'] as $k)
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                            <p class="text-xs text-gray-500">{{ $k['label'] }}</p>
+                            <p class="text-lg font-bold text-gray-800 dark:text-white mt-1">{{ $k['value'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="space-y-2">
+                    @forelse ($paymentReport['methods'] as $m)
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600 dark:text-gray-400">{{ $m['label'] }}</span>
+                            <span class="font-medium text-gray-800 dark:text-white">{{ number_format($m['amount']) }} ج.م</span>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400">{{ __('noRecords') }}</p>
+                    @endforelse
+                </div>
+            </x-ui.card-content>
+        </x-ui.card>
+    </div>
+
     {{-- AI insights --}}
     <x-ui.card class="bg-gradient-to-r from-medical-blue to-medical-blue-dark text-white">
         <x-ui.card-content class="p-6">
