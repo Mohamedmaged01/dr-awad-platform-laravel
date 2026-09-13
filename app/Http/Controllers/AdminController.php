@@ -166,7 +166,61 @@ class AdminController extends Controller
             'kpis' => $kpis,
             'monthly' => $monthly,
             'distribution' => $distribution,
+            'surgeryReport' => $this->surgeryReport(),
+            'staffReport' => $this->staffReport(),
+            'paymentReport' => $this->paymentReport(),
         ]);
+    }
+
+    /** Surgeries report — totals, status split, and a breakdown by type. */
+    private function surgeryReport(): array
+    {
+        $typeLabels = ['laparoscopy' => 'مناظير', 'hysteroscopy' => 'منظار رحمي', 'cesarean' => 'قيصرية', 'natural_delivery' => 'ولادة طبيعية', 'other' => 'أخرى'];
+        $byType = Surgery::get(['surgery_type'])->groupBy('surgery_type')->map->count();
+        $total = max(Surgery::count(), 1);
+
+        return [
+            'kpis' => [
+                ['label' => 'إجمالي العمليات', 'value' => number_format(Surgery::count())],
+                ['label' => 'مكتملة', 'value' => number_format(Surgery::where('status', 'completed')->count())],
+                ['label' => 'مجدولة', 'value' => number_format(Surgery::where('status', 'scheduled')->count())],
+                ['label' => 'إجمالي التكلفة', 'value' => number_format((float) Surgery::sum('total_cost')) . ' ج.م'],
+            ],
+            'types' => collect($typeLabels)->map(fn ($lbl, $k) => [
+                'label' => $lbl,
+                'count' => (int) ($byType[$k] ?? 0),
+                'percent' => (int) round(($byType[$k] ?? 0) / $total * 100),
+            ])->values()->all(),
+        ];
+    }
+
+    /** Staff report — active team members per role (doctors, nurses, …). */
+    private function staffReport(): array
+    {
+        $byRole = User::whereIn('role', config('clinic.staff_roles'))->where('is_active', true)
+            ->get(['role'])->groupBy('role')->map->count();
+
+        return collect(config('clinic.staff_roles'))->map(fn ($role) => [
+            'label' => __(config("clinic.role_labels.$role")),
+            'count' => (int) ($byRole[$role] ?? 0),
+        ])->all();
+    }
+
+    /** Payments report — revenue totals and a split by payment method. */
+    private function paymentReport(): array
+    {
+        $byMethod = Payment::where('status', 'paid')->get(['payment_method', 'amount'])
+            ->groupBy(fn ($p) => $p->payment_method ?: 'أخرى')->map(fn ($g) => (float) $g->sum('amount'));
+
+        return [
+            'kpis' => [
+                ['label' => 'إجمالي الإيرادات', 'value' => number_format((float) Payment::where('status', 'paid')->sum('amount')) . ' ج.م'],
+                ['label' => 'مدفوعات هذا الشهر', 'value' => number_format((float) Payment::where('status', 'paid')->whereMonth('paid_at', now()->month)->whereYear('paid_at', now()->year)->sum('amount')) . ' ج.م'],
+                ['label' => 'فواتير مدفوعة', 'value' => number_format(Invoice::where('status', 'paid')->count())],
+                ['label' => 'فواتير معلقة', 'value' => number_format(Invoice::where('status', 'pending')->count())],
+            ],
+            'methods' => $byMethod->map(fn ($amount, $method) => ['label' => $method, 'amount' => $amount])->values()->all(),
+        ];
     }
 
     /* ---------------------------------------------------------------- Patients */
@@ -178,6 +232,32 @@ class AdminController extends Controller
             // stable tiebreak that also reflects creation order for same-timestamp rows.
             'patients' => Patient::orderByDesc('created_at')->orderByDesc('id')->get(),
         ]);
+    }
+
+    /** Download the patients list as a CSV (opens in Excel; UTF-8 BOM for Arabic). */
+    public function exportPatients()
+    {
+        $patients = Patient::orderByDesc('created_at')->orderByDesc('id')->get();
+        $filename = 'patients-' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($patients) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF"); // BOM so Excel renders Arabic correctly
+            fputcsv($out, ['رقم الملف', 'الاسم', 'الهاتف', 'البريد الإلكتروني', 'العمر', 'نوع الحالة', 'آخر زيارة', 'الحالة']);
+            foreach ($patients as $p) {
+                fputcsv($out, [
+                    $p->file_number,
+                    $p->name,
+                    $p->phone,
+                    $p->email,
+                    $p->age,
+                    $p->case_type,
+                    $p->last_visit,
+                    $p->demo_status === 'active' ? 'نشط' : 'مؤرشف',
+                ]);
+            }
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     public function storePatient(Request $request)

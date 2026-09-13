@@ -13,7 +13,7 @@
                 <p class="text-gray-500">إجمالي {{ $patients->count() }} مريضة</p>
             </div>
             <div class="flex gap-3">
-                <x-ui.button variant="outline">
+                <x-ui.button variant="outline" href="{{ route('admin.patients.export') }}">
                     <x-slot:leftIcon>@svg('lucide-download', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                     تصدير Excel
                 </x-ui.button>
