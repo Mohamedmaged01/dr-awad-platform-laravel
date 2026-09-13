@@ -1,7 +1,8 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="space-y-6" x-data="{ search: '', showAddModal: false, showEditModal: false, showPwModal: false, current: {}, pwTarget: {}, matches(t) { return this.search === '' || t.includes(this.search) } }">
+    <div class="space-y-6" x-data="{ search: '', status: 'all', showAddModal: false, showEditModal: false, showPwModal: false, current: {}, pwTarget: {},
+            matches(t, s) { return (this.search === '' || t.includes(this.search)) && (this.status === 'all' || this.status === s) } }">
         @if ($errors->has('password'))
             <div class="p-3 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-sm">{{ $errors->first('password') }}</div>
         @endif
@@ -32,11 +33,14 @@
                             <x-slot:leftIcon>@svg('lucide-search', 'w-[18px] h-[18px]')</x-slot:leftIcon>
                         </x-ui.input>
                     </div>
-                    <div class="flex gap-3">
-                        <x-ui.button variant="outline">
-                            <x-slot:leftIcon>@svg('lucide-filter', 'w-[18px] h-[18px]')</x-slot:leftIcon>
-                            تصفية
-                        </x-ui.button>
+                    <div class="flex items-center gap-2">
+                        @svg('lucide-filter', 'w-[18px] h-[18px] text-gray-400 flex-shrink-0')
+                        <select x-model="status"
+                                class="px-4 py-2.5 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                            <option value="all">كل الحالات</option>
+                            <option value="active">نشط</option>
+                            <option value="archived">مؤرشف</option>
+                        </select>
                     </div>
                 </div>
             </x-ui.card-content>
@@ -57,7 +61,7 @@
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                             @foreach ($patients as $patient)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-800"
-                                    x-show="matches(@js($patient->name . ' ' . $patient->file_number . ' ' . $patient->phone))">
+                                    x-show="matches(@js($patient->name . ' ' . $patient->file_number . ' ' . $patient->phone), @js($patient->demo_status))">
                                     <td class="px-6 py-4">
                                         <span class="font-mono text-medical-blue">{{ $patient->file_number }}</span>
                                     </td>
