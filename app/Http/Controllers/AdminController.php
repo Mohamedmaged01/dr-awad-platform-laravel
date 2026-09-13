@@ -254,25 +254,45 @@ class AdminController extends Controller
             'medical_history' => $history,
         ]);
 
-        // Admin sets/resets the patient's portal login password. If the patient
-        // has no login yet, one is created when a free email is available.
+        // Admin sets/resets the patient's portal login password from the editor.
         if (! empty($data['password'])) {
-            if ($patient->user) {
-                $patient->user->update(['password' => Hash::make($data['password'])]);
-            } elseif (! empty($patient->email) && ! User::where('email', $patient->email)->exists()) {
-                $user = User::create([
-                    'email' => $patient->email,
-                    'password' => Hash::make($data['password']),
-                    'role' => 'patient',
-                    'is_active' => true,
-                ]);
-                $patient->update(['user_id' => $user->id]);
-            } else {
-                throw ValidationException::withMessages(['password' => __('cannotSetPatientPassword')]);
-            }
+            $this->setPatientPassword($patient, $data['password']);
         }
 
         return back()->with('status', __('saved'));
+    }
+
+    /** Quick password change from the patients list (dedicated key-icon dialog). */
+    public function updatePatientPassword(Request $request, Patient $patient)
+    {
+        $data = $request->validate([
+            'password' => ['required', 'string', 'min:6'],
+        ]);
+
+        $this->setPatientPassword($patient, $data['password']);
+
+        return back()->with('status', __('passwordChanged'));
+    }
+
+    /**
+     * Set/reset a patient's portal login password. If the patient has no login
+     * yet, one is created when a free email is available; otherwise it errors.
+     */
+    private function setPatientPassword(Patient $patient, string $password): void
+    {
+        if ($patient->user) {
+            $patient->user->update(['password' => Hash::make($password)]);
+        } elseif (! empty($patient->email) && ! User::where('email', $patient->email)->exists()) {
+            $user = User::create([
+                'email' => $patient->email,
+                'password' => Hash::make($password),
+                'role' => 'patient',
+                'is_active' => true,
+            ]);
+            $patient->update(['user_id' => $user->id]);
+        } else {
+            throw ValidationException::withMessages(['password' => __('cannotSetPatientPassword')]);
+        }
     }
 
     public function destroyPatient(Patient $patient)

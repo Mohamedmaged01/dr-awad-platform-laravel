@@ -1,7 +1,10 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="space-y-6" x-data="{ search: '', showAddModal: false, showEditModal: false, current: {}, matches(t) { return this.search === '' || t.includes(this.search) } }">
+    <div class="space-y-6" x-data="{ search: '', showAddModal: false, showEditModal: false, showPwModal: false, current: {}, pwTarget: {}, matches(t) { return this.search === '' || t.includes(this.search) } }">
+        @if ($errors->has('password'))
+            <div class="p-3 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-sm">{{ $errors->first('password') }}</div>
+        @endif
         {{-- Header --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -108,6 +111,14 @@
                                                     ]) }}; showEditModal = true">
                                                 @svg('lucide-edit', 'w-[18px] h-[18px] text-gray-500')
                                             </button>
+                                            <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="تغيير كلمة المرور"
+                                                    x-on:click="pwTarget = {{ Js::from([
+                                                        'id' => $patient->id,
+                                                        'name' => $patient->name,
+                                                        'has_login' => (bool) $patient->user_id,
+                                                    ]) }}; showPwModal = true">
+                                                @svg('lucide-key-round', 'w-[18px] h-[18px] text-medical-blue')
+                                            </button>
                                             <form method="POST" action="{{ route('admin.patients.destroy', $patient->id) }}"
                                                   onsubmit="return confirm('{{ __('confirmDelete') }}')">
                                                 @csrf @method('DELETE')
@@ -208,6 +219,29 @@
                         <div class="flex justify-end gap-3 pt-4">
                             <x-ui.button type="button" variant="outline" x-on:click="showEditModal = false">إلغاء</x-ui.button>
                             <x-ui.button type="submit" variant="primary">حفظ التغييرات</x-ui.button>
+                        </div>
+                    </form>
+                </x-ui.card-content>
+            </x-ui.card>
+        </div>
+
+        {{-- Password Modal (quick key-icon action) --}}
+        <div x-show="showPwModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <x-ui.card class="w-full max-w-md">
+                <x-ui.card-header class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-white">تغيير كلمة المرور</h2>
+                    <button @click="showPwModal = false" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">✕</button>
+                </x-ui.card-header>
+                <x-ui.card-content>
+                    <form class="space-y-4" method="POST" :action="'{{ url('/admin/patients') }}/' + pwTarget.id + '/password'">
+                        @csrf @method('PUT')
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300" x-text="pwTarget.name"></p>
+                        <x-ui.input label="كلمة المرور الجديدة" name="password" type="password" autocomplete="new-password" required minlength="6" />
+                        <p class="text-xs text-gray-400"
+                           x-text="pwTarget.has_login ? 'سيتم إعادة تعيين كلمة مرور دخول المريضة.' : 'سيتم إنشاء حساب دخول للمريضة (يتطلب بريدًا إلكترونيًا غير مستخدم).'"></p>
+                        <div class="flex justify-end gap-3 pt-4">
+                            <x-ui.button type="button" variant="outline" x-on:click="showPwModal = false">إلغاء</x-ui.button>
+                            <x-ui.button type="submit" variant="primary">حفظ</x-ui.button>
                         </div>
                     </form>
                 </x-ui.card-content>

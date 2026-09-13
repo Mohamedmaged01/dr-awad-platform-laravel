@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 // Patients & appointments
 Route::post('/patients', [AdminController::class, 'storePatient'])->name('patients.store');
 Route::put('/patients/{patient}', [AdminController::class, 'updatePatient'])->name('patients.update');
+Route::put('/patients/{patient}/password', [AdminController::class, 'updatePatientPassword'])->name('patients.password');
 Route::delete('/patients/{patient}', [AdminController::class, 'destroyPatient'])->name('patients.destroy');
 
 Route::post('/appointments', [AdminController::class, 'storeAppointment'])->name('appointments.store');
