@@ -21,10 +21,20 @@ class PublicController extends Controller
             'aboutAchievements' => $this->aboutAchievements($en) ?: ClinicData::aboutAchievements(),
             'aboutHighlights' => $this->aboutList('about_highlights', $en) ?: ClinicData::aboutHighlights(),
             'testimonials' => ClinicData::testimonials(),
+            'homeArticles' => $this->homeArticles(),
             'bookingBranches' => $this->branchOptions(),
             'bookingServices' => $this->serviceOptions(),
             'faqs' => ClinicData::faqs(),
         ]);
+    }
+
+    /** Latest 3 published articles for the home blog teaser; ClinicData fallback. */
+    private function homeArticles(): array
+    {
+        $articles = Content::where('type', 'article')->where('is_published', true)->latest()->take(3)->get()
+            ->map(fn (Content $c) => $this->mapArticle($c))->all();
+
+        return $articles ?: array_slice(ClinicData::articles(), 0, 3);
     }
 
     /** Decode the editable home credential cards into locale-aware rows. */
