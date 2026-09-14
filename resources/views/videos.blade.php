@@ -89,41 +89,10 @@
                                         </span>
                                     @endif
                                 </div>
-                                @if (!empty($video['youtube']))
-                                    <a href="https://www.youtube.com/watch?v={{ $video['youtube'] }}" target="_blank" rel="noopener noreferrer"
-                                       class="text-medical-blue font-medium hover:underline flex items-center gap-1">
-                                        {{ __('watchOnYoutube') }}
-                                        @svg('lucide-play', 'w-3.5 h-3.5')
-                                    </a>
-                                @endif
                             </div>
                         </div>
                     </article>
                 @endforeach
-            </div>
-        </div>
-    </section>
-
-    {{-- Subscribe CTA --}}
-    <section class="py-16 bg-gradient-to-r from-red-600 to-red-700">
-        <div class="container-custom text-center text-white">
-            <div class="max-w-2xl mx-auto">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 mb-6">
-                    <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                </div>
-                <h2 class="text-3xl font-bold mb-4">{{ __('subscribeChannelTitle') }}</h2>
-                <p class="text-white/80 text-lg mb-8">
-                    {{ __('subscribeChannelDesc') }}
-                </p>
-                <a href="{{ config('clinic.contact.youtube') }}" target="_blank" rel="noopener noreferrer"
-                   class="inline-flex items-center gap-3 bg-white text-red-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                    {{ __('subscribeNow') }}
-                </a>
             </div>
         </div>
     </section>

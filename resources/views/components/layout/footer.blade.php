@@ -15,9 +15,6 @@
     ];
     $social = collect(json_decode(\App\Models\Setting::get('social_links', '[]'), true) ?: [])
         ->filter(fn ($l) => ! empty($l['url']) && isset($socialSvg[$l['platform'] ?? '']));
-    if (! $social->contains('platform', 'youtube') && ! empty($contact['youtube'])) {
-        $social->push(['platform' => 'youtube', 'url' => $contact['youtube']]);
-    }
 @endphp
 <footer class="bg-gray-900 text-white">
     {{-- Main Footer --}}
