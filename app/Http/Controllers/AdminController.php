@@ -223,6 +223,105 @@ class AdminController extends Controller
         ];
     }
 
+    /**
+     * Export a detailed report as a CSV (opens in Excel), optionally limited to a
+     * date range. `type` selects the dataset: patients | staff | surgeries | payments.
+     */
+    public function exportReport(Request $request)
+    {
+        $type = $request->query('type', 'patients');
+        $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : null;
+        $to = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : null;
+
+        [$name, $headers, $rows] = match ($type) {
+            'staff' => $this->reportStaffRows($from, $to),
+            'surgeries' => $this->reportSurgeryRows($from, $to),
+            'payments' => $this->reportPaymentRows($from, $to),
+            default => $this->reportPatientRows($from, $to),
+        };
+
+        $suffix = ($from ? $from->format('Ymd') : 'all') . '-' . ($to ? $to->format('Ymd') : 'all');
+        $filename = "report-{$name}-{$suffix}.csv";
+
+        return response()->streamDownload(function () use ($headers, $rows) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF"); // BOM for Arabic in Excel
+            fputcsv($out, $headers);
+            foreach ($rows as $r) {
+                fputcsv($out, $r);
+            }
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    private function reportPatientRows(?Carbon $from, ?Carbon $to): array
+    {
+        $q = Patient::orderByDesc('created_at');
+        $from && $q->where('created_at', '>=', $from);
+        $to && $q->where('created_at', '<=', $to);
+
+        $rows = $q->get()->map(fn (Patient $p) => [
+            $p->file_number, $p->name, $p->phone, $p->email, $p->age, $p->case_type,
+            $p->last_visit, $p->demo_status === 'active' ? 'نشط' : 'مؤرشف',
+            optional($p->created_at)->format('Y-m-d H:i'),
+        ])->all();
+
+        return ['patients', ['رقم الملف', 'الاسم', 'الهاتف', 'البريد الإلكتروني', 'العمر', 'نوع الحالة', 'آخر زيارة', 'الحالة', 'تاريخ الإضافة'], $rows];
+    }
+
+    private function reportStaffRows(?Carbon $from, ?Carbon $to): array
+    {
+        $labels = config('clinic.role_labels');
+        $q = Staff::with('user')->orderByDesc('created_at');
+        $from && $q->where('created_at', '>=', $from);
+        $to && $q->where('created_at', '<=', $to);
+
+        $rows = $q->get()->map(fn (Staff $s) => [
+            $s->name,
+            isset($labels[$s->user?->role]) ? __($labels[$s->user->role]) : ($s->user?->role ?? ''),
+            $s->title, $s->phone, $s->user?->email,
+            $s->is_available ? 'متاح' : 'غير متاح',
+            optional($s->created_at)->format('Y-m-d H:i'),
+        ])->all();
+
+        return ['staff', ['الاسم', 'الدور', 'المسمى الوظيفي', 'الهاتف', 'البريد الإلكتروني', 'الحالة', 'تاريخ الإضافة'], $rows];
+    }
+
+    private function reportSurgeryRows(?Carbon $from, ?Carbon $to): array
+    {
+        $typeLabels = ['laparoscopy' => 'مناظير', 'hysteroscopy' => 'منظار رحمي', 'cesarean' => 'قيصرية', 'natural_delivery' => 'ولادة طبيعية', 'other' => 'أخرى'];
+        $statusLabels = ['scheduled' => 'مجدولة', 'pending' => 'معلقة', 'completed' => 'مكتملة', 'cancelled' => 'ملغية'];
+        $q = Surgery::with(['patient' => fn ($x) => $x->withTrashed(), 'staff' => fn ($x) => $x->withTrashed()])->orderByDesc('scheduled_date');
+        $from && $q->where('scheduled_date', '>=', $from);
+        $to && $q->where('scheduled_date', '<=', $to);
+
+        $rows = $q->get()->map(fn (Surgery $s) => [
+            $s->patient?->name ?? '—', $s->patient?->file_number ?? '',
+            $s->surgery_name, $typeLabels[$s->surgery_type] ?? $s->surgery_type,
+            optional($s->scheduled_date)->format('Y-m-d'), optional($s->scheduled_date)->format('H:i'),
+            $s->staff?->name ?? 'د. محمد عوض', number_format((float) $s->total_cost),
+            $statusLabels[$s->status] ?? $s->status,
+        ])->all();
+
+        return ['surgeries', ['المريضة', 'رقم الملف', 'العملية', 'النوع', 'التاريخ', 'الوقت', 'الطبيب', 'التكلفة', 'الحالة'], $rows];
+    }
+
+    private function reportPaymentRows(?Carbon $from, ?Carbon $to): array
+    {
+        $q = Payment::with('invoice.patient')->orderByDesc('paid_at');
+        $from && $q->where('paid_at', '>=', $from);
+        $to && $q->where('paid_at', '<=', $to);
+
+        $rows = $q->get()->map(fn (Payment $p) => [
+            $p->invoice?->invoice_number ?? '', $p->invoice?->patient?->name ?? '—',
+            number_format((float) $p->amount), $p->payment_method,
+            $p->status === 'paid' ? 'مدفوع' : $p->status,
+            optional($p->paid_at)->format('Y-m-d H:i'),
+        ])->all();
+
+        return ['payments', ['رقم الفاتورة', 'المريضة', 'المبلغ', 'طريقة الدفع', 'الحالة', 'تاريخ الدفع'], $rows];
+    }
+
     /* ---------------------------------------------------------------- Patients */
 
     public function patients()

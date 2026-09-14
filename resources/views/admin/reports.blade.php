@@ -25,6 +25,45 @@
         </x-slot:actions>
     </x-admin.page-header>
 
+    {{-- Export detailed reports (Excel/CSV) with an optional date range --}}
+    <x-ui.card class="mb-6">
+        <x-ui.card-header>
+            <div class="flex items-center gap-2">
+                @svg('lucide-download', 'w-5 h-5 text-medical-blue')
+                <h2 class="font-bold text-gray-800 dark:text-white">تصدير التقارير التفصيلية (Excel)</h2>
+            </div>
+        </x-ui.card-header>
+        <x-ui.card-content>
+            <form method="GET" action="{{ url('/admin/reports/export') }}" class="space-y-4">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label class="block text-sm text-gray-500 mb-1">من تاريخ</label>
+                        <input type="date" name="from" class="w-full px-4 py-2.5 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm text-gray-500 mb-1">إلى تاريخ</label>
+                        <input type="date" name="to" class="w-full px-4 py-2.5 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-blue">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400">اتركي التاريخ فارغًا لتصدير كل السجلات. كل ملف يحتوي على التفاصيل الكاملة (بما في ذلك التاريخ والوقت).</p>
+                <div class="flex flex-wrap gap-3">
+                    <button type="submit" name="type" value="patients" class="inline-flex items-center gap-2 bg-medical-blue text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-medical-blue-dark transition-colors">
+                        @svg('lucide-users', 'w-4 h-4') تصدير المريضات
+                    </button>
+                    <button type="submit" name="type" value="staff" class="inline-flex items-center gap-2 bg-purple-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+                        @svg('lucide-user-cog', 'w-4 h-4') تصدير الفريق الطبي
+                    </button>
+                    <button type="submit" name="type" value="surgeries" class="inline-flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
+                        @svg('lucide-activity', 'w-4 h-4') تصدير العمليات
+                    </button>
+                    <button type="submit" name="type" value="payments" class="inline-flex items-center gap-2 bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
+                        @svg('lucide-dollar-sign', 'w-4 h-4') تصدير المدفوعات
+                    </button>
+                </div>
+            </form>
+        </x-ui.card-content>
+    </x-ui.card>
+
     {{-- KPIs --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         @foreach ($kpis as $k)

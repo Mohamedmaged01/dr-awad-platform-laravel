@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 // Patients & appointments
 Route::get('/patients/export', [AdminController::class, 'exportPatients'])->name('patients.export');
+Route::get('/reports/export', [AdminController::class, 'exportReport'])->name('reports.export');
 Route::post('/patients', [AdminController::class, 'storePatient'])->name('patients.store');
 Route::put('/patients/{patient}', [AdminController::class, 'updatePatient'])->name('patients.update');
 Route::put('/patients/{patient}/password', [AdminController::class, 'updatePatientPassword'])->name('patients.password');
