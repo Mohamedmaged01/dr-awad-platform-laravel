@@ -60,7 +60,7 @@ class PatientAuthController extends Controller
             // Attach to an existing patient file (matched by phone) or create a new one.
             $patient = Patient::where('phone', $data['phone'])->whereNull('user_id')->first()
                 ?? new Patient([
-                    'file_number' => $fileNumber ?: ('P' . now()->format('Y') . str_pad((string) (Patient::count() + 1), 4, '0', STR_PAD_LEFT)),
+                    'file_number' => $fileNumber ?: Patient::generateFileNumber(),
                 ]);
 
             $patient->fill([

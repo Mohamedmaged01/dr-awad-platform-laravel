@@ -95,7 +95,7 @@ class PublicFormController extends Controller
         $parts = preg_split('/\s+/', trim($name), 2);
 
         return Patient::create([
-            'file_number' => 'P' . now()->format('Y') . str_pad((string) (Patient::count() + 1), 4, '0', STR_PAD_LEFT),
+            'file_number' => Patient::generateFileNumber(),
             'first_name_ar' => $parts[0] ?? $name,
             'last_name_ar' => $parts[1] ?? '',
             'phone' => $phone,

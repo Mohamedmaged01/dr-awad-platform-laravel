@@ -1176,15 +1176,7 @@ class AdminController extends Controller
 
     private function generateFileNumber(): string
     {
-        $year = now()->format('Y');
-        $seq = Patient::withTrashed()->count() + 1;
-
-        do {
-            $candidate = 'P' . $year . str_pad((string) $seq, 3, '0', STR_PAD_LEFT);
-            $seq++;
-        } while (Patient::withTrashed()->where('file_number', $candidate)->exists());
-
-        return $candidate;
+        return Patient::generateFileNumber();
     }
 
     private function generateInvoiceNumber(): string

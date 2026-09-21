@@ -38,6 +38,24 @@ class Patient extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * A unique file number (P{year}{seq}). Checks against trashed rows too, since
+     * the unique index still covers soft-deleted patients — otherwise a count-based
+     * scheme collides after any deletion.
+     */
+    public static function generateFileNumber(): string
+    {
+        $year = now()->format('Y');
+        $seq = self::withTrashed()->count() + 1;
+
+        do {
+            $candidate = 'P' . $year . str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
+            $seq++;
+        } while (self::withTrashed()->where('file_number', $candidate)->exists());
+
+        return $candidate;
+    }
+
     /** Display name used across the admin tables. */
     public function getNameAttribute(): string
     {
