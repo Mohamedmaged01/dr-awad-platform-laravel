@@ -65,6 +65,12 @@
                     <button type="submit" name="type" value="ivf" class="inline-flex items-center gap-2 bg-pink-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-pink-700 transition-colors">
                         @svg('lucide-baby', 'w-4 h-4') تصدير الحقن المجهري
                     </button>
+                    <button type="submit" name="type" value="patients_check" class="inline-flex items-center gap-2 bg-teal-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
+                        @svg('lucide-user-check', 'w-4 h-4') مريضات الكشف
+                    </button>
+                    <button type="submit" name="type" value="patients_surgery" class="inline-flex items-center gap-2 bg-rose-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-rose-700 transition-colors">
+                        @svg('lucide-scissors', 'w-4 h-4') مريضات العمليات
+                    </button>
                 </div>
             </form>
         </x-ui.card-content>
@@ -123,6 +129,26 @@
             </x-ui.card-content>
         </x-ui.card>
     </div>
+
+    {{-- Patients by type (كشف / عمليات / حقن مجهري) --}}
+    <x-ui.card class="mb-6">
+        <x-ui.card-header>
+            <div class="flex items-center gap-2">
+                @svg('lucide-users', 'w-5 h-5 text-medical-blue')
+                <h2 class="font-bold text-gray-800 dark:text-white">تقرير المريضات حسب النوع</h2>
+            </div>
+        </x-ui.card-header>
+        <x-ui.card-content>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                @foreach ($patientTypeReport as $r)
+                    <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800">
+                        <p class="text-sm text-gray-500">{{ $r['label'] }}</p>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white mt-1">{{ $r['value'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </x-ui.card-content>
+    </x-ui.card>
 
     {{-- Consultations (الكشف) + IVF (الحقن المجهري) case reports --}}
     <div class="grid lg:grid-cols-2 gap-6 mb-6">

@@ -28,6 +28,11 @@ class Patient extends Model
         return $this->hasMany(IvfCycle::class);
     }
 
+    public function surgeries()
+    {
+        return $this->hasMany(Surgery::class);
+    }
+
     public function medicalRecords()
     {
         return $this->hasMany(MedicalRecord::class);

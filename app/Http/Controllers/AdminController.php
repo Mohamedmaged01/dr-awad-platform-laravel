@@ -171,7 +171,19 @@ class AdminController extends Controller
             'paymentReport' => $this->paymentReport(),
             'appointmentReport' => $this->appointmentReport(),
             'ivfReport' => $this->ivfReport(),
+            'patientTypeReport' => $this->patientTypeReport(),
         ]);
+    }
+
+    /** Patients split by type — consultation (كشف), surgery, and IVF. */
+    private function patientTypeReport(): array
+    {
+        return [
+            ['label' => 'إجمالي المريضات', 'value' => number_format(Patient::count())],
+            ['label' => 'مريضات الكشف', 'value' => number_format(Patient::whereHas('appointments')->count())],
+            ['label' => 'مريضات العمليات', 'value' => number_format(Patient::whereHas('surgeries')->count())],
+            ['label' => 'مريضات الحقن المجهري', 'value' => number_format(Patient::whereHas('ivfCycles')->count())],
+        ];
     }
 
     /** Consultations (الكشف) report — cases by status. */
@@ -279,6 +291,8 @@ class AdminController extends Controller
             'payments' => $this->reportPaymentRows($from, $to),
             'appointments' => $this->reportAppointmentRows($from, $to),
             'ivf' => $this->reportIvfRows($from, $to),
+            'patients_check' => $this->reportCheckPatientRows($from, $to),
+            'patients_surgery' => $this->reportSurgeryPatientRows($from, $to),
             default => $this->reportPatientRows($from, $to),
         };
 
@@ -346,6 +360,43 @@ class AdminController extends Controller
         ])->all();
 
         return ['surgeries', ['المريضة', 'رقم الملف', 'العملية', 'النوع', 'التاريخ', 'الوقت', 'الطبيب', 'التكلفة', 'الحالة'], $rows];
+    }
+
+    /** Consultation patients — those with appointments (optionally within a range). */
+    private function reportCheckPatientRows(?Carbon $from, ?Carbon $to): array
+    {
+        $dateFilter = function ($q) use ($from, $to) {
+            $from && $q->where('appointment_date', '>=', $from);
+            $to && $q->where('appointment_date', '<=', $to);
+        };
+
+        $rows = Patient::whereHas('appointments', $dateFilter)
+            ->withCount(['appointments as visits' => $dateFilter])
+            ->orderByDesc('created_at')->get()
+            ->map(fn (Patient $p) => [
+                $p->file_number, $p->name, $p->phone, $p->age, $p->case_type, $p->visits, $p->last_visit,
+            ])->all();
+
+        return ['patients-check', ['رقم الملف', 'الاسم', 'الهاتف', 'العمر', 'نوع الحالة', 'عدد الكشوفات', 'آخر زيارة'], $rows];
+    }
+
+    /** Surgery patients — those with surgeries (optionally within a range). */
+    private function reportSurgeryPatientRows(?Carbon $from, ?Carbon $to): array
+    {
+        $dateFilter = function ($q) use ($from, $to) {
+            $from && $q->where('scheduled_date', '>=', $from);
+            $to && $q->where('scheduled_date', '<=', $to);
+        };
+
+        $rows = Patient::whereHas('surgeries', $dateFilter)
+            ->withCount(['surgeries as ops' => $dateFilter])
+            ->withSum(['surgeries as ops_cost' => $dateFilter], 'total_cost')
+            ->orderByDesc('created_at')->get()
+            ->map(fn (Patient $p) => [
+                $p->file_number, $p->name, $p->phone, $p->age, $p->ops, number_format((float) $p->ops_cost),
+            ])->all();
+
+        return ['patients-surgery', ['رقم الملف', 'الاسم', 'الهاتف', 'العمر', 'عدد العمليات', 'إجمالي التكلفة'], $rows];
     }
 
     private function reportAppointmentRows(?Carbon $from, ?Carbon $to): array
