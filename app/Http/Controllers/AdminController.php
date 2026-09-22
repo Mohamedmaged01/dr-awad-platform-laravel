@@ -169,7 +169,47 @@ class AdminController extends Controller
             'surgeryReport' => $this->surgeryReport(),
             'staffReport' => $this->staffReport(),
             'paymentReport' => $this->paymentReport(),
+            'appointmentReport' => $this->appointmentReport(),
+            'ivfReport' => $this->ivfReport(),
         ]);
+    }
+
+    /** Consultations (الكشف) report — cases by status. */
+    private function appointmentReport(): array
+    {
+        $labels = ['pending' => 'معلق', 'confirmed' => 'مؤكد', 'waiting' => 'في الانتظار', 'completed' => 'مكتمل', 'cancelled' => 'ملغي', 'no_show' => 'لم يحضر'];
+        $byStatus = Appointment::get(['status'])->groupBy('status')->map->count();
+        $total = max(Appointment::count(), 1);
+
+        return collect($labels)->map(fn ($lbl, $key) => [
+            'label' => $lbl,
+            'count' => (int) ($byStatus[$key] ?? 0),
+            'percent' => (int) round(($byStatus[$key] ?? 0) / $total * 100),
+        ])->values()->all();
+    }
+
+    /** IVF (الحقن المجهري) report — cycles by stage + success. */
+    private function ivfReport(): array
+    {
+        $stageLabels = ['consultation' => 'استشارة', 'stimulation' => 'تنشيط', 'egg_retrieval' => 'سحب البويضات', 'fertilization' => 'التخصيب', 'embryo_transfer' => 'زرع الأجنة', 'pregnancy_test' => 'تحليل الحمل', 'completed' => 'مكتملة'];
+        $byStage = IvfCycle::get(['current_stage'])->groupBy('current_stage')->map->count();
+        $total = max(IvfCycle::count(), 1);
+        $completed = IvfCycle::where('current_stage', 'completed')->count();
+        $pregnant = IvfCycle::where('is_pregnant', true)->count();
+
+        return [
+            'kpis' => [
+                ['label' => 'إجمالي الدورات', 'value' => number_format(IvfCycle::count())],
+                ['label' => 'دورات نشطة', 'value' => number_format(IvfCycle::where('current_stage', '!=', 'completed')->count())],
+                ['label' => 'حالات حمل', 'value' => number_format($pregnant)],
+                ['label' => 'نسبة النجاح', 'value' => $completed > 0 ? round($pregnant / $completed * 100) . '%' : '—'],
+            ],
+            'stages' => collect($stageLabels)->map(fn ($lbl, $key) => [
+                'label' => $lbl,
+                'count' => (int) ($byStage[$key] ?? 0),
+                'percent' => (int) round(($byStage[$key] ?? 0) / $total * 100),
+            ])->values()->all(),
+        ];
     }
 
     /** Surgeries report — totals, status split, and a breakdown by type. */
@@ -237,6 +277,8 @@ class AdminController extends Controller
             'staff' => $this->reportStaffRows($from, $to),
             'surgeries' => $this->reportSurgeryRows($from, $to),
             'payments' => $this->reportPaymentRows($from, $to),
+            'appointments' => $this->reportAppointmentRows($from, $to),
+            'ivf' => $this->reportIvfRows($from, $to),
             default => $this->reportPatientRows($from, $to),
         };
 
@@ -304,6 +346,48 @@ class AdminController extends Controller
         ])->all();
 
         return ['surgeries', ['المريضة', 'رقم الملف', 'العملية', 'النوع', 'التاريخ', 'الوقت', 'الطبيب', 'التكلفة', 'الحالة'], $rows];
+    }
+
+    private function reportAppointmentRows(?Carbon $from, ?Carbon $to): array
+    {
+        $statusLabels = ['pending' => 'معلق', 'confirmed' => 'مؤكد', 'waiting' => 'في الانتظار', 'completed' => 'مكتمل', 'cancelled' => 'ملغي', 'no_show' => 'لم يحضر'];
+        $q = Appointment::with([
+            'patient' => fn ($x) => $x->withTrashed(),
+            'branch' => fn ($x) => $x->withTrashed(),
+            'service' => fn ($x) => $x->withTrashed(),
+        ])->orderByDesc('appointment_date');
+        $from && $q->where('appointment_date', '>=', $from);
+        $to && $q->where('appointment_date', '<=', $to);
+
+        $rows = $q->get()->map(fn (Appointment $a) => [
+            $a->patient?->name ?? '—', $a->patient?->phone ?? '',
+            $a->branch?->name_ar ?? '', $a->service?->name_ar ?? '',
+            optional($a->appointment_date)->format('Y-m-d'), $a->time_label,
+            $statusLabels[$a->status] ?? $a->status,
+            $a->notes ?: $a->patient_notes,
+        ])->all();
+
+        return ['appointments', ['المريضة', 'الهاتف', 'الفرع', 'الخدمة', 'التاريخ', 'الوقت', 'الحالة', 'ملاحظات'], $rows];
+    }
+
+    private function reportIvfRows(?Carbon $from, ?Carbon $to): array
+    {
+        $stageLabels = ['consultation' => 'استشارة', 'stimulation' => 'تنشيط', 'egg_retrieval' => 'سحب البويضات', 'fertilization' => 'التخصيب', 'embryo_transfer' => 'زرع الأجنة', 'pregnancy_test' => 'تحليل الحمل', 'completed' => 'مكتملة'];
+        $q = IvfCycle::with(['patient' => fn ($x) => $x->withTrashed(), 'latestFollowup'])->orderByDesc('start_date');
+        $from && $q->where('start_date', '>=', $from);
+        $to && $q->where('start_date', '<=', $to);
+
+        $rows = $q->get()->map(fn (IvfCycle $c) => [
+            $c->patient?->name ?? '—',
+            $c->cycle_number, strtoupper((string) $c->cycle_type), $c->protocol,
+            $stageLabels[$c->current_stage] ?? $c->current_stage,
+            optional($c->start_date)->format('Y-m-d'),
+            $c->latestFollowup?->day_of_cycle,
+            optional($c->latestFollowup?->next_appointment)->format('Y-m-d'),
+            $c->is_pregnant === null ? '—' : ($c->is_pregnant ? 'نعم' : 'لا'),
+        ])->all();
+
+        return ['ivf', ['المريضة', 'رقم الدورة', 'النوع', 'البروتوكول', 'المرحلة', 'تاريخ البدء', 'يوم الدورة', 'الموعد القادم', 'حمل'], $rows];
     }
 
     private function reportPaymentRows(?Carbon $from, ?Carbon $to): array

@@ -59,6 +59,12 @@
                     <button type="submit" name="type" value="payments" class="inline-flex items-center gap-2 bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
                         @svg('lucide-dollar-sign', 'w-4 h-4') تصدير المدفوعات
                     </button>
+                    <button type="submit" name="type" value="appointments" class="inline-flex items-center gap-2 bg-cyan-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors">
+                        @svg('lucide-calendar-check', 'w-4 h-4') تصدير الكشوفات
+                    </button>
+                    <button type="submit" name="type" value="ivf" class="inline-flex items-center gap-2 bg-pink-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-pink-700 transition-colors">
+                        @svg('lucide-baby', 'w-4 h-4') تصدير الحقن المجهري
+                    </button>
                 </div>
             </form>
         </x-ui.card-content>
@@ -111,6 +117,65 @@
                                 <span class="text-gray-600 dark:text-gray-400">{{ $d['label'] }}</span>
                             </div>
                             <span class="font-medium text-gray-800 dark:text-white">{{ $d['percent'] }}%</span>
+                        </div>
+                    @endforeach
+                </div>
+            </x-ui.card-content>
+        </x-ui.card>
+    </div>
+
+    {{-- Consultations (الكشف) + IVF (الحقن المجهري) case reports --}}
+    <div class="grid lg:grid-cols-2 gap-6 mb-6">
+        <x-ui.card>
+            <x-ui.card-header>
+                <div class="flex items-center gap-2">
+                    @svg('lucide-calendar-check', 'w-5 h-5 text-medical-blue')
+                    <h2 class="font-bold text-gray-800 dark:text-white">تقرير الكشف (حالات المواعيد)</h2>
+                </div>
+            </x-ui.card-header>
+            <x-ui.card-content>
+                <div class="space-y-3">
+                    @foreach ($appointmentReport as $r)
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600 dark:text-gray-400">{{ $r['label'] }}</span>
+                                <span class="font-medium text-gray-800 dark:text-white">{{ $r['count'] }}</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-medical-blue rounded-full transition-all" style="width: {{ $r['percent'] }}%"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </x-ui.card-content>
+        </x-ui.card>
+
+        <x-ui.card>
+            <x-ui.card-header>
+                <div class="flex items-center gap-2">
+                    @svg('lucide-baby', 'w-5 h-5 text-medical-blue')
+                    <h2 class="font-bold text-gray-800 dark:text-white">تقرير الحقن المجهري</h2>
+                </div>
+            </x-ui.card-header>
+            <x-ui.card-content>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    @foreach ($ivfReport['kpis'] as $k)
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                            <p class="text-xs text-gray-500">{{ $k['label'] }}</p>
+                            <p class="text-lg font-bold text-gray-800 dark:text-white mt-1">{{ $k['value'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="space-y-3">
+                    @foreach ($ivfReport['stages'] as $s)
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600 dark:text-gray-400">{{ $s['label'] }}</span>
+                                <span class="font-medium text-gray-800 dark:text-white">{{ $s['count'] }}</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-pink-500 rounded-full transition-all" style="width: {{ $s['percent'] }}%"></div>
+                            </div>
                         </div>
                     @endforeach
                 </div>
