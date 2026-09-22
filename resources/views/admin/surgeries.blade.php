@@ -118,6 +118,11 @@
         </x-ui.card-content>
     </x-ui.card>
 
+    {{-- Doctor suggestions shared by the add/edit forms (choose one or type a new name) --}}
+    <datalist id="surgeonList">
+        @foreach ($doctorOptions as $d)<option value="{{ $d }}"></option>@endforeach
+    </datalist>
+
     {{-- Add modal --}}
     <x-admin.modal :title="__('add_new')" var="addOpen" max-width="max-w-2xl">
         <form method="POST" action="{{ route('admin.surgeries.store') }}" class="grid md:grid-cols-2 gap-4">
@@ -131,6 +136,10 @@
             <x-ui.input :label="__('time')" name="time" type="time" value="09:00" />
             <x-ui.input :label="__('cost')" name="total_cost" type="number" min="0" />
             <x-ui.select :label="__('status')" name="status" :options="$statusOptions" />
+            <x-ui.input :label="__('doctor')" name="doctor_name" list="surgeonList" :placeholder="__('chooseOrTypeDoctor')" />
+            <div class="md:col-span-2">
+                <x-ui.textarea :label="__('surgeryDescription')" name="notes" rows="3" />
+            </div>
             <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                 <x-ui.button type="button" variant="outline" size="sm" x-on:click="addOpen = false">{{ __('cancel') }}</x-ui.button>
                 <x-ui.button type="submit" variant="primary" size="sm">{{ __('save') }}</x-ui.button>
@@ -151,6 +160,10 @@
             <x-ui.input :label="__('time')" name="time" type="time" x-model="current.time" />
             <x-ui.input :label="__('cost')" name="total_cost" type="number" min="0" x-model="current.cost" />
             <x-ui.select :label="__('status')" name="status" :options="$statusOptions" x-model="current.status" />
+            <x-ui.input :label="__('doctor')" name="doctor_name" list="surgeonList" x-model="current.doctor_name" :placeholder="__('chooseOrTypeDoctor')" />
+            <div class="md:col-span-2">
+                <x-ui.textarea :label="__('surgeryDescription')" name="notes" rows="3" x-model="current.description" />
+            </div>
             <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                 <x-ui.button type="button" variant="outline" size="sm" x-on:click="editOpen = false">{{ __('cancel') }}</x-ui.button>
                 <x-ui.button type="submit" variant="primary" size="sm">{{ __('save_changes') }}</x-ui.button>
@@ -165,6 +178,8 @@
             <p><span class="text-gray-500">{{ __('surgery_name') }}:</span> <span class="font-medium" x-text="current.operation"></span></p>
             <p><span class="text-gray-500">{{ __('date') }}:</span> <span class="font-medium" x-text="current.date + ' - ' + current.time"></span></p>
             <p><span class="text-gray-500">{{ __('cost') }}:</span> <span class="font-medium text-medical-blue" x-text="current.cost"></span> {{ __('egp') }}</p>
+            <p><span class="text-gray-500">{{ __('doctor') }}:</span> <span class="font-medium" x-text="current.doctor"></span></p>
+            <p x-show="current.description"><span class="text-gray-500">{{ __('surgeryDescription') }}:</span> <span class="font-medium" x-text="current.description"></span></p>
         </div>
     </x-admin.modal>
 </div>

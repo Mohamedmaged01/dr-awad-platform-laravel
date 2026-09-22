@@ -15,8 +15,15 @@ class IvfCycle extends Model
 
     protected $casts = [
         'start_date' => 'date',
+        'stimulation_start_date' => 'date',
+        'stimulation_end_date' => 'date',
+        'egg_retrieval_date' => 'date',
+        'fertilization_date' => 'date',
+        'embryo_transfer_date' => 'date',
+        'pregnancy_test_date' => 'date',
         'medications' => 'array',
         'is_pregnant' => 'boolean',
+        'is_frozen' => 'boolean',
     ];
 
     public function patient()

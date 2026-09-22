@@ -377,17 +377,23 @@ class AdminController extends Controller
         $from && $q->where('start_date', '>=', $from);
         $to && $q->where('start_date', '<=', $to);
 
+        $doseLabels = ['normal' => 'عادية', 'full' => 'كاملة'];
         $rows = $q->get()->map(fn (IvfCycle $c) => [
             $c->patient?->name ?? '—',
             $c->cycle_number, strtoupper((string) $c->cycle_type), $c->protocol,
+            $doseLabels[$c->dose] ?? $c->dose,
             $stageLabels[$c->current_stage] ?? $c->current_stage,
             optional($c->start_date)->format('Y-m-d'),
-            $c->latestFollowup?->day_of_cycle,
-            optional($c->latestFollowup?->next_appointment)->format('Y-m-d'),
-            $c->is_pregnant === null ? '—' : ($c->is_pregnant ? 'نعم' : 'لا'),
+            optional($c->stimulation_start_date)->format('Y-m-d'),
+            optional($c->stimulation_end_date)->format('Y-m-d'),
+            optional($c->egg_retrieval_date)->format('Y-m-d'),
+            optional($c->fertilization_date)->format('Y-m-d'),
+            optional($c->embryo_transfer_date)->format('Y-m-d'),
+            $c->is_frozen ? 'نعم' : 'لا',
+            $c->is_pregnant === null ? '—' : ($c->is_pregnant ? 'إيجابية' : 'سلبية'),
         ])->all();
 
-        return ['ivf', ['المريضة', 'رقم الدورة', 'النوع', 'البروتوكول', 'المرحلة', 'تاريخ البدء', 'يوم الدورة', 'الموعد القادم', 'حمل'], $rows];
+        return ['ivf', ['المريضة', 'رقم الدورة', 'النوع', 'البروتوكول', 'الجرعة', 'المرحلة', 'تاريخ البدء', 'بداية التنشيط', 'نهاية التنشيط', 'سحب البويضات', 'التخصيب', 'إرجاع الأجنة', 'تجميد', 'النتيجة'], $rows];
     }
 
     private function reportPaymentRows(?Carbon $from, ?Carbon $to): array
@@ -666,7 +672,19 @@ class AdminController extends Controller
             'stats' => $this->ivfPageStats(),
             'tasks' => Setting::json('ivf_today_tasks'),
             'patientOptions' => $this->patientOptions(),
+            'patientData' => $this->patientContactMap(),
         ]);
+    }
+
+    /** id → {age, phone, address} so the new-cycle form can prefill patient fields. */
+    private function patientContactMap(): array
+    {
+        return Patient::orderBy('file_number')->get()
+            ->mapWithKeys(fn (Patient $p) => [$p->id => [
+                'age' => $p->age,
+                'phone' => $p->phone,
+                'address' => $p->address,
+            ]])->all();
     }
 
     private function ivfPageStats(): array
@@ -686,12 +704,33 @@ class AdminController extends Controller
     {
         $data = $request->validate([
             'patient_id' => ['required', 'exists:patients,id'],
+            'age' => ['nullable', 'integer', 'min:0', 'max:120'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:500'],
             'cycle_type' => ['required', 'string', 'max:50'],
             'protocol' => ['required', 'string', 'max:100'],
+            'dose' => ['nullable', 'in:normal,full'],
             'start_date' => ['required', 'date'],
             'current_stage' => ['required', 'in:consultation,stimulation,egg_retrieval,fertilization,embryo_transfer,pregnancy_test,completed'],
-            'day_of_cycle' => ['nullable', 'integer', 'min:1'],
-            'next_appointment' => ['nullable', 'date'],
+            'stimulation_start_date' => ['nullable', 'date'],
+            'stimulation_end_date' => ['nullable', 'date'],
+            'egg_retrieval_date' => ['nullable', 'date'],
+            'fertilization_date' => ['nullable', 'date'],
+            'embryo_transfer_date' => ['nullable', 'date'],
+            'is_frozen' => ['nullable', 'boolean'],
+            'final_result' => ['nullable', 'in:positive,negative'],
+        ]);
+
+        // Update the patient's editable contact fields (age lives in medical_history).
+        $patient = Patient::find($data['patient_id']);
+        $history = $patient->medical_history ?? [];
+        if (isset($data['age'])) {
+            $history['age'] = $data['age'];
+        }
+        $patient->update([
+            'phone' => $data['phone'] ?? $patient->phone,
+            'address' => $data['address'] ?? $patient->address,
+            'medical_history' => $history,
         ]);
 
         $number = IvfCycle::where('patient_id', $data['patient_id'])->max('cycle_number') + 1;
@@ -702,15 +741,23 @@ class AdminController extends Controller
             'cycle_number' => $number,
             'cycle_type' => $data['cycle_type'],
             'protocol' => $data['protocol'],
+            'dose' => $data['dose'] ?? null,
             'start_date' => $data['start_date'],
             'current_stage' => $data['current_stage'],
+            'stimulation_start_date' => $data['stimulation_start_date'] ?? null,
+            'stimulation_end_date' => $data['stimulation_end_date'] ?? null,
+            'egg_retrieval_date' => $data['egg_retrieval_date'] ?? null,
+            'fertilization_date' => $data['fertilization_date'] ?? null,
+            'embryo_transfer_date' => $data['embryo_transfer_date'] ?? null,
+            'is_frozen' => $request->boolean('is_frozen'),
+            'is_pregnant' => isset($data['final_result']) ? ($data['final_result'] === 'positive') : null,
         ]);
 
         IvfFollowup::create([
             'cycle_id' => $cycle->id,
             'followup_date' => $data['start_date'],
-            'day_of_cycle' => $data['day_of_cycle'] ?? 1,
-            'next_appointment' => $data['next_appointment'] ?? null,
+            'day_of_cycle' => 1,
+            'next_appointment' => $data['egg_retrieval_date'] ?? ($data['embryo_transfer_date'] ?? null),
         ]);
 
         return back()->with('status', __('saved'));
@@ -729,25 +776,28 @@ class AdminController extends Controller
     public function surgeries()
     {
         return view('admin.surgeries', [
-            'surgeries' => Surgery::with(['patient', 'staff'])
+            'surgeries' => Surgery::with(['patient' => fn ($q) => $q->withTrashed(), 'staff' => fn ($q) => $q->withTrashed()])
                 ->orderByDesc('scheduled_date')
                 ->get()
                 ->map(fn (Surgery $s) => [
                     'id' => $s->id,
                     'patient_id' => $s->patient_id,
-                    'patient' => $s->patient?->name ?? '',
+                    'patient' => $s->patient?->name ?? '—',
                     'file' => $s->patient?->file_number ?? '',
                     'operation' => $s->surgery_name,
                     'surgery_type' => $s->surgery_type,
                     'type' => __($s->surgery_type),
                     'date' => $s->scheduled_date?->format('Y-m-d'),
                     'time' => $s->scheduled_date?->format('H:i'),
-                    'doctor' => $s->staff?->name ?? 'د. محمد عوض',
+                    'doctor' => $s->doctor_name ?: ($s->staff?->name ?? 'د. محمد عوض'),
+                    'doctor_name' => $s->doctor_name,
+                    'description' => $s->notes,
                     'cost' => (float) $s->total_cost,
                     'status' => $s->status,
                 ])->all(),
             'stats' => $this->surgeryStats(),
             'patientOptions' => $this->patientOptions(),
+            'doctorOptions' => $this->doctorNameOptions(),
         ]);
     }
 
@@ -768,11 +818,13 @@ class AdminController extends Controller
         Surgery::create([
             'patient_id' => $data['patient_id'],
             'staff_id' => $this->doctorStaffId(),
+            'doctor_name' => $data['doctor_name'] ?? null,
             'surgery_type' => $data['surgery_type'],
             'surgery_name' => $data['surgery_name'],
             'scheduled_date' => Carbon::parse($data['date'] . ' ' . ($data['time'] ?? '09:00')),
             'status' => $data['status'],
             'total_cost' => $data['total_cost'] ?? 0,
+            'notes' => $data['notes'] ?? null,
         ]);
 
         return back()->with('status', __('saved'));
@@ -784,11 +836,13 @@ class AdminController extends Controller
 
         $surgery->update([
             'patient_id' => $data['patient_id'],
+            'doctor_name' => $data['doctor_name'] ?? null,
             'surgery_type' => $data['surgery_type'],
             'surgery_name' => $data['surgery_name'],
             'scheduled_date' => Carbon::parse($data['date'] . ' ' . ($data['time'] ?? '09:00')),
             'status' => $data['status'],
             'total_cost' => $data['total_cost'] ?? 0,
+            'notes' => $data['notes'] ?? null,
         ]);
 
         return back()->with('status', __('saved'));
@@ -811,7 +865,18 @@ class AdminController extends Controller
             'time' => ['nullable'],
             'status' => ['required', 'in:scheduled,pending,completed,cancelled'],
             'total_cost' => ['nullable', 'numeric', 'min:0'],
+            'doctor_name' => ['nullable', 'string', 'max:200'],
+            'notes' => ['nullable', 'string', 'max:2000'],
         ]);
+    }
+
+    /** Doctor-name suggestions for the surgery form's datalist. */
+    private function doctorNameOptions(): array
+    {
+        $staff = Staff::whereHas('user', fn ($q) => $q->whereIn('role', ['doctor', 'admin']))->get()->map->name;
+        $used = Surgery::whereNotNull('doctor_name')->distinct()->pluck('doctor_name');
+
+        return $staff->merge($used)->push('د. محمد عوض')->filter()->unique()->values()->all();
     }
 
     /* ---------------------------------------------------------------- Payments / invoices */

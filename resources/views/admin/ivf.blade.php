@@ -149,22 +149,64 @@
         </x-ui.card>
 
         {{-- New cycle modal --}}
-        <x-admin.modal title="{{ __('newCycleTitle') }}" var="newOpen" max-width="max-w-2xl">
-            <form method="POST" action="{{ route('admin.ivf.store') }}" class="grid md:grid-cols-2 gap-4">
+        <x-admin.modal title="{{ __('newCycleTitle') }}" var="newOpen" max-width="max-w-3xl">
+            <form method="POST" action="{{ route('admin.ivf.store') }}" class="grid md:grid-cols-2 gap-4"
+                  x-data="{
+                      patients: {{ Js::from($patientData) }},
+                      cid: '', age: '', phone: '', address: '',
+                      fill() { const p = this.patients[this.cid] || {}; this.age = p.age ?? ''; this.phone = p.phone ?? ''; this.address = p.address ?? ''; },
+                      init() { this.$watch('cid', () => this.fill()); }
+                  }">
                 @csrf
+
+                {{-- Patient (pick existing; contact fields prefill and stay editable) --}}
                 <div class="md:col-span-2">
-                    <x-ui.select :label="__('patient_name')" name="patient_id" :options="$patientOptions" :placeholder="__('selectPatient')" required />
+                    <x-ui.select :label="__('patient_name')" name="patient_id" :options="$patientOptions" :placeholder="__('selectPatient')" x-model="cid" required />
                 </div>
+                <x-ui.input :label="__('age')" name="age" type="number" min="0" max="120" x-model="age" />
+                <x-ui.input :label="__('phone')" name="phone" type="tel" x-model="phone" />
+                <div class="md:col-span-2">
+                    <x-ui.input :label="__('address')" name="address" x-model="address" />
+                </div>
+
+                {{-- Cycle basics --}}
+                <x-ui.input :label="__('date')" name="start_date" type="date" value="{{ now()->toDateString() }}" required />
                 <x-ui.select :label="__('cycleType')" name="cycle_type" :options="[
                     ['value' => 'ICSI', 'label' => 'ICSI'],
                     ['value' => 'IVF', 'label' => 'IVF'],
                     ['value' => 'IUI', 'label' => 'IUI'],
                 ]" required />
-                <x-ui.input :label="__('protocol')" name="protocol" required />
-                <x-ui.select :label="__('cycleStage')" name="current_stage" :options="collect($stageConfig)->map(fn ($c, $k) => ['value' => $k, 'label' => $c['label']])->values()->all()" required />
-                <x-ui.input :label="__('dayOfCycle')" name="day_of_cycle" type="number" min="1" value="1" />
-                <x-ui.input :label="__('date')" name="start_date" type="date" required />
-                <x-ui.input :label="__('nextAppointment')" name="next_appointment" type="date" />
+                <x-ui.select :label="__('protocol')" name="protocol" :options="[
+                    ['value' => 'agonist', 'label' => 'Agonist'],
+                    ['value' => 'antagonist', 'label' => 'Antagonist'],
+                ]" required />
+                <x-ui.select :label="__('dose')" name="dose" :options="[
+                    ['value' => 'normal', 'label' => __('doseNormal')],
+                    ['value' => 'full', 'label' => __('doseFull')],
+                ]" />
+                <div class="md:col-span-2">
+                    <x-ui.select :label="__('cycleStage')" name="current_stage" :options="collect($stageConfig)->map(fn ($c, $k) => ['value' => $k, 'label' => $c['label']])->values()->all()" required />
+                </div>
+
+                {{-- Stimulation --}}
+                <x-ui.input :label="__('stimulationStart')" name="stimulation_start_date" type="date" />
+                <x-ui.input :label="__('stimulationEnd')" name="stimulation_end_date" type="date" />
+
+                {{-- Procedure dates + outcome --}}
+                <x-ui.input :label="__('eggRetrievalDate')" name="egg_retrieval_date" type="date" />
+                <x-ui.input :label="__('fertilizationDate')" name="fertilization_date" type="date" />
+                <x-ui.input :label="__('embryoTransferDate')" name="embryo_transfer_date" type="date" />
+                <x-ui.select :label="__('freezing')" name="is_frozen" :options="[
+                    ['value' => '0', 'label' => __('no')],
+                    ['value' => '1', 'label' => __('yes')],
+                ]" />
+                <div class="md:col-span-2">
+                    <x-ui.select :label="__('finalResult')" name="final_result" :options="[
+                        ['value' => 'positive', 'label' => __('resultPositive')],
+                        ['value' => 'negative', 'label' => __('resultNegative')],
+                    ]" :placeholder="__('notDetermined')" />
+                </div>
+
                 <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                     <x-ui.button type="button" variant="outline" size="sm" x-on:click="newOpen = false">{{ __('cancel') }}</x-ui.button>
                     <x-ui.button type="submit" variant="primary" size="sm">{{ __('startCycle') }}</x-ui.button>
