@@ -29,6 +29,7 @@ Route::delete('/appointments/{appointment}', [AdminController::class, 'destroyAp
 
 // IVF cycles
 Route::post('/ivf', [AdminController::class, 'storeCycle'])->name('ivf.store');
+Route::put('/ivf/{cycle}', [AdminController::class, 'updateCycle'])->name('ivf.update');
 Route::delete('/ivf/{cycle}', [AdminController::class, 'destroyCycle'])->name('ivf.destroy');
 
 // Surgeries

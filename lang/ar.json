@@ -448,6 +448,9 @@
     "notDetermined": "لم تتحدد",
     "surgeryDescription": "وصف العملية",
     "chooseOrTypeDoctor": "اختر أو اكتب اسم الطبيب",
+    "close": "إغلاق",
+    "fileNumber": "رقم الملف",
+    "freezingPlaceholder": "مثال: تم تجميد 3 أجنة",
     "sendBookingRequest": "إرسال طلب الحجز",
     "reviewRequest": "مراجعة الطلب"
 }

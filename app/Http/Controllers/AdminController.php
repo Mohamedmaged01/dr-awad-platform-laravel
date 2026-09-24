@@ -440,7 +440,7 @@ class AdminController extends Controller
             optional($c->egg_retrieval_date)->format('Y-m-d'),
             optional($c->fertilization_date)->format('Y-m-d'),
             optional($c->embryo_transfer_date)->format('Y-m-d'),
-            $c->is_frozen ? 'نعم' : 'لا',
+            $c->freezing_note,
             $c->is_pregnant === null ? '—' : ($c->is_pregnant ? 'إيجابية' : 'سلبية'),
         ])->all();
 
@@ -753,7 +753,39 @@ class AdminController extends Controller
 
     public function storeCycle(Request $request)
     {
-        $data = $request->validate([
+        $data = $this->validateCycle($request);
+        $this->syncCyclePatient($data);
+
+        $number = IvfCycle::where('patient_id', $data['patient_id'])->max('cycle_number') + 1;
+
+        $cycle = IvfCycle::create($this->cycleAttributes($data) + [
+            'staff_id' => $this->doctorStaffId(),
+            'cycle_number' => $number,
+        ]);
+
+        IvfFollowup::create([
+            'cycle_id' => $cycle->id,
+            'followup_date' => $data['start_date'],
+            'day_of_cycle' => 1,
+            'next_appointment' => $data['egg_retrieval_date'] ?? ($data['embryo_transfer_date'] ?? null),
+        ]);
+
+        return back()->with('status', __('saved'));
+    }
+
+    /** Edit an existing IVF cycle (view/edit icons on the cycle cards). */
+    public function updateCycle(Request $request, IvfCycle $cycle)
+    {
+        $data = $this->validateCycle($request);
+        $this->syncCyclePatient($data);
+        $cycle->update($this->cycleAttributes($data));
+
+        return back()->with('status', __('saved'));
+    }
+
+    private function validateCycle(Request $request): array
+    {
+        return $request->validate([
             'patient_id' => ['required', 'exists:patients,id'],
             'age' => ['nullable', 'integer', 'min:0', 'max:120'],
             'phone' => ['nullable', 'string', 'max:20'],
@@ -768,28 +800,16 @@ class AdminController extends Controller
             'egg_retrieval_date' => ['nullable', 'date'],
             'fertilization_date' => ['nullable', 'date'],
             'embryo_transfer_date' => ['nullable', 'date'],
-            'is_frozen' => ['nullable', 'boolean'],
+            'freezing_note' => ['nullable', 'string', 'max:500'],
             'final_result' => ['nullable', 'in:positive,negative'],
         ]);
+    }
 
-        // Update the patient's editable contact fields (age lives in medical_history).
-        $patient = Patient::find($data['patient_id']);
-        $history = $patient->medical_history ?? [];
-        if (isset($data['age'])) {
-            $history['age'] = $data['age'];
-        }
-        $patient->update([
-            'phone' => $data['phone'] ?? $patient->phone,
-            'address' => $data['address'] ?? $patient->address,
-            'medical_history' => $history,
-        ]);
-
-        $number = IvfCycle::where('patient_id', $data['patient_id'])->max('cycle_number') + 1;
-
-        $cycle = IvfCycle::create([
+    /** Map validated cycle input to the model columns (shared by store + update). */
+    private function cycleAttributes(array $data): array
+    {
+        return [
             'patient_id' => $data['patient_id'],
-            'staff_id' => $this->doctorStaffId(),
-            'cycle_number' => $number,
             'cycle_type' => $data['cycle_type'],
             'protocol' => $data['protocol'],
             'dose' => $data['dose'] ?? null,
@@ -800,18 +820,24 @@ class AdminController extends Controller
             'egg_retrieval_date' => $data['egg_retrieval_date'] ?? null,
             'fertilization_date' => $data['fertilization_date'] ?? null,
             'embryo_transfer_date' => $data['embryo_transfer_date'] ?? null,
-            'is_frozen' => $request->boolean('is_frozen'),
+            'freezing_note' => $data['freezing_note'] ?? null,
             'is_pregnant' => isset($data['final_result']) ? ($data['final_result'] === 'positive') : null,
-        ]);
+        ];
+    }
 
-        IvfFollowup::create([
-            'cycle_id' => $cycle->id,
-            'followup_date' => $data['start_date'],
-            'day_of_cycle' => 1,
-            'next_appointment' => $data['egg_retrieval_date'] ?? ($data['embryo_transfer_date'] ?? null),
+    /** Persist the patient's editable contact fields from the cycle form. */
+    private function syncCyclePatient(array $data): void
+    {
+        $patient = Patient::find($data['patient_id']);
+        $history = $patient->medical_history ?? [];
+        if (isset($data['age'])) {
+            $history['age'] = $data['age'];
+        }
+        $patient->update([
+            'phone' => $data['phone'] ?? $patient->phone,
+            'address' => $data['address'] ?? $patient->address,
+            'medical_history' => $history,
         ]);
-
-        return back()->with('status', __('saved'));
     }
 
     public function destroyCycle(IvfCycle $cycle)

@@ -448,6 +448,9 @@
     "notDetermined": "Not determined",
     "surgeryDescription": "Operation description",
     "chooseOrTypeDoctor": "Choose or type a doctor's name",
+    "close": "Close",
+    "fileNumber": "File number",
+    "freezingPlaceholder": "e.g. 3 embryos frozen",
     "sendBookingRequest": "Send booking request",
     "reviewRequest": "Review your request"
 }
