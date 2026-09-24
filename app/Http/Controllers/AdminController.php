@@ -172,6 +172,7 @@ class AdminController extends Controller
             'appointmentReport' => $this->appointmentReport(),
             'ivfReport' => $this->ivfReport(),
             'patientTypeReport' => $this->patientTypeReport(),
+            'patientOptions' => $this->patientOptions(),
         ]);
     }
 
@@ -281,20 +282,8 @@ class AdminController extends Controller
      */
     public function exportReport(Request $request)
     {
-        $type = $request->query('type', 'patients');
-        $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : null;
-        $to = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : null;
-
-        [$name, $headers, $rows] = match ($type) {
-            'staff' => $this->reportStaffRows($from, $to),
-            'surgeries' => $this->reportSurgeryRows($from, $to),
-            'payments' => $this->reportPaymentRows($from, $to),
-            'appointments' => $this->reportAppointmentRows($from, $to),
-            'ivf' => $this->reportIvfRows($from, $to),
-            'patients_check' => $this->reportCheckPatientRows($from, $to),
-            'patients_surgery' => $this->reportSurgeryPatientRows($from, $to),
-            default => $this->reportPatientRows($from, $to),
-        };
+        [$type, $from, $to, $patientId] = $this->reportParams($request);
+        [$name, , $headers, $rows] = $this->reportData($type, $from, $to, $patientId);
 
         $suffix = ($from ? $from->format('Ymd') : 'all') . '-' . ($to ? $to->format('Ymd') : 'all');
         $filename = "report-{$name}-{$suffix}.csv";
@@ -310,9 +299,67 @@ class AdminController extends Controller
         }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
-    private function reportPatientRows(?Carbon $from, ?Carbon $to): array
+    /** Printable report (official header + logo); staff use the browser to save as PDF. */
+    public function printReport(Request $request)
     {
-        $q = Patient::orderByDesc('created_at');
+        [$type, $from, $to, $patientId] = $this->reportParams($request);
+        [, $title, $headers, $rows] = $this->reportData($type, $from, $to, $patientId);
+        $patient = $patientId ? Patient::withTrashed()->find($patientId) : null;
+
+        return view('admin.report-print', compact('title', 'headers', 'rows', 'from', 'to', 'patient'));
+    }
+
+    /** Shared query params for both export + print. */
+    private function reportParams(Request $request): array
+    {
+        return [
+            $request->query('type', 'patients'),
+            $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : null,
+            $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : null,
+            $request->query('patient_id') ?: null,
+        ];
+    }
+
+    /** [machine-name, title, headers[], rows[]] for a report type. */
+    private function reportData(string $type, ?Carbon $from, ?Carbon $to, ?string $patientId): array
+    {
+        return match ($type) {
+            'staff' => $this->reportStaffRows($from, $to),
+            'users' => $this->reportUsersRows(),
+            'surgeries' => $this->reportSurgeryRows($from, $to, $patientId),
+            'payments' => $this->reportPaymentRows($from, $to, $patientId),
+            'appointments' => $this->reportAppointmentRows($from, $to, $patientId),
+            'ivf' => $this->reportIvfRows($from, $to, $patientId),
+            'patients_check' => $this->reportCheckPatientRows($from, $to),
+            'patients_surgery' => $this->reportSurgeryPatientRows($from, $to),
+            default => $this->reportPatientRows($from, $to, $patientId),
+        };
+    }
+
+    /** System users + their role and the features their role can access. */
+    private function reportUsersRows(): array
+    {
+        $roleLabels = config('clinic.role_labels');
+        $rows = User::with('staff')->whereIn('role', config('clinic.staff_roles'))->orderBy('role')->get()
+            ->map(function (User $u) use ($roleLabels) {
+                $features = collect(\App\Support\Access::allowedMenu($u->role))->map(fn ($i) => __($i['name']))->implode('، ');
+
+                return [
+                    $u->staff?->name ?: '—',
+                    $u->email,
+                    isset($roleLabels[$u->role]) ? __($roleLabels[$u->role]) : $u->role,
+                    $u->is_active ? 'نشط' : 'موقوف',
+                    $features,
+                ];
+            })->all();
+
+        return ['users', 'تقرير مستخدمي النظام والصلاحيات', ['الاسم', 'البريد الإلكتروني', 'الدور', 'الحالة', 'الصلاحيات'], $rows];
+    }
+
+    private function reportPatientRows(?Carbon $from, ?Carbon $to, ?string $patientId = null): array
+    {
+        $q = Patient::withTrashed()->orderByDesc('created_at');
+        $patientId && $q->where('id', $patientId);
         $from && $q->where('created_at', '>=', $from);
         $to && $q->where('created_at', '<=', $to);
 
@@ -322,7 +369,7 @@ class AdminController extends Controller
             optional($p->created_at)->format('Y-m-d H:i'),
         ])->all();
 
-        return ['patients', ['رقم الملف', 'الاسم', 'الهاتف', 'البريد الإلكتروني', 'العمر', 'نوع الحالة', 'آخر زيارة', 'الحالة', 'تاريخ الإضافة'], $rows];
+        return ['patients', 'تقرير المريضات', ['رقم الملف', 'الاسم', 'الهاتف', 'البريد الإلكتروني', 'العمر', 'نوع الحالة', 'آخر زيارة', 'الحالة', 'تاريخ الإضافة'], $rows];
     }
 
     private function reportStaffRows(?Carbon $from, ?Carbon $to): array
@@ -340,14 +387,15 @@ class AdminController extends Controller
             optional($s->created_at)->format('Y-m-d H:i'),
         ])->all();
 
-        return ['staff', ['الاسم', 'الدور', 'المسمى الوظيفي', 'الهاتف', 'البريد الإلكتروني', 'الحالة', 'تاريخ الإضافة'], $rows];
+        return ['staff', 'تقرير الفريق الطبي', ['الاسم', 'الدور', 'المسمى الوظيفي', 'الهاتف', 'البريد الإلكتروني', 'الحالة', 'تاريخ الإضافة'], $rows];
     }
 
-    private function reportSurgeryRows(?Carbon $from, ?Carbon $to): array
+    private function reportSurgeryRows(?Carbon $from, ?Carbon $to, ?string $patientId = null): array
     {
         $typeLabels = ['laparoscopy' => 'مناظير', 'hysteroscopy' => 'منظار رحمي', 'cesarean' => 'قيصرية', 'natural_delivery' => 'ولادة طبيعية', 'other' => 'أخرى'];
         $statusLabels = ['scheduled' => 'مجدولة', 'pending' => 'معلقة', 'completed' => 'مكتملة', 'cancelled' => 'ملغية'];
         $q = Surgery::with(['patient' => fn ($x) => $x->withTrashed(), 'staff' => fn ($x) => $x->withTrashed()])->orderByDesc('scheduled_date');
+        $patientId && $q->where('patient_id', $patientId);
         $from && $q->where('scheduled_date', '>=', $from);
         $to && $q->where('scheduled_date', '<=', $to);
 
@@ -359,7 +407,7 @@ class AdminController extends Controller
             $statusLabels[$s->status] ?? $s->status,
         ])->all();
 
-        return ['surgeries', ['المريضة', 'رقم الملف', 'العملية', 'النوع', 'التاريخ', 'الوقت', 'الطبيب', 'التكلفة', 'الحالة'], $rows];
+        return ['surgeries', 'تقرير العمليات', ['المريضة', 'رقم الملف', 'العملية', 'النوع', 'التاريخ', 'الوقت', 'الطبيب', 'التكلفة', 'الحالة'], $rows];
     }
 
     /** Consultation patients — those with appointments (optionally within a range). */
@@ -377,7 +425,7 @@ class AdminController extends Controller
                 $p->file_number, $p->name, $p->phone, $p->age, $p->case_type, $p->visits, $p->last_visit,
             ])->all();
 
-        return ['patients-check', ['رقم الملف', 'الاسم', 'الهاتف', 'العمر', 'نوع الحالة', 'عدد الكشوفات', 'آخر زيارة'], $rows];
+        return ['patients-check', 'تقرير مريضات الكشف', ['رقم الملف', 'الاسم', 'الهاتف', 'العمر', 'نوع الحالة', 'عدد الكشوفات', 'آخر زيارة'], $rows];
     }
 
     /** Surgery patients — those with surgeries (optionally within a range). */
@@ -396,10 +444,10 @@ class AdminController extends Controller
                 $p->file_number, $p->name, $p->phone, $p->age, $p->ops, number_format((float) $p->ops_cost),
             ])->all();
 
-        return ['patients-surgery', ['رقم الملف', 'الاسم', 'الهاتف', 'العمر', 'عدد العمليات', 'إجمالي التكلفة'], $rows];
+        return ['patients-surgery', 'تقرير مريضات العمليات', ['رقم الملف', 'الاسم', 'الهاتف', 'العمر', 'عدد العمليات', 'إجمالي التكلفة'], $rows];
     }
 
-    private function reportAppointmentRows(?Carbon $from, ?Carbon $to): array
+    private function reportAppointmentRows(?Carbon $from, ?Carbon $to, ?string $patientId = null): array
     {
         $statusLabels = ['pending' => 'معلق', 'confirmed' => 'مؤكد', 'waiting' => 'في الانتظار', 'completed' => 'مكتمل', 'cancelled' => 'ملغي', 'no_show' => 'لم يحضر'];
         $q = Appointment::with([
@@ -407,6 +455,7 @@ class AdminController extends Controller
             'branch' => fn ($x) => $x->withTrashed(),
             'service' => fn ($x) => $x->withTrashed(),
         ])->orderByDesc('appointment_date');
+        $patientId && $q->where('patient_id', $patientId);
         $from && $q->where('appointment_date', '>=', $from);
         $to && $q->where('appointment_date', '<=', $to);
 
@@ -418,13 +467,14 @@ class AdminController extends Controller
             $a->notes ?: $a->patient_notes,
         ])->all();
 
-        return ['appointments', ['المريضة', 'الهاتف', 'الفرع', 'الخدمة', 'التاريخ', 'الوقت', 'الحالة', 'ملاحظات'], $rows];
+        return ['appointments', 'تقرير الكشوفات', ['المريضة', 'الهاتف', 'الفرع', 'الخدمة', 'التاريخ', 'الوقت', 'الحالة', 'ملاحظات'], $rows];
     }
 
-    private function reportIvfRows(?Carbon $from, ?Carbon $to): array
+    private function reportIvfRows(?Carbon $from, ?Carbon $to, ?string $patientId = null): array
     {
         $stageLabels = ['consultation' => 'استشارة', 'stimulation' => 'تنشيط', 'egg_retrieval' => 'سحب البويضات', 'fertilization' => 'التخصيب', 'embryo_transfer' => 'زرع الأجنة', 'pregnancy_test' => 'تحليل الحمل', 'completed' => 'مكتملة'];
         $q = IvfCycle::with(['patient' => fn ($x) => $x->withTrashed(), 'latestFollowup'])->orderByDesc('start_date');
+        $patientId && $q->where('patient_id', $patientId);
         $from && $q->where('start_date', '>=', $from);
         $to && $q->where('start_date', '<=', $to);
 
@@ -444,12 +494,13 @@ class AdminController extends Controller
             $c->is_pregnant === null ? '—' : ($c->is_pregnant ? 'إيجابية' : 'سلبية'),
         ])->all();
 
-        return ['ivf', ['المريضة', 'رقم الدورة', 'النوع', 'البروتوكول', 'الجرعة', 'المرحلة', 'تاريخ البدء', 'بداية التنشيط', 'نهاية التنشيط', 'سحب البويضات', 'التخصيب', 'إرجاع الأجنة', 'تجميد', 'النتيجة'], $rows];
+        return ['ivf', 'تقرير الحقن المجهري', ['المريضة', 'رقم الدورة', 'النوع', 'البروتوكول', 'الجرعة', 'المرحلة', 'تاريخ البدء', 'بداية التنشيط', 'نهاية التنشيط', 'سحب البويضات', 'التخصيب', 'إرجاع الأجنة', 'تجميد', 'النتيجة'], $rows];
     }
 
-    private function reportPaymentRows(?Carbon $from, ?Carbon $to): array
+    private function reportPaymentRows(?Carbon $from, ?Carbon $to, ?string $patientId = null): array
     {
         $q = Payment::with('invoice.patient')->orderByDesc('paid_at');
+        $patientId && $q->whereHas('invoice', fn ($x) => $x->where('patient_id', $patientId));
         $from && $q->where('paid_at', '>=', $from);
         $to && $q->where('paid_at', '<=', $to);
 
@@ -460,7 +511,7 @@ class AdminController extends Controller
             optional($p->paid_at)->format('Y-m-d H:i'),
         ])->all();
 
-        return ['payments', ['رقم الفاتورة', 'المريضة', 'المبلغ', 'طريقة الدفع', 'الحالة', 'تاريخ الدفع'], $rows];
+        return ['payments', 'تقرير المدفوعات', ['رقم الفاتورة', 'المريضة', 'المبلغ', 'طريقة الدفع', 'الحالة', 'تاريخ الدفع'], $rows];
     }
 
     /* ---------------------------------------------------------------- Patients */
